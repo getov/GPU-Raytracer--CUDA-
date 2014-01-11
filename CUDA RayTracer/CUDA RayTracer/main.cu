@@ -16,7 +16,7 @@
 #include "Node.cuh"
 #include "Lambert.cuh"
 #include "Plane.cuh"
-
+	
 using namespace std;
 
 extern "C" void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes);
@@ -24,14 +24,14 @@ extern "C" void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geo
 Color vfb[RES_X][RES_Y];
 
 // used for GPU operations
-Color vfb_linear[RES_X * RES_Y];
+Color vfb_linear[RES_X * RES_Y]; 
 
-const int ARR_SIZE = 3;
+//const int ARR_SIZE = 3;
 
 Camera* camera;
-Geometry* geometry[ARR_SIZE];
-Shader* shaders[ARR_SIZE];
-Node* nodes[ARR_SIZE];
+Geometry* geometry[GEOM_COUNT];
+Shader* shaders[GEOM_COUNT];
+Node* nodes[GEOM_COUNT];
 
 void printGPUSpecs()
 {
@@ -139,20 +139,20 @@ int main(int argc, char** argv)
 	cudaMalloc((void**)&dev_cam, sizeof(Camera));
 
 	Geometry** dev_geom;
-	cudaMalloc((void**)&dev_geom, sizeof(Geometry) * ARR_SIZE);
+	cudaMalloc((void**)&dev_geom, sizeof(Geometry) * GEOM_COUNT);
 
 	Shader** dev_shaders;
-	cudaMalloc((void**)&dev_shaders, sizeof(Shader) * ARR_SIZE);
+	cudaMalloc((void**)&dev_shaders, sizeof(Shader) * GEOM_COUNT);
 
 	Node** dev_nodes;
-	cudaMalloc((void**)&dev_nodes, sizeof(Node) * ARR_SIZE);
+	cudaMalloc((void**)&dev_nodes, sizeof(Node) * GEOM_COUNT);
 	
 	// 2. memcpy HostToDevice
 	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * RES_X * RES_Y, cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_cam, camera, sizeof(Camera), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_geom, geometry, sizeof(Geometry) * ARR_SIZE, cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_shaders, shaders, sizeof(Shader) * ARR_SIZE, cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_nodes, nodes, sizeof(Node) * ARR_SIZE, cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_geom, geometry, sizeof(Geometry) * GEOM_COUNT, cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_shaders, shaders, sizeof(Shader) * GEOM_COUNT, cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_nodes, nodes, sizeof(Node) * GEOM_COUNT, cudaMemcpyHostToDevice);
 
 	// 3. call kernels
 	// - InitializeScene
@@ -161,10 +161,6 @@ int main(int argc, char** argv)
 
 	// 4. memcpy DeviceToHost
 	cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
-	/*cudaMemcpy(camera, dev_cam, sizeof(Camera), cudaMemcpyDeviceToHost);
-	cudaMemcpy(geometry, dev_geom, sizeof(Geometry), cudaMemcpyDeviceToHost);
-	cudaMemcpy(shaders, dev_shaders, sizeof(Shader), cudaMemcpyDeviceToHost);
-	cudaMemcpy(nodes, dev_nodes, sizeof(Node), cudaMemcpyDeviceToHost);*/
 
 	// get stop time, and display the timing results
 	cudaStopTimer(start, stop);

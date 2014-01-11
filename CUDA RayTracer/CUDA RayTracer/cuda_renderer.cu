@@ -30,7 +30,7 @@ bool testVisibility(Node** dev_nodes, const IntersectionData& data)
 	IntersectionData temp;
 	temp.dist = (lightPos - ray.start).length();
 	
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < GEOM_COUNT; ++i)
 	{
 		if (dev_nodes[i]->geom->intersect(ray, temp))
 		{
@@ -79,7 +79,7 @@ Color raytrace(Ray ray, Geometry** dev_geom, Shader** dev_shaders, Node** dev_no
 
 	data.dist = 1e99;
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < GEOM_COUNT; i++)
 	{
 		if (dev_nodes[i]->geom->intersect(ray, data))
 		{
@@ -104,7 +104,7 @@ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** 
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
 	int offset = x + y * blockDim.x * gridDim.x;
-		
+
 	Ray ray = dev_cam->getScreenRay(x, y); 
 	
 	if (offset < RES_X * RES_Y)
@@ -121,11 +121,11 @@ void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader**
 {
 	initializeScene<<<1, 1>>>(dev_cam, dev_geom, dev_shaders, dev_nodes);
 
-	const int THREADS_PER_BLOCK = 32;  //32, 192, 64
+	//const int THREADS_PER_BLOCK = 32;  //32, 192, 64
 
-	// Grid of (RES_X / THREADS_PER_BLOCK) * (RES_Y / THREADS_PER_BLOCK) blocks
-	dim3 BLOCKS(RES_X / THREADS_PER_BLOCK, RES_Y / THREADS_PER_BLOCK); 
-	dim3 THREADS(THREADS_PER_BLOCK, THREADS_PER_BLOCK);
+	dim3 THREADS_PER_BLOCK(32, 32); // 32*32 = 1024 (max threads per block supported)
 
-	renderScene<<<BLOCKS, THREADS>>>(dev_vfb, dev_cam, dev_geom, dev_shaders, dev_nodes);
+	dim3 BLOCKS(RES_X / THREADS_PER_BLOCK.x, RES_Y / THREADS_PER_BLOCK.y); 
+
+	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, dev_cam, dev_geom, dev_shaders, dev_nodes);
 }
