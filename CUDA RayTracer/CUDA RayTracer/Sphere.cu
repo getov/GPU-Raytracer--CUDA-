@@ -3,29 +3,57 @@
 
 __device__ bool Sphere::intersect(Ray ray, IntersectionData& data)
 {
-	// compute the sphere intersection using a quadratic equation:
-	Vector H = ray.start - m_center;
-	double A = ray.dir.lengthSqr();
-	double B = 2 * dot(H, ray.dir);
-	double C = H.lengthSqr() - m_radius*m_radius;
-	double Dscr = B*B - 4*A*C;
-	if (Dscr < 0) return false; // no solutions to the quadratic equation - then we don't have an intersection.
-	double x1, x2;
-	x1 = (-B + sqrt(Dscr)) / (2*A);
-	x2 = (-B - sqrt(Dscr)) / (2*A);
-	double sol = x2; // get the closer of the two solutions...
-	if (sol < 0) sol = x1; // ... but if it's behind us, opt for the other one
-	if (sol < 0) return false; // ... still behind? Then the whole sphere is behind us - no intersection.
+	Vector sphereSpaceOrigin = ray.start - m_center;
+
+	float a = ray.dir.lengthSqr();
+	float b = 2 * dot(sphereSpaceOrigin, ray.dir);
+	float c = sphereSpaceOrigin.lengthSqr() - m_radius * m_radius;
+
+	float x1, x2;
+	if(solveQuadraticEquation(a, b, c, x1, x2))
+	{
+		if(x1 < 0 && x2 < 0)
+		{
+			//behind the ray
+			return false;
+		}
+
+		float solution;
+		if(x1 < 0 && x2 >= 0)
+		{
+			// start within the sphere
+			// single intersection point
+			solution = x2;
+		}
+		else if(x1 >= 0 && x2 < 0)
+		{
+			// start within the sphere
+			// single intersection point
+			solution = x1;
+		}
+		else
+		{
+			// two intersection points
+			// choose the closest
+			solution = x1 < x2 ? x1 : x2;
+		}
+
+		if (solution > data.dist)
+		{
+			return false;
+		}
+
+		data.p = ray.start + solution * ray.dir;
+		data.dist = solution;
+		data.normal = data.p - m_center;
+		data.normal.normalize();
+
+		Vector relative = data.p - sphereSpaceOrigin;
+		data.u = toDegrees(std::acos(relative.y));
+		data.v = toDegrees(std::atan2(relative.z, relative.x));
+
+		return true;
+	}
 	
-	// if the distance to the intersection doesn't optimize our current distance, bail out:
-	if (sol > data.dist) return false;
-	
-	data.dist = sol;
-	data.p = ray.start + ray.dir * sol;
-	data.normal = data.p - m_center; // generate the normal by getting the direction from the center to the ip
-	data.normal.normalize();
-	data.u = (3.141592653589793238 + atan2(data.p.z - m_center.z, data.p.x - m_center.x))/(2*3.141592653589793238);
-	data.v = 1.0 - (3.141592653589793238/2 + asin((data.p.y - m_center.y)/m_radius)) / 3.141592653589793238;
-	data.g = this;
-	return true;
+	return false;
 }

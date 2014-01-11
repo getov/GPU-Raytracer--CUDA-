@@ -80,7 +80,6 @@ __device__ Color raytrace(Ray ray, Geometry** dev_geom, Shader** dev_shaders, No
 	return closestNode->shader->shade(ray, data);
 }
 
-// TO IMPLEMENT
 __global__ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
 {
 	// map from threadIdx/BlockIdx to pixel position
