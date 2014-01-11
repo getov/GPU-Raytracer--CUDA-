@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Geometry">
+      <UniqueIdentifier>{5e97f247-96e4-43f1-b645-78e1e938366f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{1d06affb-998c-415b-8515-a07f66537f69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{aac797c2-f4a8-40e2-85f3-15c1b5c670a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{6616f7b8-cafa-4f1b-9922-4caaad1b83f4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Color.cuh">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix.cuh">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3D.cuh">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.cuh">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.cuh" />
+    <ClInclude Include="sdl.cuh" />
+    <ClInclude Include="Util.cuh" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="sdl.cu" />
+    <CudaCompile Include="cuda_renderer.cu" />
+    <CudaCompile Include="Plane.cu">
+      <Filter>Geometry</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Matrix.cu">
+      <Filter>Math</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Lambert.cu">
+      <Filter>Shaders</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Camera.cu">
+      <Filter>Camera</Filter>
+    </CudaCompile>
+    <CudaCompile Include="IShader.cu">
+      <Filter>Shaders</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Sphere.cu">
+      <Filter>Geometry</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cuda_renderer.cuh" />
+    <None Include="IGeometry.cuh">
+      <Filter>Geometry</Filter>
+    </None>
+    <None Include="Plane.cuh">
+      <Filter>Geometry</Filter>
+    </None>
+    <None Include="IShader.cuh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Lambert.cuh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Node.cuh">
+      <Filter>Geometry</Filter>
+    </None>
+    <None Include="Sphere.cuh">
+      <Filter>Geometry</Filter>
+    </None>
+  </ItemGroup>
+</Project>
