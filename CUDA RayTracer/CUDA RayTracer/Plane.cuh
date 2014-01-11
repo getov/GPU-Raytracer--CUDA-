@@ -11,11 +11,13 @@ private:
 	double _y;
 
 public:
-	__device__ Plane(double y) 
+	__device__ 
+	Plane(double y) 
 		: _y(y) 
 	{}
 
-	__device__ bool intersect(Ray ray, IntersectionData& data);
+	__device__ 
+	bool intersect(Ray ray, IntersectionData& data);
 };
 
 #endif

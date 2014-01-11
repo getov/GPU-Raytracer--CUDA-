@@ -1,6 +1,7 @@
 #include "Plane.cuh"
 
-__device__ bool Plane::intersect(Ray ray, IntersectionData& data)
+__device__
+bool Plane::intersect(Ray ray, IntersectionData& data)
 {
 	// intersect a ray with a XZ plane:
 	// if the ray is pointing to the horizon, or "up", but the plane is below us,

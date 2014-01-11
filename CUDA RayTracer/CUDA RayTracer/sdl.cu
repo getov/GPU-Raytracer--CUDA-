@@ -25,31 +25,18 @@
 
 SDL_Surface* screen = NULL;
 
-__device__ SDL_Surface* dev_screen = NULL;
-
-//void cudaAllocateSDL_Screen()
-//{
-//	//cudaMalloc((void**)&dev_vfb, sizeof(Color) * RES_X * RES_Y);
-//	cudaMalloc((void**)&dev_screen, sizeof(SDL_Surface));
-//
-//	//cudaMemcpy(dev_cam, camera, sizeof(Camera), cudaMemcpyHostToDevice);
-//	cudaMemcpy(dev_screen, screen, sizeof(SDL_Surface), cudaMemcpyHostToDevice);
-//
-//	//cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
-//}
-
 /// try to create a frame window with the given dimensions
 bool initGraphics(int frameWidth, int frameHeight)
 {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
 		printf("Cannot initialize SDL: %s\n", SDL_GetError());
 		return false;
 	}
 	screen = SDL_SetVideoMode(frameWidth, frameHeight, 32, 0);
 
-	//cudaAllocateSDL_Screen();
-
-	if (!screen) {
+	if (!screen)
+	{
 		printf("Cannot set video mode %dx%d - %s\n", frameWidth, frameHeight, SDL_GetError());
 		return false;
 	}
@@ -68,7 +55,8 @@ void displayVFB(Color vfb[RES_X][RES_Y])
 	int rs = screen->format->Rshift;
 	int gs = screen->format->Gshift;
 	int bs = screen->format->Bshift;
-	for (int y = 0; y < screen->h; y++) {
+	for (int y = 0; y < screen->h; y++)
+	{
 		Uint32 *row = (Uint32*) ((Uint8*) screen->pixels + y * screen->pitch);
 		for (int x = 0; x < screen->w; x++)
 			row[x] = vfb[y][x].toRGB32(rs, gs, bs);
@@ -113,18 +101,5 @@ int frameWidth(void)
 int frameHeight(void)
 {
 	if (screen) return screen->h;
-	return 0;
-}
-
-__device__ int d_frameWidth()
-{
-	if (dev_screen) return dev_screen->w;
-	return 0;
-}
-
-/// returns the frame height
-__device__ int d_frameHeight()
-{
-	if (dev_screen) return dev_screen->h;
 	return 0;
 }

@@ -16,19 +16,33 @@
 #include "Lambert.cuh"
 #include "Sphere.cuh"
 
-//thrust::device_ptr<Camera> camera = thrust::device_malloc<Camera>(sizeof(Camera));
+__device__ 
+bool testVisibility(Node** dev_nodes, const IntersectionData& data)
+{
+	//Vector to = lightPos;
+	// Vector from = ray.start
+	Ray ray;
+	ray.start = data.p + data.normal * 1e-3;
 
-//__device__ Camera* camera;
+	ray.dir = lightPos - ray.start;
+	ray.dir.normalize();
+	
+	IntersectionData temp;
+	temp.dist = (lightPos - ray.start).length();
+	
+	for (int i = 0; i < 3; ++i)
+	{
+		if (dev_nodes[i]->geom->intersect(ray, temp))
+		{
+			return false;
+		}
+	}
 
-//thrust::device_vector<Geometry*> geometries;
-//thrust::device_vector<Shader*> shaders;
-//thrust::device_vector<Node*> nodes;
+	return true;
+}
 
-//__device__ Geometry* geometries[1];
-//__device__ Shader* shaders[1];
-//__device__ Node* nodes[1];
-
-__global__ void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+__global__ 
+void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
 {	
 	dev_cam->yaw = 0;
 	dev_cam->pitch = -30;
@@ -48,7 +62,7 @@ __global__ void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** d
 	dev_shaders[0] = new Lambert(Color(0, 1, 0));
 	dev_nodes[0] = new Node(dev_geom[0], dev_shaders[0]);
 
-	dev_geom[1] = new Sphere(Vector(-80, 30, 180), 50.0);
+	dev_geom[1] = new Sphere(Vector(-80, 40, 180), 50.0);
 	dev_shaders[1] = new Lambert(Color(1.0, 1.0, 0.0));
 	dev_nodes[1] = new Node(dev_geom[1], dev_shaders[1]);
 
@@ -57,7 +71,8 @@ __global__ void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** d
 	dev_nodes[2] = new Node(dev_geom[2], dev_shaders[2]);
 }
 
-__device__ Color raytrace(Ray ray, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+__device__ 
+Color raytrace(Ray ray, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
 {
 	IntersectionData data;
 	Node* closestNode = nullptr;
@@ -76,11 +91,14 @@ __device__ Color raytrace(Ray ray, Geometry** dev_geom, Shader** dev_shaders, No
 	{
 		return Color(0, 0, 0);
 	}
-	
+
+	data.isVisible = testVisibility(dev_nodes, data);
+
 	return closestNode->shader->shade(ray, data);
 }
 
-__global__ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+__global__ 
+void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
 {
 	// map from threadIdx/BlockIdx to pixel position
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
@@ -95,7 +113,11 @@ __global__ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom
 	}
 }
 
-extern "C" void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+/**
+ * Wrapper kernel function
+*/
+extern "C" 
+void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
 {
 	initializeScene<<<1, 1>>>(dev_cam, dev_geom, dev_shaders, dev_nodes);
 

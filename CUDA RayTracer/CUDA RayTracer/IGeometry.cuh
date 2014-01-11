@@ -13,15 +13,19 @@ struct IntersectionData
 	double u, v; //!< 2D UV coordinates for texturing, etc.
 	
 	Geometry* g; //!< The geometry which was hit
+
+	bool isVisible;
 };
 
 class Geometry
 {
 public:
 
-	__device__ virtual ~Geometry() {}
+	__device__ 
+	virtual ~Geometry() {}
 
-	__device__ virtual bool intersect(Ray ray, IntersectionData& data) = 0;
+	__device__ 
+	virtual bool intersect(Ray ray, IntersectionData& data) = 0;
 };
 
 #endif

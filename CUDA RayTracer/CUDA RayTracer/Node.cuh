@@ -8,5 +8,10 @@ public:
 	Shader* shader;
 	
 	__device__ Node() {}
-	__device__ Node(Geometry* g, Shader* s) { geom = g; shader = s; }
+
+	__device__ 
+	Node(Geometry* g, Shader* s)
+	{ 
+		geom = g; shader = s; 
+	}
 };

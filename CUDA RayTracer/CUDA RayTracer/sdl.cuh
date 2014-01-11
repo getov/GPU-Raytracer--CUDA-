@@ -30,9 +30,4 @@ void waitForUserExit(void); //!< Pause. Wait until the user closes the applicati
 int frameWidth(void); //!< returns the frame width (pixels)
 int frameHeight(void); //!< returns the frame height (pixels)
 
-//void cudaAllocateSDL_Screen();
-
-__device__ int d_frameWidth();
-__device__ int d_frameHeight();
-
 #endif // SDL_H

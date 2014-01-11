@@ -1,7 +1,8 @@
 #include "Sphere.cuh"
 #include "Util.cuh"
 
-__device__ bool Sphere::intersect(Ray ray, IntersectionData& data)
+__device__ 
+bool Sphere::intersect(Ray ray, IntersectionData& data)
 {
 	Vector sphereSpaceOrigin = ray.start - m_center;
 

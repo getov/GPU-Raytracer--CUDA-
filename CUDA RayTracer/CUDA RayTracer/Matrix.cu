@@ -1,11 +1,13 @@
 #include "Matrix.cuh"
 
-__device__  void operator *= (Vector& v, const Matrix& a)
+__device__  
+void operator *= (Vector& v, const Matrix& a)
 {
 	v = v*a; 
 }
 
-__device__  Vector operator * (const Vector& v, const Matrix& m)
+__device__  
+Vector operator * (const Vector& v, const Matrix& m)
 {
 	return Vector(
 		v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0],
@@ -15,7 +17,8 @@ __device__  Vector operator * (const Vector& v, const Matrix& m)
 }
 
 //!< matrix multiplication; result = a*b
-__device__ Matrix operator * (const Matrix& a, const Matrix& b)
+__device__ 
+Matrix operator * (const Matrix& a, const Matrix& b)
 {
 	Matrix c(0.0);
 	for (int i = 0; i < 3; i++)
@@ -26,7 +29,8 @@ __device__ Matrix operator * (const Matrix& a, const Matrix& b)
 }
 
 //!< finds the determinant of a matrix
-__device__ double determinant(const Matrix& a)
+__device__ 
+double determinant(const Matrix& a)
 {
 	return a.m[0][0] * a.m[1][1] * a.m[2][2]
 	     - a.m[0][0] * a.m[1][2] * a.m[2][1]
@@ -36,7 +40,8 @@ __device__ double determinant(const Matrix& a)
 	     - a.m[0][2] * a.m[1][1] * a.m[2][0];
 }
 
-__device__ double cofactor(const Matrix& m, int ii, int jj)
+__device__ 
+double cofactor(const Matrix& m, int ii, int jj)
 {
 	int rows[2], rc = 0, cols[2], cc = 0;
 	for (int i = 0; i < 3; i++)
@@ -49,7 +54,8 @@ __device__ double cofactor(const Matrix& m, int ii, int jj)
 }
 
 //!< finds the inverse of a matrix (assuming it exists)
-__device__ Matrix inverseMatrix(const Matrix& m)
+__device__ 
+Matrix inverseMatrix(const Matrix& m)
 {
 	double D = determinant(m);
 	if (fabs(D) < 1e-12) return m; // an error; matrix is not invertible
@@ -62,7 +68,8 @@ __device__ Matrix inverseMatrix(const Matrix& m)
 }
 
 //!< returns a rotation matrix around the X axis; the angle is in radians
-__device__ Matrix rotationAroundX(double angle)
+__device__ 
+Matrix rotationAroundX(double angle)
 {
 	double S = sin(angle);
 	double C = cos(angle);
@@ -75,7 +82,8 @@ __device__ Matrix rotationAroundX(double angle)
 }
 
 //!< same as above, but rotate around Y
-__device__ Matrix rotationAroundY(double angle)
+__device__
+Matrix rotationAroundY(double angle)
 {
 	double S = sin(angle);
 	double C = cos(angle);
@@ -88,7 +96,8 @@ __device__ Matrix rotationAroundY(double angle)
 }
 
 //!< same as above, but rotate around Z
-__device__ Matrix rotationAroundZ(double angle)
+__device__ 
+Matrix rotationAroundZ(double angle)
 {
 	double S = sin(angle);
 	double C = cos(angle);
