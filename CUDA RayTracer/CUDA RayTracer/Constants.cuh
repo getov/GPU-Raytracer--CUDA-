@@ -13,9 +13,13 @@
 	const int RES_Y  = 480;
 #endif
 
-const int GEOM_COUNT = 3;
 const double PI = 3.141592653589793238;
 //#define PI  = 3.141592653589793238; // temporary workaround
 #define INF 1e99
+
+const int GEOM_MAX_SIZE = 1024;
+
+__device__ 
+static int GEOM_COUNT = 0;
 
 #endif // CONSTANTS_H

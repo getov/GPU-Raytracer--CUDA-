@@ -41,6 +41,21 @@ bool testVisibility(Node** dev_nodes, const IntersectionData& data)
 	return true;
 }
 
+__device__
+void createNode(Geometry* geom, Shader* shader,
+				Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+{
+	if (GEOM_COUNT >= GEOM_MAX_SIZE)
+	{
+		return;
+	}
+
+	dev_geom[GEOM_COUNT]    = geom;
+	dev_shaders[GEOM_COUNT] = shader;
+	dev_nodes[GEOM_COUNT]   = new Node(dev_geom[GEOM_COUNT], dev_shaders[GEOM_COUNT]);
+	++GEOM_COUNT;
+}
+
 __global__ 
 void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
 {	
@@ -58,17 +73,22 @@ void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders,
 	lightPower = 50000;
 	ambientLight = Color(0.2, 0.2, 0.2);
 
-	dev_geom[0] = new Plane(5);
-	dev_shaders[0] = new Lambert(Color(0, 1, 0));
-	dev_nodes[0] = new Node(dev_geom[0], dev_shaders[0]);
+	createNode(new Plane(5), new Lambert(Color(0, 1, 0)),
+			   dev_geom, dev_shaders, dev_nodes);
 
-	dev_geom[1] = new Sphere(Vector(-80, 40, 180), 50.0);
-	dev_shaders[1] = new Lambert(Color(1.0, 1.0, 0.0));
-	dev_nodes[1] = new Node(dev_geom[1], dev_shaders[1]);
+	createNode(new Sphere(Vector(-80, 40, 180), 50.0), new Lambert(Color(1.0, 1.0, 0.0)),
+			   dev_geom, dev_shaders, dev_nodes);
 
-	dev_geom[2] = new Sphere(Vector(0, 30, 200), 50.0);
-	dev_shaders[2] = new Lambert(Color(1.0, 0.0, 0.0));
-	dev_nodes[2] = new Node(dev_geom[2], dev_shaders[2]);
+	createNode(new Sphere(Vector(0, 30, 200), 50.0), new Lambert(Color(1.0, 0.0, 0.0)),
+			   dev_geom, dev_shaders, dev_nodes);
+
+	/*createNode(new Sphere(Vector(0, 80, 200), 50.0), new Lambert(Color(0.0, 0.0, 1.0)),
+			   dev_geom, dev_shaders, dev_nodes);
+
+	createNode(new Sphere(Vector(-80, 80, 200), 50.0), new Lambert(Color(0.0, 0.0, 1.0)),
+			   dev_geom, dev_shaders, dev_nodes);*/
+
+
 }
 
 __device__ 
@@ -120,8 +140,6 @@ extern "C"
 void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
 {
 	initializeScene<<<1, 1>>>(dev_cam, dev_geom, dev_shaders, dev_nodes);
-
-	//const int THREADS_PER_BLOCK = 32;  //32, 192, 64
 
 	dim3 THREADS_PER_BLOCK(32, 32); // 32*32 = 1024 (max threads per block supported)
 

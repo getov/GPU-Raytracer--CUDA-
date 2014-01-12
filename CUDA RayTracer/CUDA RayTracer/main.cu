@@ -16,6 +16,7 @@
 #include "Node.cuh"
 #include "Lambert.cuh"
 #include "Plane.cuh"
+#include "Sphere.cuh"
 	
 using namespace std;
 
@@ -26,12 +27,10 @@ Color vfb[RES_X][RES_Y];
 // used for GPU operations
 Color vfb_linear[RES_X * RES_Y]; 
 
-//const int ARR_SIZE = 3;
-
 Camera* camera;
-Geometry* geometry[GEOM_COUNT];
-Shader* shaders[GEOM_COUNT];
-Node* nodes[GEOM_COUNT];
+Geometry* geometry[GEOM_MAX_SIZE];
+Shader* shaders[GEOM_MAX_SIZE];
+Node* nodes[GEOM_MAX_SIZE];
 
 void printGPUSpecs()
 {
@@ -137,22 +136,22 @@ int main(int argc, char** argv)
 
 	Camera* dev_cam;
 	cudaMalloc((void**)&dev_cam, sizeof(Camera));
-
+	
 	Geometry** dev_geom;
-	cudaMalloc((void**)&dev_geom, sizeof(Geometry) * GEOM_COUNT);
+	cudaMalloc((void**)&dev_geom, sizeof(Geometry*) * GEOM_MAX_SIZE);
 
 	Shader** dev_shaders;
-	cudaMalloc((void**)&dev_shaders, sizeof(Shader) * GEOM_COUNT);
+	cudaMalloc((void**)&dev_shaders, sizeof(Shader*) * GEOM_MAX_SIZE);
 
 	Node** dev_nodes;
-	cudaMalloc((void**)&dev_nodes, sizeof(Node) * GEOM_COUNT);
+	cudaMalloc((void**)&dev_nodes, sizeof(Node*) * GEOM_MAX_SIZE);
 	
 	// 2. memcpy HostToDevice
 	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * RES_X * RES_Y, cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_cam, camera, sizeof(Camera), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_geom, geometry, sizeof(Geometry) * GEOM_COUNT, cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_shaders, shaders, sizeof(Shader) * GEOM_COUNT, cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_nodes, nodes, sizeof(Node) * GEOM_COUNT, cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_geom, geometry, sizeof(Geometry*) * GEOM_MAX_SIZE, cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_shaders, shaders, sizeof(Shader*) * GEOM_MAX_SIZE, cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_nodes, nodes, sizeof(Node*) * GEOM_MAX_SIZE, cudaMemcpyHostToDevice);
 
 	// 3. call kernels
 	// - InitializeScene

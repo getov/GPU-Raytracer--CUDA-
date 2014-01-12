@@ -55,9 +55,10 @@ void displayVFB(Color vfb[RES_X][RES_Y])
 	int rs = screen->format->Rshift;
 	int gs = screen->format->Gshift;
 	int bs = screen->format->Bshift;
+
 	for (int y = 0; y < screen->h; y++)
 	{
-		Uint32 *row = (Uint32*) ((Uint8*) screen->pixels + y * screen->pitch);
+		Uint32* row = (Uint32*) ((Uint8*) screen->pixels + y * screen->pitch);
 		for (int x = 0; x < screen->w; x++)
 			row[x] = vfb[y][x].toRGB32(rs, gs, bs);
 	}

@@ -15,16 +15,6 @@ Lambert::Lambert(const Color& diffuseColor)
 __device__ 
 Color Lambert::shade(Ray ray, const IntersectionData& data)
 {
-	/*Color result = _color;
-	
-	result = result * lightColor * lightPower / (data.p - lightPos).lengthSqr();
-	Vector lightDir = lightPos - data.p;
-	lightDir.normalize();
-	
-	double cosTheta = dot(lightDir, data.normal);
-	result = result * cosTheta;
-
-	return result;*/
 	Vector N = faceforward(ray.dir, data.normal);
 
 	Color diffuseColor = _color;
