@@ -35,6 +35,7 @@
     <CudaCompile Include="IShader.cu" />
     <CudaCompile Include="Lambert.cu" />
     <CudaCompile Include="Matrix.cu" />
+    <CudaCompile Include="OrenNayar.cu" />
     <CudaCompile Include="Plane.cu" />
     <CudaCompile Include="sdl.cu" />
     <CudaCompile Include="cuda_renderer.cu" />
@@ -45,6 +46,7 @@
     <None Include="IGeometry.cuh" />
     <None Include="Lambert.cuh" />
     <None Include="Node.cuh" />
+    <None Include="OrenNayar.cuh" />
     <None Include="Plane.cuh" />
     <None Include="IShader.cuh" />
     <None Include="Sphere.cuh" />

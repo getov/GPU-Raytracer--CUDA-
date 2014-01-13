@@ -52,6 +52,9 @@
     <CudaCompile Include="Sphere.cu">
       <Filter>Geometry</Filter>
     </CudaCompile>
+    <CudaCompile Include="OrenNayar.cu">
+      <Filter>Shaders</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />
@@ -75,6 +78,9 @@
     </None>
     <None Include="Sphere.cuh">
       <Filter>Geometry</Filter>
+    </None>
+    <None Include="OrenNayar.cuh">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>
