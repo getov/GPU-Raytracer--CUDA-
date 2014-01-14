@@ -50,7 +50,7 @@ void closeGraphics(void)
 }
 
 /// displays a VFB (virtual frame buffer) to the real framebuffer, with the necessary color clipping
-void displayVFB(Color vfb[RES_X][RES_Y])
+void displayVFB(Color vfb[RES_Y][RES_X])
 {
 	int rs = screen->format->Rshift;
 	int gs = screen->format->Gshift;
@@ -67,26 +67,28 @@ void displayVFB(Color vfb[RES_X][RES_Y])
 
 /// waits the user to indicate he wants to close the application (by either clicking on the "X" of the window,
 /// or by pressing ESC)
-void waitForUserExit(void)
+void handleUserInput()
 {
 	SDL_Event ev;
-	while (1) {
-		while (SDL_WaitEvent(&ev)) {
-			switch (ev.type) {
-				case SDL_QUIT:
-					return;
-				case SDL_KEYDOWN:
+	
+	while (SDL_WaitEvent(&ev))
+	{
+		switch (ev.type)
+		{
+			case SDL_QUIT:
+				return;
+			case SDL_KEYDOWN:
+			{
+				switch (ev.key.keysym.sym)
 				{
-					switch (ev.key.keysym.sym) {
-						case SDLK_ESCAPE:
-							return;
-						default:
-							break;
-					}
+					case SDLK_ESCAPE:
+						return;
+					default:
+						break;
 				}
-				default:
-					break;
 			}
+			default:
+				break;
 		}
 	}
 }

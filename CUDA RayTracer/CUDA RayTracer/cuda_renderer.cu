@@ -18,7 +18,7 @@
 #include "OrenNayar.cuh"
 
 __device__
-bool needsAA[RES_X][RES_Y];
+bool needsAA[RES_X * RES_Y];
 
 __device__ 
 bool testVisibility(Node** dev_nodes, const IntersectionData& data)
@@ -68,7 +68,7 @@ void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders,
 	dev_cam->roll = 0;
 	dev_cam->fov = 90;
 	dev_cam->aspect = 4.0 / 3.0;
-	dev_cam->pos = Vector(0, 160, -10);
+	dev_cam->pos = Vector(0, 160, -50);
 
 	dev_cam->beginFrame();
 	
@@ -77,7 +77,7 @@ void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders,
 	lightPower = 50000;
 	ambientLight = Color(0.2, 0.2, 0.2);
 
-	createNode(new Plane(5), new Lambert(Color(0, 1, 0)),
+	createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0),
 			   dev_geom, dev_shaders, dev_nodes);
 
 	createNode(new Sphere(Vector(-150, 40, 180), 20.0), new Lambert(Color(1.0, 1.0, 0.0)),
@@ -101,6 +101,9 @@ void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders,
 	createNode(new Sphere(Vector(0, 40, 220), 20.0), new OrenNayar(Color(0.0, 0.0, 0.5), 0.9),
 			   dev_geom, dev_shaders, dev_nodes);
 
+	createNode(new Sphere(Vector(80, 40, 220), 20.0), new OrenNayar(Color(0.5, 0.0, 0.5), 0.9),
+			   dev_geom, dev_shaders, dev_nodes);
+
 
 }
 
@@ -111,7 +114,7 @@ Color raytrace(Ray ray, Geometry** dev_geom, Shader** dev_shaders, Node** dev_no
 	Node* closestNode = nullptr;
 
 	data.dist = 1e99;
-
+	
 	for (int i = 0; i < GEOM_COUNT; i++)
 	{
 		if (dev_nodes[i]->geom->intersect(ray, data))
@@ -152,14 +155,13 @@ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** 
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
 	int offset = x + y * blockDim.x * gridDim.x;
-
-	Ray ray = dev_cam->getScreenRay(x, y); 
 	
 	if (offset < RES_X * RES_Y)
 	{
 		// first pass
-		dev_vfb[offset] = raytrace(ray, dev_geom, dev_shaders, dev_nodes);
-
+		dev_vfb[offset] = raytrace(dev_cam->getScreenRay(x, y), dev_geom, dev_shaders, dev_nodes);
+	
+#ifdef ANTI_ALIASING
 		const double kernel[5][2] = {
 					{ 0, 0 },
 					{ 0.3, 0.3 },
@@ -167,7 +169,7 @@ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** 
 					{ 0, 0.6 },
 					{ 0.6, 0.6 },
 				};
-
+		
 		// second pass
 		Color neighs[5];
 		neighs[0] = dev_vfb[offset];
@@ -178,31 +180,32 @@ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** 
 
 		Color average(0, 0, 0);
 			
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 5; ++i)
 		{
 			average += neighs[i];
 		}
 		average /= 5.0f;
 			
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 5; ++i)
 		{
 			if (tooDifferent(neighs[i], average))
 			{
-				needsAA[x][y] = true;
+				needsAA[offset] = true;
 				break;
 			}
 		}
 
-		if (needsAA[x][y])
+		if (needsAA[offset])
 		{
-			Color result = dev_vfb[offset]; 
-
-			for (int i = 1; i < 5; i++)
+			Color result = dev_vfb[offset];
+			
+			for (int i = 1; i < 5; ++i)
 			{
 				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1]), dev_geom, dev_shaders, dev_nodes);
 			}
 			dev_vfb[offset] = result / 5.0f;
 		}
+#endif
 	}
 }
 

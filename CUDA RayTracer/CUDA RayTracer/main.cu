@@ -22,9 +22,10 @@ using namespace std;
 
 extern "C" void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes);
 
-Color vfb[RES_X][RES_Y];
+// virtual framebuffer
+Color vfb[RES_Y][RES_X];
 
-// used for GPU operations
+// virtual framebuffer used for GPU operations
 Color vfb_linear[RES_X * RES_Y]; 
 
 Camera* camera;
@@ -32,12 +33,16 @@ Geometry* geometry[GEOM_MAX_SIZE];
 Shader* shaders[GEOM_MAX_SIZE];
 Node* nodes[GEOM_MAX_SIZE];
 
+/**
+ * Function that prints CUDA specs of the 
+ * of the GPU device/s on the console
+*/
 void printGPUSpecs()
 {
 	cudaDeviceProp  prop;
     int count;
     cudaGetDeviceCount(&count);
-	//printf( "%d", sizeof(nodes)/sizeof(Node*));
+	
     for (int i = 0; i < count; ++i) 
 	{
         cudaGetDeviceProperties( &prop, i );
@@ -89,6 +94,11 @@ void printGPUSpecs()
     }
 }
 
+/**
+ * Wrapper function that creates timer and captures the start and stop time
+ * @param start - output - captures the start time
+ * @param stop - output - captires the stop time
+*/
 void cudaStartTimer(cudaEvent_t& start, cudaEvent_t& stop)
 {
 	cudaEventCreate(&start);
@@ -96,6 +106,13 @@ void cudaStartTimer(cudaEvent_t& start, cudaEvent_t& stop)
 	cudaEventRecord(start, 0);
 }
 
+/**
+ * Wrapper function that takes the previously captured start and stop time
+ * from cudaStartTimer() function and calculates the elapsed time
+ * @param start - the start time that is previously captured by cudaStartTimer()
+ * @param stop - the stop time that is previously captured by cudaStartTimer()
+ * @reference - cudaStartTimer(cudaEvent_t& start, cudaEvent_t& stop)
+*/
 void cudaStopTimer(cudaEvent_t& start, cudaEvent_t& stop)
 {
 	cudaEventRecord(stop, 0);
@@ -108,11 +125,19 @@ void cudaStopTimer(cudaEvent_t& start, cudaEvent_t& stop)
     cudaEventDestroy(stop);
 }
 
+/**
+ * function that converts the linear array vfb_linear
+ * into the 2D array vfb
+ *
+ * This is needed because we pass linear array to the GPU
+ * to process our pixel data and then we convert it to 
+ * 2D array in order to display our pixel data with SDL
+*/
 void convertDeviceToHostBuffer()
 {
-	for (int i = 0; i < RES_X; ++i)
+	for (int i = 0; i < RES_Y; ++i)
 	{
-		for (int j = 0; j < RES_Y; ++j)
+		for (int j = 0; j < RES_X; ++j)
 		{
 			vfb[i][j] = vfb_linear[i * RES_X + j];
 		}
@@ -173,12 +198,11 @@ int main(int argc, char** argv)
 	cudaFree(dev_shaders);
 	cudaFree(dev_nodes);
 
-	// convert the linear array to our 2D array
 	convertDeviceToHostBuffer();
-	
+
 	displayVFB(vfb);
 
-	waitForUserExit();
+	handleUserInput();
 	
 	closeGraphics();
 

@@ -2,6 +2,7 @@
 #define CONSTANTS_H
 
 //#define FULL_HD
+#define ANTI_ALIASING
 
 #define VFB_MAX_SIZE 1920
 
