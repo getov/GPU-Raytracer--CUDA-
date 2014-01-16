@@ -20,7 +20,9 @@
 	
 using namespace std;
 
-extern "C" void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes);
+extern "C" 
+void cudaRenderer(Color* dev_vfb, Camera* dev_cam, 
+				  Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes);
 
 // virtual framebuffer
 Color vfb[RES_Y][RES_X];
@@ -150,7 +152,7 @@ int main(int argc, char** argv)
 	{
 		return -1;
 	}
-
+	
 	// capture the start time
 	cudaEvent_t start, stop;
 	cudaStartTimer(start, stop);
@@ -198,8 +200,8 @@ int main(int argc, char** argv)
 	cudaFree(dev_shaders);
 	cudaFree(dev_nodes);
 
-	convertDeviceToHostBuffer();
-
+	convertDeviceToHostBuffer();	
+	
 	displayVFB(vfb);
 
 	handleUserInput();

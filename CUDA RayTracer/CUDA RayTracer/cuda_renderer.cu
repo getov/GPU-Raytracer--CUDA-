@@ -29,6 +29,7 @@ bool testVisibility(Node** dev_nodes, const IntersectionData& data)
 	ray.start = data.p + data.normal * 1e-3;
 
 	ray.dir = lightPos - ray.start;
+
 	ray.dir.normalize();
 	
 	IntersectionData temp;
@@ -64,11 +65,11 @@ __global__
 void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
 {	
 	dev_cam->yaw = 0;
-	dev_cam->pitch = -30;
+	dev_cam->pitch = -15;
 	dev_cam->roll = 0;
 	dev_cam->fov = 90;
 	dev_cam->aspect = 4.0 / 3.0;
-	dev_cam->pos = Vector(0, 160, -50);
+	dev_cam->pos = Vector(0, 120, -50);
 
 	dev_cam->beginFrame();
 	
@@ -103,8 +104,6 @@ void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders,
 
 	createNode(new Sphere(Vector(80, 40, 220), 20.0), new OrenNayar(Color(0.5, 0.0, 0.5), 0.9),
 			   dev_geom, dev_shaders, dev_nodes);
-
-
 }
 
 __device__ 
@@ -129,7 +128,7 @@ Color raytrace(Ray ray, Geometry** dev_geom, Shader** dev_shaders, Node** dev_no
 	}
 
 	data.isVisible = testVisibility(dev_nodes, data);
-
+	
 	return closestNode->shader->shade(ray, data);
 }
 
@@ -148,6 +147,70 @@ bool tooDifferent(const Color& a, const Color& b)
 		     fabs(a.b - b.b) > THRESHOLD);
 }
 
+__global__
+void antiAliasing(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+{
+	int x = threadIdx.x + blockIdx.x * blockDim.x;
+	int y = threadIdx.y + blockIdx.y * blockDim.y;
+	int offset = x + y * blockDim.x * gridDim.x;	
+		
+	const int n_size = 5;
+	Color neighs[n_size];
+	neighs[0] = dev_vfb[offset];
+	neighs[1] = dev_vfb[(x > 0 ? x - 1 : x) + y * blockDim.x * gridDim.x];
+	neighs[2] = dev_vfb[(x + 1 < RES_X ? x + 1 : x) + y * blockDim.x * gridDim.x];
+	neighs[3] = dev_vfb[x + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x];
+	neighs[4] = dev_vfb[x + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x];
+
+	Color average(0, 0, 0);
+			
+	for (int i = 0; i < n_size; ++i)
+	{
+		average += neighs[i];
+	}
+	average /= static_cast<float>(n_size);
+			
+	for (int i = 0; i < n_size; ++i)
+	{
+		if (tooDifferent(neighs[i], average))
+		{
+			needsAA[offset] = true;
+			break;
+		}
+	}
+
+	const double kernel[5][2] = {
+			{ 0, 0 },
+			{ 0.3, 0.3 },
+			{ 0.6, 0 },
+			{ 0, 0.6 },
+			{ 0.6, 0.6 },
+		};
+
+	bool previewAA = false;
+
+	if (previewAA)
+	{
+		if (needsAA[offset])
+		{
+			dev_vfb[offset] = Color(1, 0, 0);
+		}
+	}
+	else
+	{
+		if (needsAA[offset])
+		{
+			Color result = dev_vfb[offset];
+			
+			for (int i = 1; i < n_size; ++i)
+			{
+				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1]), dev_geom, dev_shaders, dev_nodes);
+			}
+			dev_vfb[offset] = result / static_cast<float>(n_size);
+		}
+	}
+}
+
 __global__ 
 void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
 {
@@ -158,54 +221,7 @@ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** 
 	
 	if (offset < RES_X * RES_Y)
 	{
-		// first pass
 		dev_vfb[offset] = raytrace(dev_cam->getScreenRay(x, y), dev_geom, dev_shaders, dev_nodes);
-	
-#ifdef ANTI_ALIASING
-		const double kernel[5][2] = {
-					{ 0, 0 },
-					{ 0.3, 0.3 },
-					{ 0.6, 0 },
-					{ 0, 0.6 },
-					{ 0.6, 0.6 },
-				};
-		
-		// second pass
-		Color neighs[5];
-		neighs[0] = dev_vfb[offset];
-		neighs[1] = dev_vfb[(x > 0 ? x - 1 : x) + y * blockDim.x * gridDim.x];
-		neighs[2] = dev_vfb[(x + 1 < RES_X ? x + 1 : x) + y * blockDim.x * gridDim.x];
-		neighs[3] = dev_vfb[x + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x];
-		neighs[4] = dev_vfb[x + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x];
-
-		Color average(0, 0, 0);
-			
-		for (int i = 0; i < 5; ++i)
-		{
-			average += neighs[i];
-		}
-		average /= 5.0f;
-			
-		for (int i = 0; i < 5; ++i)
-		{
-			if (tooDifferent(neighs[i], average))
-			{
-				needsAA[offset] = true;
-				break;
-			}
-		}
-
-		if (needsAA[offset])
-		{
-			Color result = dev_vfb[offset];
-			
-			for (int i = 1; i < 5; ++i)
-			{
-				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1]), dev_geom, dev_shaders, dev_nodes);
-			}
-			dev_vfb[offset] = result / 5.0f;
-		}
-#endif
 	}
 }
 
@@ -218,8 +234,15 @@ void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader**
 	initializeScene<<<1, 1>>>(dev_cam, dev_geom, dev_shaders, dev_nodes);
 
 	dim3 THREADS_PER_BLOCK(32, 32); // 32*32 = 1024 (max threads per block supported)
-
 	dim3 BLOCKS(RES_X / THREADS_PER_BLOCK.x, RES_Y / THREADS_PER_BLOCK.y); 
-
+	
+	// first pass
 	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, dev_cam, dev_geom, dev_shaders, dev_nodes);
+
+#ifdef ANTI_ALIASING
+
+	//second pass
+	antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, dev_cam, dev_geom, dev_shaders, dev_nodes);
+
+#endif
 }
