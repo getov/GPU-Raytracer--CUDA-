@@ -1,3 +1,6 @@
+#ifndef NODE_H
+#define NODE_H
+
 #include "IGeometry.cuh"
 #include "IShader.cuh"
 
@@ -15,3 +18,5 @@ public:
 		geom = g; shader = s; 
 	}
 };
+
+#endif

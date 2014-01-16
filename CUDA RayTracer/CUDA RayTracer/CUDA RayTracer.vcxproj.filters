@@ -55,6 +55,12 @@
     <CudaCompile Include="OrenNayar.cu">
       <Filter>Shaders</Filter>
     </CudaCompile>
+    <CudaCompile Include="Phong.cu">
+      <Filter>Shaders</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Refraction.cu">
+      <Filter>Shaders</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />
@@ -80,6 +86,12 @@
       <Filter>Geometry</Filter>
     </None>
     <None Include="OrenNayar.cuh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Phong.cuh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Refraction.cuh">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

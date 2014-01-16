@@ -36,7 +36,9 @@
     <CudaCompile Include="Lambert.cu" />
     <CudaCompile Include="Matrix.cu" />
     <CudaCompile Include="OrenNayar.cu" />
+    <CudaCompile Include="Phong.cu" />
     <CudaCompile Include="Plane.cu" />
+    <CudaCompile Include="Refraction.cu" />
     <CudaCompile Include="sdl.cu" />
     <CudaCompile Include="cuda_renderer.cu" />
     <CudaCompile Include="Sphere.cu" />
@@ -47,8 +49,10 @@
     <None Include="Lambert.cuh" />
     <None Include="Node.cuh" />
     <None Include="OrenNayar.cuh" />
+    <None Include="Phong.cuh" />
     <None Include="Plane.cuh" />
     <None Include="IShader.cuh" />
+    <None Include="Refraction.cuh" />
     <None Include="Sphere.cuh" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

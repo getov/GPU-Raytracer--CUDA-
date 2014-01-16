@@ -171,6 +171,18 @@ inline Vector reflect(const Vector& ray, const Vector& norm)
 	return result;
 }
 
+__device__
+inline Vector refract(const Vector& i, const Vector& n, float ior)
+{
+	float NdotI = float(dot(i, n));
+	float k = 1 - (ior * ior) * (1 - NdotI * NdotI);
+	if (k < 0)
+	{
+		return Vector(0, 0, 0);
+	}
+	return ior * i - (ior * NdotI + sqrt(k)) * n;
+}
+
 __device__  
 inline Vector faceforward(const Vector& ray, const Vector& norm)
 {
@@ -208,6 +220,7 @@ struct Ray
 {
 	Vector start;
 	Vector dir;
+	int depth;
 
 	bool debug;
 	
@@ -222,6 +235,7 @@ struct Ray
 		start = _start;
 		dir = _dir;
 		debug = false;
+		depth = 0;
 	}
 };
 

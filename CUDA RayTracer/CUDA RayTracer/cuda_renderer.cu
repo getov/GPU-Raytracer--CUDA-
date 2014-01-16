@@ -16,12 +16,19 @@
 #include "Lambert.cuh"
 #include "Sphere.cuh"
 #include "OrenNayar.cuh"
+#include "Phong.cuh"
+#include "Refraction.cuh"
 
 __device__
 bool needsAA[RES_X * RES_Y];
 
+__device__ Camera* dev_cam;
+__device__ Geometry* dev_geom[GEOM_MAX_SIZE];
+__device__ Shader* dev_shaders[GEOM_MAX_SIZE];
+__device__ Node* dev_nodes[GEOM_MAX_SIZE];
+
 __device__ 
-bool testVisibility(Node** dev_nodes, const IntersectionData& data)
+bool testVisibility(const IntersectionData& data)
 {
 	//Vector to = lightPos;
 	// Vector from = ray.start
@@ -47,8 +54,7 @@ bool testVisibility(Node** dev_nodes, const IntersectionData& data)
 }
 
 __device__
-void createNode(Geometry* geom, Shader* shader,
-				Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+void createNode(Geometry* geom, Shader* shader)
 {
 	if (GEOM_COUNT >= GEOM_MAX_SIZE)
 	{
@@ -62,8 +68,9 @@ void createNode(Geometry* geom, Shader* shader,
 }
 
 __global__ 
-void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+void initializeScene()
 {	
+	dev_cam = new Camera;
 	dev_cam->yaw = 0;
 	dev_cam->pitch = -15;
 	dev_cam->roll = 0;
@@ -78,36 +85,29 @@ void initializeScene(Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders,
 	lightPower = 50000;
 	ambientLight = Color(0.2, 0.2, 0.2);
 
-	createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0),
-			   dev_geom, dev_shaders, dev_nodes);
+	createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0));
 
-	createNode(new Sphere(Vector(-150, 40, 180), 20.0), new Lambert(Color(1.0, 1.0, 0.0)),
-			   dev_geom, dev_shaders, dev_nodes);
+	createNode(new Sphere(Vector(-150, 40, 180), 20.0), new Lambert(Color(1.0, 1.0, 0.0)));
 
-	createNode(new Sphere(Vector(-50, 40, 180), 20.0), new Lambert(Color(0.5, 0.5, 0.5)),
-			   dev_geom, dev_shaders, dev_nodes);
+	createNode(new Sphere(Vector(-50, 40, 180), 20.0), new Lambert(Color(0.5, 0.5, 0.5)));
 
-	createNode(new Sphere(Vector(-100, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0),
-			   dev_geom, dev_shaders, dev_nodes);
+	createNode(new Sphere(Vector(-100, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 
-	createNode(new Sphere(Vector(0, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5),
-			   dev_geom, dev_shaders, dev_nodes);
+	createNode(new Sphere(Vector(0, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5));
 
-	createNode(new Sphere(Vector(-100, 40, 220), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5),
-			   dev_geom, dev_shaders, dev_nodes);
+	createNode(new Sphere(Vector(-100, 30, 100), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5));
 
-	createNode(new Sphere(Vector(-50, 40, 220), 20.0), new OrenNayar(Color(0.0, 0.5, 0.5), 0.2),
-			   dev_geom, dev_shaders, dev_nodes);
+	//createNode(new Sphere(Vector(-50, 30, 100), 20.0), new OrenNayar(Color(0.0, 0.5, 0.5), 0.2));
 	
-	createNode(new Sphere(Vector(0, 40, 220), 20.0), new OrenNayar(Color(0.0, 0.0, 0.5), 0.9),
-			   dev_geom, dev_shaders, dev_nodes);
+	createNode(new Sphere(Vector(0, 30, 100), 20.0), new OrenNayar(Color(0.0, 0.0, 0.5), 0.9));
 
-	createNode(new Sphere(Vector(80, 40, 220), 20.0), new OrenNayar(Color(0.5, 0.0, 0.5), 0.9),
-			   dev_geom, dev_shaders, dev_nodes);
+	createNode(new Sphere(Vector(80, 30, 100), 20.0), new Phong(Color(0.5, 0.0, 0.5), 32));
+
+	//createNode(new Sphere(Vector(-80, 30, 100), 20.0), new Refraction(Color(0.5, 0.0, 0.5), 1.6));
 }
 
 __device__ 
-Color raytrace(Ray ray, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+Color raytrace(Ray ray)
 {
 	IntersectionData data;
 	Node* closestNode = nullptr;
@@ -127,7 +127,7 @@ Color raytrace(Ray ray, Geometry** dev_geom, Shader** dev_shaders, Node** dev_no
 		return Color(0, 0, 0);
 	}
 
-	data.isVisible = testVisibility(dev_nodes, data);
+	data.isVisible = testVisibility(data);
 	
 	return closestNode->shader->shade(ray, data);
 }
@@ -148,7 +148,7 @@ bool tooDifferent(const Color& a, const Color& b)
 }
 
 __global__
-void antiAliasing(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+void antiAliasing(Color* dev_vfb)
 {
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
@@ -204,7 +204,7 @@ void antiAliasing(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader**
 			
 			for (int i = 1; i < n_size; ++i)
 			{
-				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1]), dev_geom, dev_shaders, dev_nodes);
+				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1]));
 			}
 			dev_vfb[offset] = result / static_cast<float>(n_size);
 		}
@@ -212,7 +212,7 @@ void antiAliasing(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader**
 }
 
 __global__ 
-void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+void renderScene(Color* dev_vfb)
 {
 	// map from threadIdx/BlockIdx to pixel position
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
@@ -221,7 +221,7 @@ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** 
 	
 	if (offset < RES_X * RES_Y)
 	{
-		dev_vfb[offset] = raytrace(dev_cam->getScreenRay(x, y), dev_geom, dev_shaders, dev_nodes);
+		dev_vfb[offset] = raytrace(dev_cam->getScreenRay(x, y));
 	}
 }
 
@@ -229,20 +229,20 @@ void renderScene(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** 
  * Wrapper kernel function
 */
 extern "C" 
-void cudaRenderer(Color* dev_vfb, Camera* dev_cam, Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes)
+void cudaRenderer(Color* dev_vfb)
 {
-	initializeScene<<<1, 1>>>(dev_cam, dev_geom, dev_shaders, dev_nodes);
+	initializeScene<<<1, 1>>>();
 
 	dim3 THREADS_PER_BLOCK(32, 32); // 32*32 = 1024 (max threads per block supported)
 	dim3 BLOCKS(RES_X / THREADS_PER_BLOCK.x, RES_Y / THREADS_PER_BLOCK.y); 
 	
 	// first pass
-	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, dev_cam, dev_geom, dev_shaders, dev_nodes);
+	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb);
 
 #ifdef ANTI_ALIASING
 
 	//second pass
-	antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, dev_cam, dev_geom, dev_shaders, dev_nodes);
+	antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb);
 
 #endif
 }

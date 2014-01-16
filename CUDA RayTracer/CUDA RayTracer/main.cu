@@ -21,19 +21,13 @@
 using namespace std;
 
 extern "C" 
-void cudaRenderer(Color* dev_vfb, Camera* dev_cam, 
-				  Geometry** dev_geom, Shader** dev_shaders, Node** dev_nodes);
+void cudaRenderer(Color* dev_vfb);
 
 // virtual framebuffer
 Color vfb[RES_Y][RES_X];
 
 // virtual framebuffer used for GPU operations
 Color vfb_linear[RES_X * RES_Y]; 
-
-Camera* camera;
-Geometry* geometry[GEOM_MAX_SIZE];
-Shader* shaders[GEOM_MAX_SIZE];
-Node* nodes[GEOM_MAX_SIZE];
 
 /**
  * Function that prints CUDA specs of the 
@@ -110,7 +104,8 @@ void cudaStartTimer(cudaEvent_t& start, cudaEvent_t& stop)
 
 /**
  * Wrapper function that takes the previously captured start and stop time
- * from cudaStartTimer() function and calculates the elapsed time
+ * from cudaStartTimer() function, calculates the elapsed time,
+ * prints it on the console and shows it on the window frame
  * @param start - the start time that is previously captured by cudaStartTimer()
  * @param stop - the stop time that is previously captured by cudaStartTimer()
  * @reference - cudaStartTimer(cudaEvent_t& start, cudaEvent_t& stop)
@@ -123,6 +118,10 @@ void cudaStopTimer(cudaEvent_t& start, cudaEvent_t& stop)
     cudaEventElapsedTime(&elapsedTime, start, stop);
     printf( "Time to render:  %3.1f ms\n\n", elapsedTime);
 	
+	char info[128];
+	sprintf(info, "Time to render: %3.1f ms", elapsedTime);
+	SDL_WM_SetCaption(info, NULL);
+
 	cudaEventDestroy(start);
     cudaEventDestroy(stop);
 }
@@ -160,30 +159,14 @@ int main(int argc, char** argv)
 	// 1. allocate memory for vfb on the GPU
 	Color* dev_vfb;
 	cudaMalloc((void**)&dev_vfb, sizeof(Color) * RES_X * RES_Y);
-
-	Camera* dev_cam;
-	cudaMalloc((void**)&dev_cam, sizeof(Camera));
-	
-	Geometry** dev_geom;
-	cudaMalloc((void**)&dev_geom, sizeof(Geometry*) * GEOM_MAX_SIZE);
-
-	Shader** dev_shaders;
-	cudaMalloc((void**)&dev_shaders, sizeof(Shader*) * GEOM_MAX_SIZE);
-
-	Node** dev_nodes;
-	cudaMalloc((void**)&dev_nodes, sizeof(Node*) * GEOM_MAX_SIZE);
 	
 	// 2. memcpy HostToDevice
 	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * RES_X * RES_Y, cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_cam, camera, sizeof(Camera), cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_geom, geometry, sizeof(Geometry*) * GEOM_MAX_SIZE, cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_shaders, shaders, sizeof(Shader*) * GEOM_MAX_SIZE, cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_nodes, nodes, sizeof(Node*) * GEOM_MAX_SIZE, cudaMemcpyHostToDevice);
 
 	// 3. call kernels
 	// - InitializeScene
 	// - RenderScene
-	cudaRenderer(dev_vfb, dev_cam, dev_geom, dev_shaders, dev_nodes);
+	cudaRenderer(dev_vfb);
 
 	// 4. memcpy DeviceToHost
 	cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
@@ -195,10 +178,6 @@ int main(int argc, char** argv)
 
 	// 5. free memory
 	cudaFree(dev_vfb);
-	cudaFree(dev_cam);
-	cudaFree(dev_geom);
-	cudaFree(dev_shaders);
-	cudaFree(dev_nodes);
 
 	convertDeviceToHostBuffer();	
 	
