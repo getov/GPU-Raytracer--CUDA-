@@ -22,10 +22,17 @@
 __device__
 bool needsAA[RES_X * RES_Y];
 
-__device__ Camera* dev_cam;
-__device__ Geometry* dev_geom[GEOM_MAX_SIZE];
-__device__ Shader* dev_shaders[GEOM_MAX_SIZE];
-__device__ Node* dev_nodes[GEOM_MAX_SIZE];
+__device__ 
+Camera* dev_cam;
+
+__device__ 
+Geometry* dev_geom[GEOM_MAX_SIZE];
+
+__device__ 
+Shader* dev_shaders[GEOM_MAX_SIZE];
+
+__device__ 
+Node* dev_nodes[GEOM_MAX_SIZE];
 
 __device__ 
 bool testVisibility(const IntersectionData& data)
@@ -60,7 +67,7 @@ void createNode(Geometry* geom, Shader* shader)
 	{
 		return;
 	}
-
+	
 	dev_geom[GEOM_COUNT]    = geom;
 	dev_shaders[GEOM_COUNT] = shader;
 	dev_nodes[GEOM_COUNT]   = new Node(dev_geom[GEOM_COUNT], dev_shaders[GEOM_COUNT]);
@@ -87,23 +94,23 @@ void initializeScene()
 
 	createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0));
 
-	createNode(new Sphere(Vector(-150, 40, 180), 20.0), new Lambert(Color(1.0, 1.0, 0.0)));
+	//createNode(new Sphere(Vector(-150, 40, 180), 20.0), new Lambert(Color(1.0, 1.0, 0.0)));
 
-	createNode(new Sphere(Vector(-50, 40, 180), 20.0), new Lambert(Color(0.5, 0.5, 0.5)));
+	//createNode(new Sphere(Vector(-100, 40, 180), 20.0), new Lambert(Color(0.5, 0.5, 0.5)));
 
-	createNode(new Sphere(Vector(-100, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
+	//createNode(new Sphere(Vector(-50, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 
-	createNode(new Sphere(Vector(0, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5));
+	//createNode(new Sphere(Vector(0, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5));
 
-	createNode(new Sphere(Vector(-100, 30, 100), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5));
+	//createNode(new Sphere(Vector(50, 30, 100), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5));
 
-	//createNode(new Sphere(Vector(-50, 30, 100), 20.0), new OrenNayar(Color(0.0, 0.5, 0.5), 0.2));
+	createNode(new Sphere(Vector(0, 20, 180), 20.0), new OrenNayar(Color(0.0, 0.5, 0.5), 0.2));
 	
-	createNode(new Sphere(Vector(0, 30, 100), 20.0), new OrenNayar(Color(0.0, 0.0, 0.5), 0.9));
+	createNode(new Sphere(Vector(-40, 30, 100), 20.0), new OrenNayar(Color(0.0, 0.0, 0.5), 0.9));
 
-	createNode(new Sphere(Vector(80, 30, 100), 20.0), new Phong(Color(0.5, 0.0, 0.5), 32));
+	createNode(new Sphere(Vector(40, 40, 100), 20.0), new Phong(Color(0.5, 0.0, 0.5), 32));
 
-	//createNode(new Sphere(Vector(-80, 30, 100), 20.0), new Refraction(Color(0.5, 0.0, 0.5), 1.6));
+	createNode(new Sphere(Vector(0, 40, 100), 20.0), new Refraction(Color(0.9, 0.9, 0.9), 1.6));
 }
 
 __device__ 
@@ -111,6 +118,11 @@ Color raytrace(Ray ray)
 {
 	IntersectionData data;
 	Node* closestNode = nullptr;
+
+	if (ray.depth > MAX_RAY_DEPTH)
+	{
+		return Color(0, 0, 0);
+	}
 
 	data.dist = 1e99;
 	
@@ -225,6 +237,15 @@ void renderScene(Color* dev_vfb)
 	}
 }
 
+__global__
+void freeMemory()
+{
+	delete dev_cam;
+	delete [] dev_geom;
+	delete [] dev_nodes;
+	delete [] dev_shaders;
+}
+
 /**
  * Wrapper kernel function
 */
@@ -245,4 +266,11 @@ void cudaRenderer(Color* dev_vfb)
 	antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb);
 
 #endif
+	
+}
+
+extern "C"
+void freeDeviceMemory()
+{
+	freeMemory<<<1, 1>>>();
 }

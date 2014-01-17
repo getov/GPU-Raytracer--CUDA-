@@ -20,8 +20,8 @@
 	
 using namespace std;
 
-extern "C" 
-void cudaRenderer(Color* dev_vfb);
+extern "C" void cudaRenderer(Color* dev_vfb);
+extern "C"void freeDeviceMemory();
 
 // virtual framebuffer
 Color vfb[RES_Y][RES_X];
@@ -151,32 +151,67 @@ int main(int argc, char** argv)
 	{
 		return -1;
 	}
+
+	cudaDeviceSetLimit(cudaLimitStackSize, STACK_SIZE);
 	
 	// capture the start time
 	cudaEvent_t start, stop;
 	cudaStartTimer(start, stop);
 
-	// 1. allocate memory for vfb on the GPU
+	// allocate memory for vfb on the GPU
 	Color* dev_vfb;
 	cudaMalloc((void**)&dev_vfb, sizeof(Color) * RES_X * RES_Y);
 	
-	// 2. memcpy HostToDevice
+	// memcpy HostToDevice
 	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * RES_X * RES_Y, cudaMemcpyHostToDevice);
 
-	// 3. call kernels
+	// call kernels
 	// - InitializeScene
 	// - RenderScene
 	cudaRenderer(dev_vfb);
 
-	// 4. memcpy DeviceToHost
+	// memcpy DeviceToHost
 	cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
 
 	// get stop time, and display the timing results
 	cudaStopTimer(start, stop);
 
+	//Uint8* keystate = SDL_GetKeyState(NULL);
+	//while (true)
+	//{
+	//	if (keystate[SDLK_UP])
+	//	{
+	//		printf("SDLK_UP\n");
+	//	}
+	//	if (keystate[SDLK_DOWN])
+	//	{
+	//		printf("SDLK_DOWN\n");
+	//	}
+	//	if (keystate[SDLK_RIGHT])
+	//	{
+	//		printf("SDLK_RIGHT\n");
+	//	}
+	//	if (keystate[SDLK_LEFT])
+	//	{
+	//		printf("SDLK_LEFT\n");
+	//	}
+	//	if (keystate[SDLK_ESCAPE])
+	//	{
+	//		return 0;
+	//	}
+
+	//	cudaRenderer(dev_vfb);
+	//	cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
+	//	convertDeviceToHostBuffer();
+	//	displayVFB(vfb);
+	//}
+
+
+
 	printGPUSpecs();
 
-	// 5. free memory
+	// free memory	
+	freeDeviceMemory();
 	cudaFree(dev_vfb);
 
 	convertDeviceToHostBuffer();	
