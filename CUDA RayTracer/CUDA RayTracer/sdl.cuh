@@ -21,7 +21,7 @@
 #define SDL_H
 
 #include "Color.cuh"
-#include "Constants.cuh"
+#include "Settings.cuh"
 
 bool initGraphics(int frameWidth, int frameHeight);
 void closeGraphics(void);

@@ -216,6 +216,32 @@ inline Vector unproject(const Vector& v, int a, int b, int c)
 	return result;
 }
 
+__device__
+inline Vector normalize(const Vector& vec)
+{
+	double multiplier = 1.0 / vec.length();
+	return vec * multiplier;
+}
+
+/// given an unit vector a, create an orhonormed system (a, b, c). Code is deterministic.
+__device__
+inline void orthonormedSystem(const Vector& a, Vector& b, Vector& c)
+{
+	Vector temp = Vector(1, 0, 0);
+
+	if (fabs(dot(a, temp)) > 0.99)
+	{
+		temp = Vector(0, 1, 0);
+		if (fabs(dot(a, temp)) > 0.99)
+			temp = Vector(0, 0, 1);
+	}
+
+	b = a ^ temp;
+	b.normalize();
+	c = a ^ b;
+	c.normalize();
+}
+
 struct Ray
 {
 	Vector start;

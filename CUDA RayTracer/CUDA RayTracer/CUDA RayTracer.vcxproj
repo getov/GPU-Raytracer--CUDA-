@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.cuh" />
     <ClInclude Include="Color.cuh" />
-    <ClInclude Include="Constants.cuh" />
+    <ClInclude Include="Settings.cuh" />
     <ClInclude Include="Matrix.cuh" />
     <ClInclude Include="sdl.cuh" />
     <ClInclude Include="Util.cuh" />
@@ -54,6 +54,7 @@
     <None Include="IShader.cuh" />
     <None Include="Refraction.cuh" />
     <None Include="Sphere.cuh" />
+    <None Include="Transform.cuh" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9A9B1A78-D0BA-4948-A5D9-74FB6B9C5289}</ProjectGuid>

@@ -199,7 +199,6 @@ int main(int argc, char** argv)
 	//	{
 	//		return 0;
 	//	}
-
 	//	cudaRenderer(dev_vfb);
 	//	cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
 	//	convertDeviceToHostBuffer();

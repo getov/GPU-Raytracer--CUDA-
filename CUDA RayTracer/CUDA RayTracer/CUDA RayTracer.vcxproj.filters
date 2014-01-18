@@ -27,9 +27,9 @@
     <ClInclude Include="Camera.cuh">
       <Filter>Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Constants.cuh" />
     <ClInclude Include="sdl.cuh" />
     <ClInclude Include="Util.cuh" />
+    <ClInclude Include="Settings.cuh" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="sdl.cu" />
@@ -93,6 +93,9 @@
     </None>
     <None Include="Refraction.cuh">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="Transform.cuh">
+      <Filter>Math</Filter>
     </None>
   </ItemGroup>
 </Project>

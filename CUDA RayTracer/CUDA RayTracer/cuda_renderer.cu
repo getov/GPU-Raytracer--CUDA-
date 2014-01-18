@@ -18,6 +18,7 @@
 #include "OrenNayar.cuh"
 #include "Phong.cuh"
 #include "Refraction.cuh"
+#include "Transform.cuh"
 
 __device__
 bool needsAA[RES_X * RES_Y];
@@ -51,7 +52,7 @@ bool testVisibility(const IntersectionData& data)
 	
 	for (int i = 0; i < GEOM_COUNT; ++i)
 	{
-		if (dev_nodes[i]->geom->intersect(ray, temp))
+		if (dev_nodes[i]->intersect(ray, temp))
 		{
 			return false;
 		}
@@ -61,7 +62,7 @@ bool testVisibility(const IntersectionData& data)
 }
 
 __device__
-void createNode(Geometry* geom, Shader* shader)
+Node* createNode(Geometry* geom, Shader* shader)
 {
 	if (GEOM_COUNT >= GEOM_MAX_SIZE)
 	{
@@ -72,6 +73,8 @@ void createNode(Geometry* geom, Shader* shader)
 	dev_shaders[GEOM_COUNT] = shader;
 	dev_nodes[GEOM_COUNT]   = new Node(dev_geom[GEOM_COUNT], dev_shaders[GEOM_COUNT]);
 	++GEOM_COUNT;
+
+	return dev_nodes[GEOM_COUNT - 1];
 }
 
 __global__ 
@@ -79,38 +82,40 @@ void initializeScene()
 {	
 	dev_cam = new Camera;
 	dev_cam->yaw = 0;
-	dev_cam->pitch = -15;
+	dev_cam->pitch = 0;
 	dev_cam->roll = 0;
 	dev_cam->fov = 90;
 	dev_cam->aspect = 4.0 / 3.0;
-	dev_cam->pos = Vector(0, 120, -50);
+	dev_cam->pos = Vector(0, 120, -100);
 
 	dev_cam->beginFrame();
 	
-	lightPos = Vector(-90, 200, 150);
+	lightPos = Vector(0, 296, 100);
 	lightColor = Color(1, 1, 1);
-	lightPower = 50000;
+	lightPower = 60000;
 	ambientLight = Color(0.2, 0.2, 0.2);
 
 	createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0));
 
-	//createNode(new Sphere(Vector(-150, 40, 180), 20.0), new Lambert(Color(1.0, 1.0, 0.0)));
+	Node* BackWall = createNode(new Plane(-300), new OrenNayar(Color(1.0, 1.0, 0.0), 1.0));
+	BackWall->transform.rotate(0, 90, 0);
 
-	//createNode(new Sphere(Vector(-100, 40, 180), 20.0), new Lambert(Color(0.5, 0.5, 0.5)));
+	Node* SideWallLeft = createNode(new Plane(-150), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
+	SideWallLeft->transform.rotate(0, 0, 90);
 
-	//createNode(new Sphere(Vector(-50, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
+	Node* SideWallRight = createNode(new Plane(150), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
+	SideWallRight->transform.rotate(0, 0, 90);
 
-	//createNode(new Sphere(Vector(0, 40, 180), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5));
-
-	//createNode(new Sphere(Vector(50, 30, 100), 20.0), new OrenNayar(Color(0.5, 0.5, 0.5), 0.5));
+	Node* Roof = createNode(new Plane(300), new OrenNayar(Color(0.96, 0.82, 0.46), 1.0));
 
 	createNode(new Sphere(Vector(0, 20, 180), 20.0), new OrenNayar(Color(0.0, 0.5, 0.5), 0.2));
 	
 	createNode(new Sphere(Vector(-40, 30, 100), 20.0), new OrenNayar(Color(0.0, 0.0, 0.5), 0.9));
 
-	createNode(new Sphere(Vector(40, 40, 100), 20.0), new Phong(Color(0.5, 0.0, 0.5), 32));
+	createNode(new Sphere(Vector(50, 50, 200), 20.0), new Phong(Color(0.5, 0.0, 0.5), 32));
 
-	createNode(new Sphere(Vector(0, 40, 100), 20.0), new Refraction(Color(0.9, 0.9, 0.9), 1.6));
+	createNode(new Sphere(Vector(60, 50, 120), 40.0), new Refraction(Color(0.9, 0.9, 0.9), 10));
+
 }
 
 __device__ 
@@ -128,7 +133,7 @@ Color raytrace(Ray ray)
 	
 	for (int i = 0; i < GEOM_COUNT; i++)
 	{
-		if (dev_nodes[i]->geom->intersect(ray, data))
+		if (dev_nodes[i]->intersect(ray, data))
 		{
 			closestNode = dev_nodes[i];
 		}

@@ -3,7 +3,7 @@
 
 #include "Color.cuh"
 #include "Vector3D.cuh"
-#include "Constants.cuh"
+#include "Settings.cuh"
 #include "IGeometry.cuh"
 #include "Camera.cuh"
 #include "IShader.cuh"
