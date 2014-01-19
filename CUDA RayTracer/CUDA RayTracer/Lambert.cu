@@ -20,7 +20,7 @@ Color Lambert::shade(Ray ray, const IntersectionData& data)
 	Color diffuseColor = _color;
 	Color lightContrib = ambientLight;
 
-	if (data.isVisible)
+	if (testVisibility(data.p + N * 1e-3, lightPos))
 	{
 		Vector lightDir = lightPos - data.p;
 		lightDir.normalize();

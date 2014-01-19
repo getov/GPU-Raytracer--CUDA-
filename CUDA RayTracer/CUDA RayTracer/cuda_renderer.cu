@@ -36,22 +36,18 @@ Shader* dev_shaders[GEOM_MAX_SIZE];
 __device__ 
 Node* dev_nodes[GEOM_MAX_SIZE];
 
-__device__ 
-bool testVisibility(const IntersectionData& data)
+__device__
+bool testVisibility(const Vector& from, const Vector& to)
 {
-	//Vector to = lightPos;
-	// Vector from = ray.start
 	Ray ray;
-	ray.start = data.p + data.normal * 1e-3;
-
-	ray.dir = lightPos - ray.start;
-
+	ray.start = from;
+	ray.dir = to - from;
 	ray.dir.normalize();
-	
+
 	IntersectionData temp;
-	temp.dist = (lightPos - ray.start).length();
-	
-	for (int i = 0; i < GEOM_COUNT; ++i)
+	temp.dist = (to - from).length();
+
+	for (int i = 0; i < GEOM_COUNT; i++)
 	{
 		if (dev_nodes[i]->intersect(ray, temp))
 		{
@@ -142,7 +138,10 @@ Color raytrace(Ray ray)
 		return Color(0, 0, 0);
 	}
 
-	data.isVisible = testVisibility(data);
+	//Vector N = faceforward(ray.dir, data.normal);
+	//data.normal = N;
+
+	//data.isVisible = testVisibility(data);
 	
 	return closestNode->shader->shade(ray, data);
 }

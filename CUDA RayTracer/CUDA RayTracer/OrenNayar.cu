@@ -51,7 +51,7 @@ Color OrenNayar::shade(Ray ray, const IntersectionData& data)
 						(A + B * azimuthDiffCos * std::sin(alpha) * std::tan(beta)) *
 		                  incomingLight;
 
-	if (data.isVisible) 
+	if (testVisibility(data.p + N * 1e-3, lightPos)) 
 	{
 		lightContrib += reflectedLight;
 	}

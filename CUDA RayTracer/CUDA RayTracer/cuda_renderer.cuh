@@ -12,4 +12,7 @@
 __device__ 
 Color raytrace(Ray ray);
 
+__device__
+bool testVisibility(const Vector& from, const Vector& to);
+
 #endif
