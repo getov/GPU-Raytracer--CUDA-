@@ -61,6 +61,9 @@
     <CudaCompile Include="Refraction.cu">
       <Filter>Shaders</Filter>
     </CudaCompile>
+    <CudaCompile Include="Reflection.cu">
+      <Filter>Shaders</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />
@@ -96,6 +99,9 @@
     </None>
     <None Include="Transform.cuh">
       <Filter>Math</Filter>
+    </None>
+    <None Include="Reflection.cuh">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

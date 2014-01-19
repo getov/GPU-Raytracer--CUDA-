@@ -9,8 +9,8 @@ private:
 	double glossiness;
 	int numSamples;
 
-	/*__device__
-	static void getRandomDiscPoint(double& x, double& y);*/
+	__device__
+	static void getRandomDiscPoint(double& x, double& y);
 
 public:
 	__device__

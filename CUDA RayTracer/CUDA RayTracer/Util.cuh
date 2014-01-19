@@ -6,6 +6,8 @@
 #include "Settings.cuh"
 #include "curand.h"
 #include "curand_kernel.h"
+#include <thrust\random.h>
+#include <ctime>
 
 __device__ 
 inline double signOf(double x)
@@ -56,16 +58,25 @@ inline bool solveQuadraticEquation(float a, float b, float c, float& outX1, floa
 
 /// returns a random floating-point number in [0..1).
 /// This is not a very good implementation. A better method is to be employed soon.
+//__device__
+//inline float randomFloat()
+//{
+//	//unsigned int N = 10000; // samples per thread
+//
+// //   unsigned int seed = thread_id;
+//
+// //   curandState s;
+//	//curandGenerateUniform curand_uniform 
+//	return rand() / (float) RAND_MAX;
+//}
+
 __device__
 inline float randomFloat()
 {
-	//unsigned int N = 10000; // samples per thread
+	thrust::default_random_engine randEngine(10);
+	thrust::uniform_real_distribution<float> range(0,1);
 
- //   unsigned int seed = thread_id;
-
- //   curandState s;
-	//curandGenerateUniform curand_uniform 
-	return rand() / (float) RAND_MAX;
+	return (float)range(randEngine);
 }
 
 #endif // UTIL_H

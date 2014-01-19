@@ -154,6 +154,10 @@ int main(int argc, char** argv)
 
 	cudaDeviceSetLimit(cudaLimitStackSize, STACK_SIZE);
 	
+	/*size_t stackLimit;
+	cudaDeviceGetLimit(&stackLimit, cudaLimitMallocHeapSize);
+	printf("%d\n", stackLimit);*/
+
 	// capture the start time
 	cudaEvent_t start, stop;
 	cudaStartTimer(start, stop);

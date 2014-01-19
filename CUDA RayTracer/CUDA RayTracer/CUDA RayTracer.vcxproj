@@ -38,6 +38,7 @@
     <CudaCompile Include="OrenNayar.cu" />
     <CudaCompile Include="Phong.cu" />
     <CudaCompile Include="Plane.cu" />
+    <CudaCompile Include="Reflection.cu" />
     <CudaCompile Include="Refraction.cu" />
     <CudaCompile Include="sdl.cu" />
     <CudaCompile Include="cuda_renderer.cu" />
@@ -52,6 +53,7 @@
     <None Include="Phong.cuh" />
     <None Include="Plane.cuh" />
     <None Include="IShader.cuh" />
+    <None Include="Reflection.cuh" />
     <None Include="Refraction.cuh" />
     <None Include="Sphere.cuh" />
     <None Include="Transform.cuh" />

@@ -1,18 +1,19 @@
 #include "Reflection.cuh"
 #include "cuda_renderer.cuh"
-#include "random_generator.cuh"
+#include "Util.cuh"
 
-//__device__
-//void Reflection::getRandomDiscPoint(double& x, double& y)
-//{
-//	// pick a random point in the unit disc with uniform probability by using polar coords.
-//	// Note the sqrt(). For explanation why it's needed, see 
-//	// http://mathworld.wolfram.com/DiskPointPicking.html
-//	double theta = randomFloat() * 2 * PI;
-//	double rho = sqrt(randomFloat());
-//	x = rho * cos(theta);
-//	y = rho * sin(theta);
-//}
+
+__device__
+void Reflection::getRandomDiscPoint(double& x, double& y)
+{
+	// pick a random point in the unit disc with uniform probability by using polar coords.
+	// Note the sqrt(). For explanation why it's needed, see 
+	// http://mathworld.wolfram.com/DiskPointPicking.html
+	double theta = randomFloat() * 2 * PI;
+	double rho = sqrt(randomFloat());
+	x = rho * cos(theta);
+	y = rho * sin(theta);
+}
 
 __device__
 Reflection::Reflection(const Color& filter, double glossiness, int numSamples)
@@ -27,19 +28,18 @@ Color Reflection::shade(Ray ray, const IntersectionData& data)
 {
 	Vector N = faceforward(ray.dir, data.normal);
 	
-	if (glossiness == 1)
+	if (glossiness == 1.0)
 	{
 		Vector reflected = reflect(ray.dir, N);
 		
 		Ray newRay = ray;
-		newRay.start = data.p + N * 1e-6;
+		newRay.start = data.p + N * 1e-3;
 		newRay.dir = reflected;
 		newRay.depth = ray.depth + 1;
 		return raytrace(newRay) * _color;
 	} 
-	else 
+	else // Not working at the moment. Maybe it need more stack size per thread than my GPU supports
 	{
-		Random& rnd = getRandomGen();
 		Vector a, b;
 		orthonormedSystem(N, a, b);
 		Color result(0, 0, 0);
@@ -51,7 +51,7 @@ Color Reflection::shade(Ray ray, const IntersectionData& data)
 			do 
 			{
 				double x, y;
-				rnd.unitDiscSample(x, y);
+				getRandomDiscPoint(x, y);
 				x *= scaling;
 				y *= scaling;
 				
@@ -67,6 +67,6 @@ Color Reflection::shade(Ray ray, const IntersectionData& data)
 			newRay.depth = ray.depth + 1;
 			result += raytrace(newRay) * _color;
 		}
-		return result / samplesWanted;
+		return result ;
 	}
 }

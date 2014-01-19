@@ -32,9 +32,11 @@ struct Color
 	__device__ 
 	explicit Color(unsigned rgbcolor) //!< Construct a color from R8G8B8 value like "0xffce08"
 	{
-		b = (rgbcolor & 0xff) / 255.0f;
-		g = ((rgbcolor >> 8) & 0xff) / 255.0f;
-		r = ((rgbcolor >> 16) & 0xff) / 255.0f;
+		float divider = 1 / 255.0f;
+
+		b = (rgbcolor & 0xff) * divider;
+		g = ((rgbcolor >> 8) & 0xff) * divider;
+		r = ((rgbcolor >> 16) & 0xff) * divider;
 	}
 
 	/// convert to RGB32, with channel shift specifications. The default values are for
@@ -68,7 +70,7 @@ struct Color
 	__device__ 
 	float intensity(void)
 	{
-		return (r + g + b) / 3;
+		return (r + g + b) * 0.3333333;
 	}
 
 	/// get the perceptual intensity of the color

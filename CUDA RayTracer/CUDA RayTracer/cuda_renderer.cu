@@ -19,6 +19,7 @@
 #include "Phong.cuh"
 #include "Refraction.cuh"
 #include "Transform.cuh"
+#include "Reflection.cuh"
 
 __device__
 bool needsAA[RES_X * RES_Y];
@@ -72,9 +73,8 @@ Node* createNode(Geometry* geom, Shader* shader)
 	dev_geom[GEOM_COUNT]    = geom;
 	dev_shaders[GEOM_COUNT] = shader;
 	dev_nodes[GEOM_COUNT]   = new Node(dev_geom[GEOM_COUNT], dev_shaders[GEOM_COUNT]);
-	++GEOM_COUNT;
 
-	return dev_nodes[GEOM_COUNT - 1];
+	return dev_nodes[GEOM_COUNT++];
 }
 
 __global__ 
@@ -108,13 +108,11 @@ void initializeScene()
 
 	Node* Roof = createNode(new Plane(300), new OrenNayar(Color(0.96, 0.82, 0.46), 1.0));
 
-	createNode(new Sphere(Vector(0, 20, 180), 20.0), new OrenNayar(Color(0.0, 0.5, 0.5), 0.2));
-	
-	createNode(new Sphere(Vector(-40, 30, 100), 20.0), new OrenNayar(Color(0.0, 0.0, 0.5), 0.9));
-
-	createNode(new Sphere(Vector(50, 50, 200), 20.0), new Phong(Color(0.5, 0.0, 0.5), 32));
+	createNode(new Sphere(Vector(-40, 50, 150), 30.0), new Phong(Color(0.5, 0.0, 0.5), 32));
 
 	createNode(new Sphere(Vector(60, 50, 120), 40.0), new Refraction(Color(0.9, 0.9, 0.9), 10));
+
+	createNode(new Sphere(Vector(0, 150, 150), 30.0), new Reflection(Color(0.9, 0.9, 0.9)));
 
 }
 
