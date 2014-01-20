@@ -20,6 +20,8 @@
 #include "Refraction.cuh"
 #include "Transform.cuh"
 #include "Reflection.cuh"
+#include "Layered.cuh"
+#include "Fresnel.cuh"
 
 __device__
 bool needsAA[RES_X * RES_Y];
@@ -93,9 +95,12 @@ void initializeScene()
 
 	createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0));
 
+	Layered* mirror = new Layered;
+	mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
+
 	Node* BackWall = createNode(new Plane(-300), new OrenNayar(Color(1.0, 1.0, 0.0), 1.0));
 	BackWall->transform.rotate(0, 90, 0);
-
+	
 	Node* SideWallLeft = createNode(new Plane(-150), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
 	SideWallLeft->transform.rotate(0, 0, 90);
 
@@ -104,11 +109,21 @@ void initializeScene()
 
 	Node* Roof = createNode(new Plane(300), new OrenNayar(Color(0.96, 0.82, 0.46), 1.0));
 
-	createNode(new Sphere(Vector(-40, 50, 150), 30.0), new Phong(Color(0.5, 0.0, 0.5), 32));
+	//createNode(new Sphere(Vector(-40, 50, 150), 30.0), new Phong(Color(0.5, 0.0, 0.5), 32));
 
-	createNode(new Sphere(Vector(60, 50, 120), 40.0), new Refraction(Color(0.9, 0.9, 0.9), 10));
+	//createNode(new Sphere(Vector(60, 50, 120), 40.0), new Refraction(Color(0.9, 0.9, 0.9), 10));
 
-	createNode(new Sphere(Vector(0, 150, 150), 30.0), new Reflection(Color(0.9, 0.9, 0.9)));
+	//createNode(new Sphere(Vector(0, 150, 150), 30.0), new Reflection(Color(0.9, 0.9, 0.9)));
+
+	Layered* moreGlossy = new Layered;
+	moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
+	moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
+	createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
+
+	/*Layered* glossy = new Layered;
+	glossy->addLayer(new Phong(Color(0.5, 0.0, 0.5), 32), Color(1.0, 1.0, 1.0)); 
+	glossy->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1, 1, 1), new Fresnel(3.0));
+	createNode(new Sphere(Vector(-90, 50, 130), 40.0), glossy);*/
 
 }
 

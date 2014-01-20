@@ -64,6 +64,12 @@
     <CudaCompile Include="Reflection.cu">
       <Filter>Shaders</Filter>
     </CudaCompile>
+    <CudaCompile Include="Fresnel.cu">
+      <Filter>Shaders</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Layered.cu">
+      <Filter>Shaders</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />
@@ -101,6 +107,15 @@
       <Filter>Math</Filter>
     </None>
     <None Include="Reflection.cuh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Fresnel.cuh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Texture.cuh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Layered.cuh">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

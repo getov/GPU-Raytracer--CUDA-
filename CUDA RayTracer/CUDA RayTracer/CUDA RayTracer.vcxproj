@@ -32,8 +32,10 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="Camera.cu" />
+    <CudaCompile Include="Fresnel.cu" />
     <CudaCompile Include="IShader.cu" />
     <CudaCompile Include="Lambert.cu" />
+    <CudaCompile Include="Layered.cu" />
     <CudaCompile Include="Matrix.cu" />
     <CudaCompile Include="OrenNayar.cu" />
     <CudaCompile Include="Phong.cu" />
@@ -46,8 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cuda_renderer.cuh" />
+    <None Include="Fresnel.cuh" />
     <None Include="IGeometry.cuh" />
     <None Include="Lambert.cuh" />
+    <None Include="Layered.cuh" />
     <None Include="Node.cuh" />
     <None Include="OrenNayar.cuh" />
     <None Include="Phong.cuh" />
@@ -56,6 +60,7 @@
     <None Include="Reflection.cuh" />
     <None Include="Refraction.cuh" />
     <None Include="Sphere.cuh" />
+    <None Include="Texture.cuh" />
     <None Include="Transform.cuh" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
