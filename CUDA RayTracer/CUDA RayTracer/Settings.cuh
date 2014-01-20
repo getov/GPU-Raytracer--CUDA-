@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 //#define FULL_HD
+//#define REAL_TIME_RENDERING
 #define ANTI_ALIASING
 #define VFB_MAX_SIZE 1920
 #define INF 1e99
@@ -9,7 +10,7 @@
 #define PI 3.141592653589793238
 
 // the stack size in bytes for each GPU thread
-const size_t STACK_SIZE = 20 * 1024;
+const size_t STACK_SIZE = 5 * 1024;
 
 #ifdef FULL_HD
 	const int RES_X  = 1920;

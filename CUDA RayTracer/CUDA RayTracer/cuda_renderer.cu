@@ -152,11 +152,6 @@ Color raytrace(Ray ray)
 	{
 		return Color(0, 0, 0);
 	}
-
-	//Vector N = faceforward(ray.dir, data.normal);
-	//data.normal = N;
-
-	//data.isVisible = testVisibility(data);
 	
 	return closestNode->shader->shade(ray, data);
 }
@@ -263,14 +258,30 @@ void freeMemory()
 	delete [] dev_shaders;
 }
 
+__global__
+void update()
+{
+	dev_cam->pos += Vector(0, 0, 1) * 2;
+}
+
+extern "C"
+void updateScene()
+{
+	update<<<1, 1>>>();
+}
+
 /**
  * Wrapper kernel function
 */
+extern "C"
+void initScene()
+{
+	initializeScene<<<1, 1>>>();
+}
+
 extern "C" 
 void cudaRenderer(Color* dev_vfb)
 {
-	initializeScene<<<1, 1>>>();
-
 	dim3 THREADS_PER_BLOCK(32, 32); // 32*32 = 1024 (max threads per block supported)
 	dim3 BLOCKS(RES_X / THREADS_PER_BLOCK.x, RES_Y / THREADS_PER_BLOCK.y); 
 	

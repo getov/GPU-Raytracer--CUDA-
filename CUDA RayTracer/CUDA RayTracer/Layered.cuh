@@ -18,7 +18,7 @@ class Layered: public Shader
 	int numLayers;
 public:
 	__device__
-	Layered(): Shader(Color(0, 0, 0)) { numLayers = 0; }
+	Layered();
 
 	__device__
 	void addLayer(Shader* shader, const Color& blend, Texture* texture = NULL);

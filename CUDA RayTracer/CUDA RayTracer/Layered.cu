@@ -1,6 +1,13 @@
 #include "Layered.cuh"
 
 __device__
+Layered::Layered()
+	: Shader(Color(0, 0, 0))
+{
+	numLayers = 0;
+}
+
+__device__
 void Layered::addLayer(Shader* shader, const Color& blend, Texture* texture)
 {
 	Layer& l = layers[numLayers];
@@ -15,7 +22,8 @@ Color Layered::shade(Ray ray, const IntersectionData& data)
 {
 	Color result(0, 0, 0);
 	Vector N = data.normal;
-	for (int i = 0; i < numLayers; i++) {
+	for (int i = 0; i < numLayers; i++)
+	{
 		Layer& l = layers[i];
 		Color opacity = l.texture ?
 			l.texture->getTexColor(ray, data.u, data.v, N) : l.blend;
