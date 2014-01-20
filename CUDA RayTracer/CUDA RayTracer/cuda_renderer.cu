@@ -22,6 +22,7 @@
 #include "Reflection.cuh"
 #include "Layered.cuh"
 #include "Fresnel.cuh"
+#include "CameraController.cuh"
 
 __device__
 bool needsAA[RES_X * RES_Y];
@@ -37,6 +38,9 @@ Shader* dev_shaders[GEOM_MAX_SIZE];
 
 __device__ 
 Node* dev_nodes[GEOM_MAX_SIZE];
+
+__device__
+CameraController* m_controller;
 
 __device__
 bool testVisibility(const Vector& from, const Vector& to)
@@ -85,8 +89,9 @@ void initializeScene()
 	dev_cam->fov = 90;
 	dev_cam->aspect = 4.0 / 3.0;
 	dev_cam->pos = Vector(0, 120, -100);
-
 	dev_cam->beginFrame();
+
+	m_controller = new CameraController(*dev_cam, 0.2f);
 	
 	lightPos = Vector(0, 296, 100);
 	lightColor = Color(1, 1, 1);
@@ -253,6 +258,7 @@ __global__
 void freeMemory()
 {
 	delete dev_cam;
+	delete m_controller;
 	delete [] dev_geom;
 	delete [] dev_nodes;
 	delete [] dev_shaders;
@@ -261,7 +267,8 @@ void freeMemory()
 __global__
 void update()
 {
-	dev_cam->pos += Vector(0, 0, 1) * 2;
+	//   forward    Vector(0, 0, 0) - Vector(0, 0, 1)
+	m_controller->moveForward();
 }
 
 extern "C"

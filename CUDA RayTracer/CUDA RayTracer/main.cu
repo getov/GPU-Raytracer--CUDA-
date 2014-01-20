@@ -1,9 +1,12 @@
 #include <Windows.h>
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include <GL\glfw.h>
 
 #include <SDL/SDL.h>
 #include <iostream>
+#include <string>
+#include <sstream>
 #include "cuda_renderer.cuh"
 #include "Vector3D.cuh"
 #include <vector>
@@ -25,6 +28,12 @@ extern "C" void freeDeviceMemory();
 extern "C" void initScene();
 
 extern "C" void updateScene();
+
+unsigned frameCount;
+unsigned lastFrameEnd;
+unsigned lastTitleUpdateTime;
+unsigned lastTitleUpdateFrameCount;
+const char* const appName = "CUDA Traycer";
 
 // virtual framebuffer
 Color vfb[RES_Y][RES_X];
@@ -129,6 +138,33 @@ void cudaStopTimer(cudaEvent_t& start, cudaEvent_t& stop)
     cudaEventDestroy(stop);
 }
 
+void displayFrameCounter()
+{
+	++frameCount;
+
+	const unsigned now = SDL_GetTicks();
+	const unsigned frameTime = now - lastFrameEnd;
+	const unsigned titleUpdateTimeDelta = now - lastTitleUpdateTime;
+
+	if (titleUpdateTimeDelta > 1000)
+	{
+		const unsigned framesDelta = frameCount - lastTitleUpdateFrameCount;
+		const unsigned meanFrameTime = titleUpdateTimeDelta / framesDelta;
+		const unsigned fps = framesDelta * 1000 / titleUpdateTimeDelta;
+
+		std::ostringstream title;
+		title << appName << "\t\t\t mean frame time: " << meanFrameTime << " ms || fps: " << fps;
+		title.flush();
+
+		SDL_WM_SetCaption(title.str().c_str(), NULL);
+
+		lastTitleUpdateTime = now;
+		lastTitleUpdateFrameCount = frameCount;
+	}
+
+	lastFrameEnd = SDL_GetTicks();
+}
+
 /**
  * function that converts the linear array vfb_linear
  * into the 2D array vfb
@@ -174,11 +210,14 @@ int main(int argc, char** argv)
 
 	initScene();
 	
+	Uint32 lastTime = SDL_GetTicks();
 	bool running = true;
 	while (running)
 	{
+		Uint32 thisTime = SDL_GetTicks();
+
 		SDL_Event event;
-		while (SDL_PollEvent (&event) != 0)
+		while (SDL_PollEvent(&event))
 		{
 			switch (event.type)
 			{
@@ -191,6 +230,10 @@ int main(int argc, char** argv)
 									break;
 						case SDLK_UP:
 									printf("SDLK_UP\n");
+									updateScene();
+									break;
+						case SDLK_DOWN:
+									printf("SDLK_DOWN\n");
 									updateScene();
 									break;
 						default:
@@ -211,6 +254,12 @@ int main(int argc, char** argv)
 			}
 		}
 		
+		// update (thisTime - lastTime = timeElapsed)
+
+		displayFrameCounter();
+
+		lastTime = thisTime;
+
 		cudaRenderer(dev_vfb);
 		cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
 		convertDeviceToHostBuffer();

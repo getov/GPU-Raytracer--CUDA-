@@ -70,6 +70,9 @@
     <CudaCompile Include="Layered.cu">
       <Filter>Shaders</Filter>
     </CudaCompile>
+    <CudaCompile Include="CameraController.cu">
+      <Filter>Camera</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />
@@ -117,6 +120,9 @@
     </None>
     <None Include="Layered.cuh">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="CameraController.cuh">
+      <Filter>Camera</Filter>
     </None>
   </ItemGroup>
 </Project>

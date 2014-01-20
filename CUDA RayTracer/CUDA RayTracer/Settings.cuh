@@ -2,7 +2,7 @@
 #define SETTINGS_H
 
 //#define FULL_HD
-//#define REAL_TIME_RENDERING
+#define REAL_TIME_RENDERING
 #define ANTI_ALIASING
 #define VFB_MAX_SIZE 1920
 #define INF 1e99
