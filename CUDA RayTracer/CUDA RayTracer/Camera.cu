@@ -27,6 +27,10 @@ void Camera::beginFrame(void)
 	upLeft *= rotation;
 	upRight *= rotation;
 	downLeft *= rotation;
+
+	rightDir = Vector(1, 0, 0) * rotation;
+	upDir    = Vector(0, 1, 0) * rotation;
+	frontDir = Vector(0, 0, 1) * rotation;
 	
 	upLeft += pos;
 	upRight += pos;
@@ -48,4 +52,11 @@ Ray Camera::getScreenRay(double x, double y)
 	result.dir.normalize();
 	
 	return result;
+}
+
+__device__
+void Camera::move(double dx, double dz)
+{
+	pos += dx * rightDir;
+	pos += dz * frontDir;
 }

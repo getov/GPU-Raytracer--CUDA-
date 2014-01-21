@@ -20,6 +20,7 @@
 #include "Lambert.cuh"
 #include "Plane.cuh"
 #include "Sphere.cuh"
+#include "EventHandler.cuh"
 	
 using namespace std;
 
@@ -27,7 +28,7 @@ extern "C" void cudaRenderer(Color* dev_vfb);
 extern "C" void freeDeviceMemory();
 extern "C" void initScene();
 
-extern "C" void updateScene();
+extern "C" void updateScene(bool forward, bool backward, bool strafeRight, bool strafeLeft);
 
 unsigned frameCount;
 unsigned lastFrameEnd;
@@ -153,7 +154,7 @@ void displayFrameCounter()
 		const unsigned fps = framesDelta * 1000 / titleUpdateTimeDelta;
 
 		std::ostringstream title;
-		title << appName << "\t\t\t mean frame time: " << meanFrameTime << " ms || fps: " << fps;
+		title << appName << " :\t\t\t mean frame time: " << meanFrameTime << " ms || fps: " << fps;
 		title.flush();
 
 		SDL_WM_SetCaption(title.str().c_str(), NULL);
@@ -193,11 +194,9 @@ int main(int argc, char** argv)
 
 	printGPUSpecs();
 
+	EventHandler m_eventController;
+
 	cudaDeviceSetLimit(cudaLimitStackSize, STACK_SIZE);
-	
-	/*size_t stackLimit;
-	cudaDeviceGetLimit(&stackLimit, cudaLimitMallocHeapSize);
-	printf("%d\n", stackLimit);*/
 
 	// allocate memory for vfb on the GPU
 	Color* dev_vfb;
@@ -206,59 +205,18 @@ int main(int argc, char** argv)
 	// memcpy HostToDevice
 	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * RES_X * RES_Y, cudaMemcpyHostToDevice);
 
-#ifdef REAL_TIME_RENDERING
-
+	// - InitializeScene
 	initScene();
-	
-	Uint32 lastTime = SDL_GetTicks();
-	bool running = true;
-	while (running)
-	{
-		Uint32 thisTime = SDL_GetTicks();
 
-		SDL_Event event;
-		while (SDL_PollEvent(&event))
-		{
-			switch (event.type)
-			{
-				case SDL_KEYDOWN:
-				{
-					switch (event.key.keysym.sym)
-					{
-						case SDLK_ESCAPE:
-									running = false;
-									break;
-						case SDLK_UP:
-									printf("SDLK_UP\n");
-									updateScene();
-									break;
-						case SDLK_DOWN:
-									printf("SDLK_DOWN\n");
-									updateScene();
-									break;
-						default:
-							break;
-					}
-				}
-				case SDL_KEYUP:
-				{
-					switch (event.key.keysym.sym)
-					{
-						case SDLK_UP:
-									//forw = false;
-									break;
-						default:
-							break;
-					}
-				}
-			}
-		}
-		
-		// update (thisTime - lastTime = timeElapsed)
+#ifdef REAL_TIME_RENDERING
+	
+	while (m_eventController.isRealTimeRendering)
+	{
+		m_eventController.handleEvents();
+
+		//updateScene(m_eventController.isMovingForward, m_eventController.isMovingBackward, m_eventController.isStrafeRight, m_eventController.isStrafeLeft);
 
 		displayFrameCounter();
-
-		lastTime = thisTime;
 
 		cudaRenderer(dev_vfb);
 		cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
@@ -266,19 +224,10 @@ int main(int argc, char** argv)
 		displayVFB(vfb);
 	}
 
-	// free memory	
-	freeDeviceMemory();
-	cudaFree(dev_vfb);
-
-	closeGraphics();
-
 #else
 	// capture the start time
 	cudaEvent_t start, stop;
 	cudaStartTimer(start, stop);
-
-	// - InitializeScene
-	initScene();
 
 	// call kernels
 	// - RenderScene
@@ -290,19 +239,19 @@ int main(int argc, char** argv)
 	// get stop time, and display the timing results
 	cudaStopTimer(start, stop);
 
-	// free memory	
-	freeDeviceMemory();
-	cudaFree(dev_vfb);
-
 	convertDeviceToHostBuffer();	
 	
 	displayVFB(vfb);
 
-	handleUserInput();
-	
-	closeGraphics();
+	m_eventController.handleUserInput();
 
 #endif
+
+	// free memory	
+	freeDeviceMemory();
+	cudaFree(dev_vfb);
+
+	closeGraphics();
 
 	return EXIT_SUCCESS;
 }

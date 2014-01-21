@@ -91,45 +91,41 @@ void initializeScene()
 	dev_cam->pos = Vector(0, 120, -100);
 	dev_cam->beginFrame();
 
-	m_controller = new CameraController(*dev_cam, 0.2f);
+	m_controller = new CameraController(*dev_cam, 0.05f);
 	
 	lightPos = Vector(0, 296, 100);
 	lightColor = Color(1, 1, 1);
 	lightPower = 60000;
 	ambientLight = Color(0.2, 0.2, 0.2);
 
-	createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0));
+	//createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0));
 
-	Layered* mirror = new Layered;
-	mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
+	//Layered* mirror = new Layered;
+	//mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
 
-	Node* BackWall = createNode(new Plane(-300), new OrenNayar(Color(1.0, 1.0, 0.0), 1.0));
-	BackWall->transform.rotate(0, 90, 0);
-	
-	Node* SideWallLeft = createNode(new Plane(-150), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
-	SideWallLeft->transform.rotate(0, 0, 90);
+	//Node* BackWall = createNode(new Plane(-300), new OrenNayar(Color(1.0, 1.0, 0.0), 1.0));
+	//BackWall->transform.rotate(0, 90, 0);
+	//
+	//Node* SideWallLeft = createNode(new Plane(-150), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
+	//SideWallLeft->transform.rotate(0, 0, 90);
 
-	Node* SideWallRight = createNode(new Plane(150), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
-	SideWallRight->transform.rotate(0, 0, 90);
+	//Node* SideWallRight = createNode(new Plane(150), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
+	//SideWallRight->transform.rotate(0, 0, 90);
 
-	Node* Roof = createNode(new Plane(300), new OrenNayar(Color(0.96, 0.82, 0.46), 1.0));
+	//Node* Roof = createNode(new Plane(300), new OrenNayar(Color(0.96, 0.82, 0.46), 1.0));
 
-	//createNode(new Sphere(Vector(-40, 50, 150), 30.0), new Phong(Color(0.5, 0.0, 0.5), 32));
+	//Layered* moreGlossy = new Layered;
+	//moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
+	//moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
+	//createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
 
-	//createNode(new Sphere(Vector(60, 50, 120), 40.0), new Refraction(Color(0.9, 0.9, 0.9), 10));
 
-	//createNode(new Sphere(Vector(0, 150, 150), 30.0), new Reflection(Color(0.9, 0.9, 0.9)));
+	// For Real Time Rendering
+	createNode(new Plane(5), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 
-	Layered* moreGlossy = new Layered;
-	moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
-	moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
-	createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
+	createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 
-	/*Layered* glossy = new Layered;
-	glossy->addLayer(new Phong(Color(0.5, 0.0, 0.5), 32), Color(1.0, 1.0, 1.0)); 
-	glossy->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1, 1, 1), new Fresnel(3.0));
-	createNode(new Sphere(Vector(-90, 50, 130), 40.0), glossy);*/
-
+	createNode(new Sphere(Vector(0, 50, 200), 40.0), new Phong(Color(0, 0, 1), 32));
 }
 
 __device__ 
@@ -265,16 +261,31 @@ void freeMemory()
 }
 
 __global__
-void update()
+void update(bool forward, bool backward, bool strafeRight, bool strafeLeft)
 {
 	//   forward    Vector(0, 0, 0) - Vector(0, 0, 1)
-	m_controller->moveForward();
+	if (forward)
+	{
+		m_controller->moveForward();
+	}
+	if (backward)
+	{
+		m_controller->moveBackward();
+	}
+	if (strafeRight)
+	{
+		m_controller->strafeRight();
+	}
+	if (strafeLeft)
+	{
+		m_controller->strafeLeft();
+	}
 }
 
 extern "C"
-void updateScene()
+void updateScene(bool forward, bool backward, bool strafeRight, bool strafeLeft)
 {
-	update<<<1, 1>>>();
+	update<<<1, 1>>>(forward, backward, strafeRight, strafeLeft);
 }
 
 /**
@@ -308,4 +319,57 @@ extern "C"
 void freeDeviceMemory()
 {
 	freeMemory<<<1, 1>>>();
+}
+
+/////
+__global__
+void mvForward()
+{
+	m_controller->moveForward();
+	//dev_cam->move(0, 0.2);
+}
+
+extern "C" 
+void moveForward()
+{
+	mvForward<<<1, 1>>>();
+}
+
+__global__
+void mvBackward()
+{
+	m_controller->moveBackward();
+	//dev_cam->move(0, -0.2);
+}
+
+extern "C" 
+void moveBackward()
+{
+	mvBackward<<<1, 1>>>();
+}
+
+__global__
+void mvLeft()
+{
+	m_controller->strafeLeft();
+	//dev_cam->move(-0.2, 0);
+}
+
+extern "C" 
+void moveLeft()
+{
+	mvLeft<<<1, 1>>>();
+}
+
+__global__
+void mvRight()
+{
+	m_controller->strafeRight();
+	//dev_cam->move(0.2, 0);
+}
+
+extern "C" 
+void moveRight()
+{
+	mvRight<<<1, 1>>>();
 }

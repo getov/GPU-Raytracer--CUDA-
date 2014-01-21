@@ -33,6 +33,7 @@
   <ItemGroup>
     <CudaCompile Include="Camera.cu" />
     <CudaCompile Include="CameraController.cu" />
+    <CudaCompile Include="EventHandler.cu" />
     <CudaCompile Include="Fresnel.cu" />
     <CudaCompile Include="IShader.cu" />
     <CudaCompile Include="Lambert.cu" />
@@ -50,6 +51,7 @@
   <ItemGroup>
     <None Include="CameraController.cuh" />
     <None Include="cuda_renderer.cuh" />
+    <None Include="EventHandler.cuh" />
     <None Include="Fresnel.cuh" />
     <None Include="IGeometry.cuh" />
     <None Include="Lambert.cuh" />

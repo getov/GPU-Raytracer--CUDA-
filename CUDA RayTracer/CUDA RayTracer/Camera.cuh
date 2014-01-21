@@ -9,7 +9,10 @@
 class Camera 
 {
 	Vector upLeft, upRight, downLeft;
+	
 public:
+	Vector frontDir, rightDir, upDir;
+
 	Vector pos; // position
 	double yaw, pitch, roll; // in degrees
 	double fov; // in degrees
@@ -21,6 +24,8 @@ public:
 	__device__ 
 	Ray getScreenRay(double x, double y);
 	
+	__device__
+	void move(double dx, double dz);
 };
 
 

@@ -73,6 +73,7 @@
     <CudaCompile Include="CameraController.cu">
       <Filter>Camera</Filter>
     </CudaCompile>
+    <CudaCompile Include="EventHandler.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />
@@ -124,5 +125,6 @@
     <None Include="CameraController.cuh">
       <Filter>Camera</Filter>
     </None>
+    <None Include="EventHandler.cuh" />
   </ItemGroup>
 </Project>
