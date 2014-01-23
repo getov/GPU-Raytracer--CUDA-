@@ -76,9 +76,6 @@
     <CudaCompile Include="EventHandler.cu" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cu" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="cuda_renderer.cuh" />
     <None Include="IGeometry.cuh">
       <Filter>Geometry</Filter>
@@ -126,5 +123,8 @@
       <Filter>Camera</Filter>
     </None>
     <None Include="EventHandler.cuh" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cu" />
   </ItemGroup>
 </Project>

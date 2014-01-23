@@ -28,6 +28,8 @@ extern "C" void cudaRenderer(Color* dev_vfb);
 extern "C" void freeDeviceMemory();
 extern "C" void initScene();
 
+extern "C"void camBeginFrame();
+
 extern "C" void updateScene(bool forward, bool backward, bool strafeRight, bool strafeLeft);
 
 unsigned frameCount;
@@ -176,6 +178,7 @@ void displayFrameCounter()
 */
 void convertDeviceToHostBuffer()
 {
+	//#pragma omp parallel for schedule(dynamic, 1)
 	for (int i = 0; i < RES_Y; ++i)
 	{
 		for (int j = 0; j < RES_X; ++j)
@@ -212,19 +215,21 @@ int main(int argc, char** argv)
 	
 	while (m_eventController.isRealTimeRendering)
 	{
-		m_eventController.handleEvents();
-
-		//updateScene(m_eventController.isMovingForward, m_eventController.isMovingBackward, m_eventController.isStrafeRight, m_eventController.isStrafeLeft);
-
+		camBeginFrame();
+		
 		displayFrameCounter();
-
+		
 		cudaRenderer(dev_vfb);
 		cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
 		convertDeviceToHostBuffer();
+
+		m_eventController.handleEvents();
+
 		displayVFB(vfb);
 	}
 
 #else
+
 	// capture the start time
 	cudaEvent_t start, stop;
 	cudaStartTimer(start, stop);

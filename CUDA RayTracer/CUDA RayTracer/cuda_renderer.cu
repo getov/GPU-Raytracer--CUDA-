@@ -91,7 +91,7 @@ void initializeScene()
 	dev_cam->pos = Vector(0, 120, -100);
 	dev_cam->beginFrame();
 
-	m_controller = new CameraController(*dev_cam, 0.05f);
+	m_controller = new CameraController(*dev_cam, 10.f);
 	
 	lightPos = Vector(0, 296, 100);
 	lightColor = Color(1, 1, 1);
@@ -140,7 +140,7 @@ Color raytrace(Ray ray)
 	}
 
 	data.dist = 1e99;
-	
+
 	for (int i = 0; i < GEOM_COUNT; i++)
 	{
 		if (dev_nodes[i]->intersect(ray, data))
@@ -243,7 +243,7 @@ void renderScene(Color* dev_vfb)
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
 	int offset = x + y * blockDim.x * gridDim.x;
-	
+
 	if (offset < RES_X * RES_Y)
 	{
 		dev_vfb[offset] = raytrace(dev_cam->getScreenRay(x, y));
@@ -295,6 +295,18 @@ extern "C"
 void initScene()
 {
 	initializeScene<<<1, 1>>>();
+}
+
+__global__
+void cameraBeginFrame()
+{
+	dev_cam->beginFrame();
+}
+
+extern "C"
+void camBeginFrame()
+{
+	cameraBeginFrame<<<1, 1>>>();
 }
 
 extern "C" 

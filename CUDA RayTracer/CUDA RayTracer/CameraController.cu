@@ -39,35 +39,23 @@ Vector CameraController::left()
 __device__ 
 void CameraController::moveForward()
 {
-	//m_camera->pos += forward() * movementSpeed;
-
-	m_camera->pos += m_camera->rightDir * 0;
-	m_camera->pos += m_camera->frontDir * movementSpeed;
+	m_camera->pos += forward() * movementSpeed;
 }
 
 __device__
 void CameraController::moveBackward()
 {
-	//m_camera->pos += backward() * movementSpeed;
-
-	m_camera->pos += m_camera->rightDir * 0;
-	m_camera->pos += m_camera->frontDir * -movementSpeed;
+	m_camera->pos += backward() * movementSpeed;
 }
 
 __device__ 
 void CameraController::strafeRight()
 {
-	//m_camera->pos += right() * movementSpeed;
-
-	m_camera->pos += m_camera->rightDir * movementSpeed;
-	m_camera->pos += m_camera->frontDir * 0;
+	m_camera->pos += right() * movementSpeed;
 }
 
 __device__ 
 void CameraController::strafeLeft()
 {
-	//m_camera->pos += left() * movementSpeed;
-
-	m_camera->pos += m_camera->rightDir * -movementSpeed;
-	m_camera->pos += m_camera->frontDir * 0;
+	m_camera->pos += left() * movementSpeed;
 }
