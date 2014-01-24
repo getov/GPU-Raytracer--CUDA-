@@ -28,9 +28,8 @@ extern "C" void cudaRenderer(Color* dev_vfb);
 extern "C" void freeDeviceMemory();
 extern "C" void initScene();
 
-extern "C"void camBeginFrame();
+extern "C"void cameraBeginFrame();
 
-extern "C" void updateScene(bool forward, bool backward, bool strafeRight, bool strafeLeft);
 
 unsigned frameCount;
 unsigned lastFrameEnd;
@@ -178,7 +177,7 @@ void displayFrameCounter()
 */
 void convertDeviceToHostBuffer()
 {
-	//#pragma omp parallel for schedule(dynamic, 1)
+	//#pragma omp parallel for schedule(dynamic, 1) 
 	for (int i = 0; i < RES_Y; ++i)
 	{
 		for (int j = 0; j < RES_X; ++j)
@@ -208,22 +207,29 @@ int main(int argc, char** argv)
 	// memcpy HostToDevice
 	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * RES_X * RES_Y, cudaMemcpyHostToDevice);
 
-	// - InitializeScene
+	//SDL_ShowCursor(0);
+
+	// InitializeScene
 	initScene();
+
+	SDL_WarpMouse(RES_X / 2, RES_Y / 2);
 
 #ifdef REAL_TIME_RENDERING
 	
 	while (m_eventController.isRealTimeRendering)
 	{
-		camBeginFrame();
+		cameraBeginFrame();
 		
 		displayFrameCounter();
 		
 		cudaRenderer(dev_vfb);
 		cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
 		convertDeviceToHostBuffer();
-
+		
 		m_eventController.handleEvents();
+
+		SDL_WM_GrabInput(SDL_GRAB_ON);
+		//SDL_WarpMouse(RES_X/2, RES_Y/2);
 
 		displayVFB(vfb);
 	}

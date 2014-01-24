@@ -50,7 +50,7 @@ public:
 	}
 
 	__device__
-	void scale(double X, double Y, double Z) 
+	void scale(const double& X, const double& Y, const double& Z) 
 	{
 		Matrix scaling(X);
 		scaling.m[1][1] = Y;
@@ -61,7 +61,7 @@ public:
 	}
 
 	__device__
-	void rotate(double yaw, double pitch, double roll)
+	void rotate(const double& yaw, const double& pitch, const double& roll)
 	{
 		transform = transform *
 			rotationAroundX(toRadians(pitch)) *

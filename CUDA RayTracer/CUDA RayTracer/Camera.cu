@@ -1,7 +1,7 @@
 #include "Camera.cuh"
 
 __device__ 
-void Camera::beginFrame(void)
+void Camera::beginFrame()
 {
 	double x = -aspect;
 	double y = +1;
@@ -38,7 +38,7 @@ void Camera::beginFrame(void)
 }
 
 __device__ 
-Ray Camera::getScreenRay(double x, double y)
+Ray Camera::getScreenRay(const double& x, const double& y)
 {
 	Ray result; // A, B -     C = A + (B - A) * x
 	result.start = this->pos;
@@ -52,11 +52,4 @@ Ray Camera::getScreenRay(double x, double y)
 	result.dir.normalize();
 	
 	return result;
-}
-
-__device__
-void Camera::move(double dx, double dz)
-{
-	pos += dx * rightDir;
-	pos += dz * frontDir;
 }

@@ -22,7 +22,7 @@ public:
 	__device__  Vector(){}
 
 	__device__  
-	Vector(double _x, double _y, double _z)
+	Vector(const double& _x, const double& _y, const double& _z)
 	{
 		x = _x;
 		y = _y;
@@ -48,7 +48,7 @@ public:
 	}
 
 	__device__  
-	void scale(double multiplier)
+	void scale(const double& multiplier)
 	{
 		x *= multiplier;
 		y *= multiplier;
@@ -56,7 +56,7 @@ public:
 	}
 
 	__device__ 
-	void operator *= (double multiplier)
+	void operator *= (const double& multiplier)
 	{
 		scale(multiplier);
 	}
@@ -70,7 +70,7 @@ public:
 	}
 
 	__device__  
-	void operator /= (double divider)
+	void operator /= (const double& divider)
 	{
 		scale(1.0 / divider);
 	}
@@ -83,19 +83,19 @@ public:
 	}
 
 	__device__  
-	void setLength(double newLength)
+	void setLength(const double& newLength)
 	{
 		scale(newLength / length());
 	}
 
 	__device__  
-	double& operator[] (int index)
+	double& operator[] (const int& index)
 	{
 		return components[index];
 	}
 
 	__device__  
-	const double& operator[] (int index) const
+	const double& operator[] (const int& index) const
 	{
 		return components[index];
 	}
@@ -151,13 +151,13 @@ inline Vector operator * (const Vector& a, double multiplier)
 }
 
 __device__  
-inline Vector operator * (double multiplier, const Vector& a)
+inline Vector operator * (const double& multiplier, const Vector& a)
 {
 	return Vector(a.x * multiplier, a.y * multiplier, a.z * multiplier);
 }
 
 __device__  
-inline Vector operator / (const Vector& a, double divider)
+inline Vector operator / (const Vector& a, const double& divider)
 {
 	double multiplier = 1.0 / divider;
 	return Vector(a.x * multiplier, a.y * multiplier, a.z * multiplier);
@@ -197,7 +197,7 @@ inline Vector faceforward(const Vector& ray, const Vector& norm)
 }
 
 __device__  
-inline Vector project(const Vector& v, int a, int b, int c)
+inline Vector project(const Vector& v, const int& a, const int& b, const int& c)
 {
 	Vector result;
 	result[a] = v[0];
@@ -207,7 +207,7 @@ inline Vector project(const Vector& v, int a, int b, int c)
 }
 
 __device__  
-inline Vector unproject(const Vector& v, int a, int b, int c)
+inline Vector unproject(const Vector& v, const int& a, const int& b, const int& c)
 {
 	Vector result;
 	result[0] = v[a];
@@ -266,7 +266,7 @@ struct Ray
 };
 
 __device__  
-inline Ray project(const Ray& v, int a, int b, int c)
+inline Ray project(const Ray& v, const int& a, const int& b, const int& c)
 {
 	return Ray(project(v.start, a, b, c), project(v.dir, a, b, c));
 }

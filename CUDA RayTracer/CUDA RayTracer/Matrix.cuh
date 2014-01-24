@@ -9,7 +9,7 @@ struct Matrix
 	__device__ Matrix() {}
 
 	__device__ 
-	Matrix(double diagonalElement)
+	Matrix(const double& diagonalElement)
 	{
 		for (int i = 0; i < 3; i++)
 			for (int j = 0; j < 3; j++)
@@ -31,18 +31,18 @@ __device__
 double determinant(const Matrix& a);
 
 __device__ 
-double cofactor(const Matrix& m, int ii, int jj);
+double cofactor(const Matrix& m, const int& ii, const int& jj);
 
 __device__ 
 Matrix inverseMatrix(const Matrix& m);
 
 __device__ 
-Matrix rotationAroundX(double angle);
+Matrix rotationAroundX(const double& angle);
 
 __device__ 
-Matrix rotationAroundY(double angle);
+Matrix rotationAroundY(const double& angle);
 
 __device__ 
-Matrix rotationAroundZ(double angle);
+Matrix rotationAroundZ(const double& angle);
 
 #endif // MATRIX_H

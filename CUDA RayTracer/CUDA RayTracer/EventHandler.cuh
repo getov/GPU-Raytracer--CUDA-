@@ -16,11 +16,6 @@ public:
 
 	bool isRealTimeRendering;
 
-	bool isMovingForward;
-	bool isMovingBackward;
-	bool isStrafeLeft;
-	bool isStrafeRight;
-
 	void handleEvents();
 	void handleKeyboard(SDL_Event& ev);
 	void handleMouse(SDL_Event& ev);

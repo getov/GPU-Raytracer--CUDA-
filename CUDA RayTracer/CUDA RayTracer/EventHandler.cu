@@ -1,15 +1,14 @@
 #include "EventHandler.cuh"
 #include <SDL\SDL.h>
-
-extern "C" void moveForward();
-extern "C" void moveBackward();
-extern "C" void moveLeft();
-extern "C" void moveRight();
+#include "RaytracerControls.cuh"
 
 EventHandler::EventHandler()
 	: isRealTimeRendering(true)
 {
-	bool keysHeld[323] = {false};
+	for (int i = 0; i < 323; ++i)
+	{
+		keysHeld[i] = false;
+	}
 }
 
 void EventHandler::handleEvents()
@@ -33,12 +32,12 @@ void EventHandler::handleEvents()
 
 	if (keysHeld[SDLK_a])
 	{
-		moveLeft();
+		strafeLeft();
 	}
 
 	if (keysHeld[SDLK_d])
 	{
-		moveRight();
+		strafeRight();
 	}
 }
 
@@ -90,4 +89,19 @@ void EventHandler::handleUserInput()
 
 void EventHandler::handleMouse(SDL_Event& ev)
 {
+	if(ev.type == SDL_MOUSEMOTION)
+	{
+		int x, y;
+		Uint8 buttons = SDL_GetMouseState(&x, &y);
+
+		if(buttons)
+		{
+			return;
+		}
+
+		float deltax = float(ev.motion.xrel);
+		float deltay = float(ev.motion.yrel);
+
+		setCameraOrientation(deltay, deltax);
+	}
 }

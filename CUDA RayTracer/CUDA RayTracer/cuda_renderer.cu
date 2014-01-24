@@ -98,34 +98,39 @@ void initializeScene()
 	lightPower = 60000;
 	ambientLight = Color(0.2, 0.2, 0.2);
 
-	//createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0));
+#ifdef REAL_TIME_RENDERING
 
-	//Layered* mirror = new Layered;
-	//mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
-
-	//Node* BackWall = createNode(new Plane(-300), new OrenNayar(Color(1.0, 1.0, 0.0), 1.0));
-	//BackWall->transform.rotate(0, 90, 0);
-	//
-	//Node* SideWallLeft = createNode(new Plane(-150), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
-	//SideWallLeft->transform.rotate(0, 0, 90);
-
-	//Node* SideWallRight = createNode(new Plane(150), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
-	//SideWallRight->transform.rotate(0, 0, 90);
-
-	//Node* Roof = createNode(new Plane(300), new OrenNayar(Color(0.96, 0.82, 0.46), 1.0));
-
-	//Layered* moreGlossy = new Layered;
-	//moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
-	//moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
-	//createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
-
-
-	// For Real Time Rendering
 	createNode(new Plane(5), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 
-	createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
+	//createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 
 	createNode(new Sphere(Vector(0, 50, 200), 40.0), new Phong(Color(0, 0, 1), 32));
+
+#else
+
+	createNode(new Plane(5), new OrenNayar(Color(0.0, 1.0, 0.0), 1.0));
+
+	Layered* mirror = new Layered;
+	mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
+
+	Node* BackWall = createNode(new Plane(-300), new OrenNayar(Color(1.0, 1.0, 0.0), 1.0));
+	BackWall->transform.rotate(0, 90, 0);
+	
+	Node* SideWallLeft = createNode(new Plane(-150), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
+	SideWallLeft->transform.rotate(0, 0, 90);
+
+	Node* SideWallRight = createNode(new Plane(150), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
+	SideWallRight->transform.rotate(0, 0, 90);
+
+	Node* Roof = createNode(new Plane(300), new OrenNayar(Color(0.96, 0.82, 0.46), 1.0));
+
+	Layered* moreGlossy = new Layered;
+	moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
+	moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
+	createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
+
+#endif
+
 }
 
 __device__ 
@@ -258,34 +263,7 @@ void freeMemory()
 	delete [] dev_geom;
 	delete [] dev_nodes;
 	delete [] dev_shaders;
-}
-
-__global__
-void update(bool forward, bool backward, bool strafeRight, bool strafeLeft)
-{
-	//   forward    Vector(0, 0, 0) - Vector(0, 0, 1)
-	if (forward)
-	{
-		m_controller->moveForward();
-	}
-	if (backward)
-	{
-		m_controller->moveBackward();
-	}
-	if (strafeRight)
-	{
-		m_controller->strafeRight();
-	}
-	if (strafeLeft)
-	{
-		m_controller->strafeLeft();
-	}
-}
-
-extern "C"
-void updateScene(bool forward, bool backward, bool strafeRight, bool strafeLeft)
-{
-	update<<<1, 1>>>(forward, backward, strafeRight, strafeLeft);
+	printf("DELETED");
 }
 
 /**
@@ -298,15 +276,15 @@ void initScene()
 }
 
 __global__
-void cameraBeginFrame()
+void camBeginFrame()
 {
 	dev_cam->beginFrame();
 }
 
 extern "C"
-void camBeginFrame()
+void cameraBeginFrame()
 {
-	cameraBeginFrame<<<1, 1>>>();
+	camBeginFrame<<<1, 1>>>();
 }
 
 extern "C" 
@@ -331,57 +309,4 @@ extern "C"
 void freeDeviceMemory()
 {
 	freeMemory<<<1, 1>>>();
-}
-
-/////
-__global__
-void mvForward()
-{
-	m_controller->moveForward();
-	//dev_cam->move(0, 0.2);
-}
-
-extern "C" 
-void moveForward()
-{
-	mvForward<<<1, 1>>>();
-}
-
-__global__
-void mvBackward()
-{
-	m_controller->moveBackward();
-	//dev_cam->move(0, -0.2);
-}
-
-extern "C" 
-void moveBackward()
-{
-	mvBackward<<<1, 1>>>();
-}
-
-__global__
-void mvLeft()
-{
-	m_controller->strafeLeft();
-	//dev_cam->move(-0.2, 0);
-}
-
-extern "C" 
-void moveLeft()
-{
-	mvLeft<<<1, 1>>>();
-}
-
-__global__
-void mvRight()
-{
-	m_controller->strafeRight();
-	//dev_cam->move(0.2, 0);
-}
-
-extern "C" 
-void moveRight()
-{
-	mvRight<<<1, 1>>>();
 }

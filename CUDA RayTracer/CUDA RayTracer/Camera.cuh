@@ -19,13 +19,10 @@ public:
 	double aspect; // 1.3 or ?
 	
 	__device__ 
-	void beginFrame(void);
+	void beginFrame();
 	
 	__device__ 
-	Ray getScreenRay(double x, double y);
-	
-	__device__
-	void move(double dx, double dz);
+	Ray getScreenRay(const double& x, const double& y);
 };
 
 

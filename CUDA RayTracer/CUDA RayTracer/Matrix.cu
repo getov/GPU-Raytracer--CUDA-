@@ -41,7 +41,7 @@ double determinant(const Matrix& a)
 }
 
 __device__ 
-double cofactor(const Matrix& m, int ii, int jj)
+double cofactor(const Matrix& m, const int& ii, const int& jj)
 {
 	int rows[2], rc = 0, cols[2], cc = 0;
 	for (int i = 0; i < 3; i++)
@@ -69,7 +69,7 @@ Matrix inverseMatrix(const Matrix& m)
 
 //!< returns a rotation matrix around the X axis; the angle is in radians
 __device__ 
-Matrix rotationAroundX(double angle)
+Matrix rotationAroundX(const double& angle)
 {
 	double S = sin(angle);
 	double C = cos(angle);
@@ -83,7 +83,7 @@ Matrix rotationAroundX(double angle)
 
 //!< same as above, but rotate around Y
 __device__
-Matrix rotationAroundY(double angle)
+Matrix rotationAroundY(const double& angle)
 {
 	double S = sin(angle);
 	double C = cos(angle);
@@ -97,7 +97,7 @@ Matrix rotationAroundY(double angle)
 
 //!< same as above, but rotate around Z
 __device__ 
-Matrix rotationAroundZ(double angle)
+Matrix rotationAroundZ(const double& angle)
 {
 	double S = sin(angle);
 	double C = cos(angle);
