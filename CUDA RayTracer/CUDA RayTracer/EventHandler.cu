@@ -1,9 +1,11 @@
 #include "EventHandler.cuh"
 #include <SDL\SDL.h>
 #include "RaytracerControls.cuh"
+#include "Settings.cuh"
 
 EventHandler::EventHandler()
 	: isRealTimeRendering(true)
+	, mouseSensitivity(0.6f)
 {
 	for (int i = 0; i < 323; ++i)
 	{
@@ -39,6 +41,20 @@ void EventHandler::handleEvents()
 	{
 		strafeRight();
 	}
+
+	if (keysHeld[SDLK_KP_PLUS])
+	{
+		mouseSensitivity += 0.02;
+	}
+	else if (keysHeld[SDLK_KP_MINUS])
+	{
+		mouseSensitivity -= 0.02;
+
+		if (mouseSensitivity <= 0)
+		{
+			mouseSensitivity = 0.6;
+		}
+	}
 }
 
 void EventHandler::handleKeyboard(SDL_Event& ev)
@@ -59,6 +75,28 @@ void EventHandler::handleKeyboard(SDL_Event& ev)
 	if (ev.key.keysym.sym == SDLK_ESCAPE)
 	{
 		isRealTimeRendering = false;
+	}
+
+	if (ev.type == SDL_KEYDOWN)
+	{
+		if (ev.key.keysym.sym == SDLK_F1)
+		{
+			GlobalSettings::AAEnabled = true;
+		}
+		else if (ev.key.keysym.sym == SDLK_F2)
+		{
+			GlobalSettings::AAEnabled = false;
+		}
+
+		// bugging
+		//if (ev.key.keysym.sym == SDLK_F3 && GlobalSettings::AAEnabled)
+		//{			
+		//	GlobalSettings::previewAA = true;
+		//}
+		//else if (ev.key.keysym.sym == SDLK_F4)
+		//{
+		//	GlobalSettings::previewAA = false;
+		//}
 	}
 }
 
@@ -99,9 +137,12 @@ void EventHandler::handleMouse(SDL_Event& ev)
 			return;
 		}
 
-		float deltax = float(ev.motion.xrel);
-		float deltay = float(ev.motion.yrel);
+		float deltaX = float(ev.motion.xrel);
+		float deltaY = float(ev.motion.yrel);
 
-		setCameraOrientation(deltay, deltax);
+		SDL_ShowCursor(0);
+		SDL_WM_GrabInput(SDL_GRAB_ON);
+
+		setCameraOrientation(deltaY * mouseSensitivity, deltaX * mouseSensitivity);
 	}
 }

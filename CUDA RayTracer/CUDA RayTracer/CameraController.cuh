@@ -26,7 +26,8 @@ public:
 	__device__ void strafeLeft();
 
 	// rotation
-	__device__ void offsetCameraOrientation(const float& zenith, const float& azimuth);
+	__device__
+	void offsetCameraOrientation(const float& zenith, const float& azimuth);
 };
 
 #endif 

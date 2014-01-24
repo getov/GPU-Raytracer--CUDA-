@@ -44,7 +44,7 @@ Color vfb[RES_Y][RES_X];
 Color vfb_linear[RES_X * RES_Y]; 
 
 /**
- * Function that prints CUDA specs of the 
+ * Function that prints CUDA specs 
  * of the GPU device/s on the console
 */
 void printGPUSpecs()
@@ -207,8 +207,6 @@ int main(int argc, char** argv)
 	// memcpy HostToDevice
 	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * RES_X * RES_Y, cudaMemcpyHostToDevice);
 
-	//SDL_ShowCursor(0);
-
 	// InitializeScene
 	initScene();
 
@@ -227,13 +225,10 @@ int main(int argc, char** argv)
 		convertDeviceToHostBuffer();
 		
 		m_eventController.handleEvents();
-
-		SDL_WM_GrabInput(SDL_GRAB_ON);
-		//SDL_WarpMouse(RES_X/2, RES_Y/2);
-
+		
 		displayVFB(vfb);
 	}
-
+		
 #else
 
 	// capture the start time

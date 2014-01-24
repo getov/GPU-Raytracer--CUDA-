@@ -75,6 +75,7 @@
     </CudaCompile>
     <CudaCompile Include="EventHandler.cu" />
     <CudaCompile Include="RaytracerControls.cu" />
+    <CudaCompile Include="Settings.cu" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cuda_renderer.cuh" />

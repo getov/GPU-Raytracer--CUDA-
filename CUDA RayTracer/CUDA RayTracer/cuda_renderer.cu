@@ -23,6 +23,8 @@
 #include "Layered.cuh"
 #include "Fresnel.cuh"
 #include "CameraController.cuh"
+#include "RaytracerControls.cuh"
+#include "Settings.cuh"
 
 __device__
 bool needsAA[RES_X * RES_Y];
@@ -178,7 +180,7 @@ bool tooDifferent(const Color& a, const Color& b)
 }
 
 __global__
-void antiAliasing(Color* dev_vfb)
+void antiAliasing(Color* dev_vfb, bool previewAA)
 {
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
@@ -216,8 +218,6 @@ void antiAliasing(Color* dev_vfb)
 			{ 0, 0.6 },
 			{ 0.6, 0.6 },
 		};
-
-	bool previewAA = false;
 
 	if (previewAA)
 	{
@@ -296,13 +296,11 @@ void cudaRenderer(Color* dev_vfb)
 	// first pass
 	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb);
 
-#ifdef ANTI_ALIASING
-
 	//second pass
-	antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb);
-
-#endif
-	
+	if (GlobalSettings::AAEnabled)
+	{
+		antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA);
+	}
 }
 
 extern "C"

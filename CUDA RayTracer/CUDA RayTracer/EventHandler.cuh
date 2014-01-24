@@ -11,6 +11,8 @@ private:
 
 	bool keysHeld[323];
 
+	float mouseSensitivity;
+
 public:
 	EventHandler();
 

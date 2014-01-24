@@ -47,6 +47,7 @@
     <CudaCompile Include="Refraction.cu" />
     <CudaCompile Include="sdl.cu" />
     <CudaCompile Include="cuda_renderer.cu" />
+    <CudaCompile Include="Settings.cu" />
     <CudaCompile Include="Sphere.cu" />
   </ItemGroup>
   <ItemGroup>
