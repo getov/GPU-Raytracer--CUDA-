@@ -73,9 +73,9 @@
     <CudaCompile Include="CameraController.cu">
       <Filter>Camera</Filter>
     </CudaCompile>
-    <CudaCompile Include="EventHandler.cu" />
     <CudaCompile Include="RaytracerControls.cu" />
     <CudaCompile Include="Settings.cu" />
+    <CudaCompile Include="EventHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cuda_renderer.cuh" />
@@ -124,8 +124,8 @@
     <None Include="CameraController.cuh">
       <Filter>Camera</Filter>
     </None>
-    <None Include="EventHandler.cuh" />
     <None Include="RaytracerControls.cuh" />
+    <None Include="EventHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />

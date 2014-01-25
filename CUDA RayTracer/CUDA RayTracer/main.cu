@@ -20,15 +20,14 @@
 #include "Lambert.cuh"
 #include "Plane.cuh"
 #include "Sphere.cuh"
-#include "EventHandler.cuh"
+#include "EventHandler.h"
 	
 using namespace std;
 
 extern "C" void cudaRenderer(Color* dev_vfb);
 extern "C" void freeDeviceMemory();
 extern "C" void initScene();
-
-extern "C"void cameraBeginFrame();
+extern "C" void cameraBeginFrame();
 
 
 unsigned frameCount;
@@ -44,7 +43,7 @@ Color vfb[RES_Y][RES_X];
 Color vfb_linear[RES_X * RES_Y]; 
 
 /**
- * Function that prints CUDA specs 
+ * @brief - Function that prints CUDA specs 
  * of the GPU device/s on the console
 */
 void printGPUSpecs()
@@ -105,7 +104,7 @@ void printGPUSpecs()
 }
 
 /**
- * Wrapper function that creates timer and captures the start and stop time
+ * @brief - Wrapper function that creates timer and captures the start and stop time
  * @param start - output - captures the start time
  * @param stop - output - captires the stop time
 */
@@ -117,7 +116,7 @@ void cudaStartTimer(cudaEvent_t& start, cudaEvent_t& stop)
 }
 
 /**
- * Wrapper function that takes the previously captured start and stop time
+ * @brief - Wrapper function that takes the previously captured start and stop time
  * from cudaStartTimer() function, calculates the elapsed time,
  * prints it on the console and shows it on the window frame
  * @param start - the start time that is previously captured by cudaStartTimer()
@@ -168,7 +167,7 @@ void displayFrameCounter()
 }
 
 /**
- * function that converts the linear array vfb_linear
+ * @brief - function that converts the linear array vfb_linear
  * into the 2D array vfb
  *
  * This is needed because we pass linear array to the GPU

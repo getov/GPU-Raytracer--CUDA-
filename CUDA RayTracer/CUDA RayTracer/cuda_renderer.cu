@@ -165,7 +165,7 @@ Color raytrace(Ray ray)
 }
 
 /**
- * The function checks if one of the red, green or blue components
+ * @brief - The function checks if one of the red, green or blue components
  * of the colors a and b are too different.
  * @return true - if the difference is bigger than the THRESHOLD
  * @return false - if the difference is lower than the THRESHOLD
