@@ -76,6 +76,9 @@
     <CudaCompile Include="RaytracerControls.cu" />
     <CudaCompile Include="Settings.cu" />
     <CudaCompile Include="EventHandler.cpp" />
+    <CudaCompile Include="WaterWaves.cu">
+      <Filter>Shaders</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cuda_renderer.cuh" />
@@ -126,6 +129,9 @@
     </None>
     <None Include="RaytracerControls.cuh" />
     <None Include="EventHandler.h" />
+    <None Include="WaterWaves.cuh">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />

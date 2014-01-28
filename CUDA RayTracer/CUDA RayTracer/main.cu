@@ -132,7 +132,7 @@ void cudaStopTimer(cudaEvent_t& start, cudaEvent_t& stop)
     printf( "Time to render:  %3.1f ms\n\n", elapsedTime);
 	
 	char info[128];
-	sprintf(info, "Time to render: %3.1f ms", elapsedTime);
+	sprintf(info, "CUDA Traycer || Time to render: %3.1f ms", elapsedTime);
 	SDL_WM_SetCaption(info, NULL);
 
 	cudaEventDestroy(start);

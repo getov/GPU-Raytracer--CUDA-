@@ -4,6 +4,7 @@
 #include "IGeometry.cuh"
 #include "IShader.cuh"
 #include "Transform.cuh"
+#include "Texture.cuh"
 
 class Node 
 {
@@ -11,13 +12,16 @@ public:
 	Geometry* geom;
 	Shader* shader;
 	Transform transform;
+	Texture* bumpTex;
 	
 	__device__ Node() {}
 
 	__device__ 
-	Node(Geometry* g, Shader* s)
+	Node(Geometry* g, Shader* s, Texture* bump = nullptr)
 	{ 
-		geom = g; shader = s; 
+		geom    = g;
+		shader  = s; 
+		bumpTex = bump;
 	}
 
 	__device__
@@ -39,6 +43,8 @@ public:
 		}
 
 		data.normal = normalize(transform.direction(data.normal));
+		data.dNdx = normalize(transform.direction(data.dNdx));
+		data.dNdy = normalize(transform.direction(data.dNdy));
 		data.p = transform.point(data.p);
 		data.dist /= rayDirLength;
 		return true;

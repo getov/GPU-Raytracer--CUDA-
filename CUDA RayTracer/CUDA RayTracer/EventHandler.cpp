@@ -63,12 +63,12 @@ void EventHandler::handleKeyboard(SDL_Event& ev)
 
 		if (ev.key.keysym.sym == SDLK_F1 && !keySwitch[0])
 		{
-			GlobalSettings::AAEnabled = true;
+			GlobalSettings::AAEnabled = false;
 			keySwitch[0] = true;
 		}
 		else if (ev.key.keysym.sym == SDLK_F1 && keySwitch[0])
 		{
-			GlobalSettings::AAEnabled = false;
+			GlobalSettings::AAEnabled = true;
 			keySwitch[0] = false;
 		}
 	}

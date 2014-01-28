@@ -1,4 +1,4 @@
 #include "Settings.cuh"
 
-bool GlobalSettings::AAEnabled = false;
+bool GlobalSettings::AAEnabled = true;
 bool GlobalSettings::previewAA = false;
