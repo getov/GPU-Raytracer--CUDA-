@@ -8,6 +8,10 @@
 #include "curand_kernel.h"
 #include <thrust\random.h>
 #include <ctime>
+#include <string>
+
+#include <vector>
+using std::string;
 
 __device__ 
 inline double signOf(double x)
@@ -64,5 +68,78 @@ inline float randomFloat()
 
 	return (float)range(randEngine);
 }
+
+template <typename T>
+__device__ T dev_min(const T& a, const T& b)
+{
+	return a < b ? a : b;
+}
+
+template <typename T>
+__device__ T dev_max(const T& a, const T& b)
+{
+	return a > b ? a : b;
+}
+
+template <typename T>
+__device__ void dev_swap(T& a, T& b)
+{
+	T temp(a);
+	a = b;
+	b = temp;
+}
+
+//
+// parse a string, convert to double. If string is empty, return 0
+static double getDouble(const string& s)
+{
+	double res;
+	if (s == "") return 0;
+	sscanf(s.c_str(), "%lf", &res);
+	return res;
+}
+
+// parse a string, convert to int. If string is empty, return 0
+static int getInt(const string& s)
+{
+	int res;
+	if (s == "") return 0;
+	sscanf(s.c_str(), "%d", &res);
+	return res;
+}
+
+std::vector<string> tokenize(string s);
+std::vector<string> split(string s, char separator);
+
+//class c_string
+//{
+//private:
+//	char* temp;
+//
+//public:
+//	__device__
+//	c_string();
+//
+//	__device__
+//	~c_string();
+//
+//	__device__
+//	int length(const char* s);
+//
+//	__device__
+//	bool isspace(const char s);
+//
+//	__device__
+//	char* substr(const char* s, int pos, int length);
+//
+//	__device__
+//	int atoi(const char* s);
+//};
+//
+//__device__
+//vector<char*> tokenize(char* s);
+//
+//__device__
+//vector<char*> split(const char* s, char separator);
 
 #endif // UTIL_H

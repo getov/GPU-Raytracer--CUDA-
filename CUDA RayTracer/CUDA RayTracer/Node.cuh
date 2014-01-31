@@ -13,6 +13,7 @@ public:
 	Shader* shader;
 	Transform transform;
 	Texture* bumpTex;
+	GeometryID nodeID;
 	
 	__device__ Node() {}
 
@@ -47,6 +48,8 @@ public:
 		data.dNdy = normalize(transform.direction(data.dNdy));
 		data.p = transform.point(data.p);
 		data.dist /= rayDirLength;
+		nodeID = data.geomID;
+
 		return true;
 	}
 };

@@ -46,6 +46,8 @@ bool Plane::intersect(Ray ray, IntersectionData& data)
 		data.u = data.p.x;
 		data.v = data.p.z;
 		data.g = this;
+		data.geomID = GeometryID::PLANE;
+
 		return true;
 	}
 }

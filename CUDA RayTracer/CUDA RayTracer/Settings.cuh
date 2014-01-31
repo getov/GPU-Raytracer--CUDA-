@@ -8,6 +8,9 @@
 #define MAX_RAY_DEPTH 5
 #define PI 3.141592653589793238
 
+#define MAX_TRIANGLES_PER_LEAF 20
+#define MAX_TREE_DEPTH         64
+
 struct GlobalSettings
 {
 	static bool AAEnabled;

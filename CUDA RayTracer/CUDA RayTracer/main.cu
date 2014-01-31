@@ -202,7 +202,7 @@ int main(int argc, char** argv)
 	// allocate memory for vfb on the GPU
 	Color* dev_vfb;
 	cudaMalloc((void**)&dev_vfb, sizeof(Color) * RES_X * RES_Y);
-	
+
 	// memcpy HostToDevice
 	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * RES_X * RES_Y, cudaMemcpyHostToDevice);
 

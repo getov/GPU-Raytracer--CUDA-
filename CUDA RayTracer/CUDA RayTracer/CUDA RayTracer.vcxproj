@@ -49,11 +49,13 @@
     <CudaCompile Include="cuda_renderer.cu" />
     <CudaCompile Include="Settings.cu" />
     <CudaCompile Include="Sphere.cu" />
+    <CudaCompile Include="Util.cu" />
     <CudaCompile Include="WaterWaves.cu" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CameraController.cuh" />
     <None Include="cuda_renderer.cuh" />
+    <None Include="custom_vector.cuh" />
     <None Include="EventHandler.h" />
     <None Include="Fresnel.cuh" />
     <None Include="IGeometry.cuh" />

@@ -8,11 +8,14 @@
 #include "Camera.cuh"
 #include "IShader.cuh"
 #include "Node.cuh"
+#include "custom_vector.cuh"
+#include "CameraController.cuh"
 
 __device__ 
 Color raytrace(Ray ray);
 
 __device__
 bool testVisibility(const Vector& from, const Vector& to);
+
 
 #endif

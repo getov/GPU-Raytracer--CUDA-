@@ -3,6 +3,13 @@
 
 #include "Vector3D.cuh"
 
+enum class GeometryID
+{
+	NONE,
+	PLANE,
+	SPHERE
+};
+
 class Geometry;
 struct IntersectionData 
 {
@@ -15,6 +22,8 @@ struct IntersectionData
 	double u, v; //!< 2D UV coordinates for texturing, etc.
 	
 	Geometry* g; //!< The geometry which was hit
+
+	GeometryID geomID;
 };
 
 class Geometry

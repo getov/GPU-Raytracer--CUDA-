@@ -26,6 +26,9 @@
 #include "RaytracerControls.cuh"
 #include "Settings.cuh"
 #include "WaterWaves.cuh"
+//#include "custom_vector.cuh"
+//
+//using pgg::vector;
 
 __device__
 bool needsAA[RES_X * RES_Y];
@@ -45,6 +48,11 @@ Node* dev_nodes[GEOM_MAX_SIZE];
 __device__
 Texture* dev_textures[GEOM_MAX_SIZE];
 
+//__device__ vector<Geometry*> dev_geom;
+//__device__ vector<Shader*> dev_shaders;
+//__device__ vector<Node*> dev_nodes;
+//__device__ vector<Texture*> dev_textures;
+ 
 __device__
 CameraController* m_controller;
 
@@ -84,6 +92,11 @@ Node* createNode(Geometry* geom, Shader* shader, Texture* tex = nullptr)
 	dev_nodes[GEOM_COUNT]    = new Node(dev_geom[GEOM_COUNT], dev_shaders[GEOM_COUNT], dev_textures[GEOM_COUNT]);
 
 	return dev_nodes[GEOM_COUNT++];
+
+	/*dev_geom.push_back(geom);
+	dev_shaders.push_back(shader);
+	dev_textures.push_back(tex);
+	dev_nodes.push_back(new Node(geom, shader, tex));*/
 }
 
 __global__ 
@@ -127,41 +140,41 @@ void initializeScene()
 #else
 
 	/// room
-	//createNode(new Plane(5, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
+	createNode(new Plane(5, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
 
-	//Layered* mirror = new Layered;
-	//mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
+	Layered* mirror = new Layered;
+	mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
 
-	//Node* BackWall = createNode(new Plane(-300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
-	//BackWall->transform.rotate(0, 90, 0);
-	//
-	//Node* SideWallLeft = createNode(new Plane(-150, 300, 300), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
-	//SideWallLeft->transform.rotate(0, 0, 90);
+	Node* BackWall = createNode(new Plane(-300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
+	BackWall->transform.rotate(0, 90, 0);
+	
+	Node* SideWallLeft = createNode(new Plane(-150, 300, 300), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
+	SideWallLeft->transform.rotate(0, 0, 90);
 
-	//Node* SideWallRight = createNode(new Plane(150, 300, 300), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
-	//SideWallRight->transform.rotate(0, 0, 90);
+	Node* SideWallRight = createNode(new Plane(150, 300, 300), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
+	SideWallRight->transform.rotate(0, 0, 90);
 
-	//Node* Roof = createNode(new Plane(300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
+	Node* Roof = createNode(new Plane(300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
 
-	//Layered* moreGlossy = new Layered;
-	//moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
-	//moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
-	//createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
+	Layered* moreGlossy = new Layered;
+	moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
+	moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
+	createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
 
-	//Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
-	//rectMirror->transform.rotate(0, 90, 0);
-	//rectMirror->transform.translate(Vector(0, 120, 298));
+	Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
+	rectMirror->transform.rotate(0, 90, 0);
+	rectMirror->transform.translate(Vector(0, 120, 298));
 
 	/// ocean
-	createNode(new Plane(-300), new Lambert(Color(0x0AB6FF))); 
-	Layered* water = new Layered;
-	water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
-	water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
-	
-	Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
-	waterGeom->transform.scale(5, 5, 5);
+	//createNode(new Plane(-300), new Lambert(Color(0x0AB6FF))); 
+	//Layered* water = new Layered;
+	//water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
+	//water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
+	//
+	//Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
+	//waterGeom->transform.scale(5, 5, 5);
 
-	createNode(new Sphere(Vector(50, -20, 350), 100.0), new Lambert(Color(0, 1, 0)));
+	//createNode(new Sphere(Vector(50, -20, 350), 100.0), new Lambert(Color(0, 1, 0)));
 	
 #endif
 
@@ -180,7 +193,7 @@ Color raytrace(Ray ray)
 
 	data.dist = 1e99;
 
-	for (int i = 0; i < GEOM_COUNT; i++)
+	for (int i = 0; i < GEOM_COUNT; ++i)
 	{
 		if (dev_nodes[i]->intersect(ray, data))
 		{
@@ -299,10 +312,15 @@ void freeMemory()
 {
 	delete dev_cam;
 	delete m_controller;
-	delete [] dev_geom;
-	delete [] dev_nodes;
-	delete [] dev_shaders;
-	delete [] dev_textures;
+
+	for (int i = 0; i < GEOM_COUNT; ++i)
+	{
+		delete dev_geom[i];
+		delete dev_shaders[i];
+		delete dev_textures[i];
+		delete dev_nodes[i];
+	}
+
 	printf("DELETED");
 }
 
@@ -345,6 +363,6 @@ void cudaRenderer(Color* dev_vfb)
 
 extern "C"
 void freeDeviceMemory()
-{
+{	
 	freeMemory<<<1, 1>>>();
 }

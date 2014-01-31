@@ -29,6 +29,14 @@ public:
 		z = _z;
 	}
 
+	__device__
+	void set(const double& _x, const double& _y, const double& _z)
+	{
+		x = _x;
+		y = _y;
+		z = _z;
+	}
+
 	__device__  
 	void makeZero()
 	{

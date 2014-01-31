@@ -79,6 +79,7 @@
     <CudaCompile Include="WaterWaves.cu">
       <Filter>Shaders</Filter>
     </CudaCompile>
+    <CudaCompile Include="Util.cu" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cuda_renderer.cuh" />
@@ -132,6 +133,7 @@
     <None Include="WaterWaves.cuh">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="custom_vector.cuh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />

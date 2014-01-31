@@ -53,6 +53,8 @@ bool Sphere::intersect(Ray ray, IntersectionData& data)
 		data.u = toDegrees(std::acos(relative.y));
 		data.v = toDegrees(std::atan2(relative.z, relative.x));
 
+		data.geomID = GeometryID::SPHERE;
+
 		return true;
 	}
 	
