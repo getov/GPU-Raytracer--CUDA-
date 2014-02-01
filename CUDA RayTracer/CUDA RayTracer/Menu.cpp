@@ -148,11 +148,13 @@ void Menu::handleMouseEvents()
 							// Resolution
 							if (optionButtons[i]->id == 1 && !selectedItem[i])
 							{
+								GlobalSettings::RES_X = 640;
+								GlobalSettings::RES_Y = 480;
+
 								selectedItem[i] = true;
 								SDL_FreeSurface(optionButtons[i]->body);
 								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);
-
-								
+																
 								selectedItem[i + 1] = false;
 								selectedItem[i + 2] = false;
 								selectedItem[i + 3] = false;
@@ -166,11 +168,13 @@ void Menu::handleMouseEvents()
 							}
 							else if (optionButtons[i]->id == 2 && !selectedItem[i])
 							{
+								GlobalSettings::RES_X = 1024;
+								GlobalSettings::RES_Y = 768;
+
 								selectedItem[i] = true;
 								SDL_FreeSurface(optionButtons[i]->body);
 								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);
-
-
+								
 								selectedItem[i + 1] = false;
 								selectedItem[i + 2] = false;
 								selectedItem[i - 1] = false;
@@ -183,11 +187,13 @@ void Menu::handleMouseEvents()
 							}
 							else if (optionButtons[i]->id == 3 && !selectedItem[i])
 							{
+								GlobalSettings::RES_X = 1280;
+								GlobalSettings::RES_Y = 720;
+
 								selectedItem[i] = true;
 								SDL_FreeSurface(optionButtons[i]->body);
 								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);
-
-
+								
 								selectedItem[i + 1] = false;
 								selectedItem[i - 1] = false;
 								selectedItem[i - 2] = false;
@@ -200,6 +206,9 @@ void Menu::handleMouseEvents()
 							}
 							else if (optionButtons[i]->id == 4 && !selectedItem[i])
 							{
+								GlobalSettings::RES_X = 1920;
+								GlobalSettings::RES_Y = 1080;
+
 								selectedItem[i] = true;
 								SDL_FreeSurface(optionButtons[i]->body);
 								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);

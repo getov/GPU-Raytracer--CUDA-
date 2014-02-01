@@ -39,10 +39,10 @@ unsigned lastTitleUpdateFrameCount;
 const char* const appName = "CUDA Traycer";
 
 // virtual framebuffer
-Color vfb[RES_Y][RES_X];
+Color vfb[VFB_MAX_SIZE][VFB_MAX_SIZE];
 
 // virtual framebuffer used for GPU operations
-Color vfb_linear[RES_X * RES_Y]; 
+Color vfb_linear[VFB_MAX_SIZE * VFB_MAX_SIZE]; 
 
 /**
  * @brief - Function that prints CUDA specs 
@@ -179,11 +179,11 @@ void displayFrameCounter()
 void convertDeviceToHostBuffer()
 {
 	//#pragma omp parallel for schedule(dynamic, 1) 
-	for (int i = 0; i < RES_Y; ++i)
+	for (int i = 0; i < GlobalSettings::RES_Y; ++i)
 	{
-		for (int j = 0; j < RES_X; ++j)
+		for (int j = 0; j < GlobalSettings::RES_X; ++j)
 		{
-			vfb[i][j] = vfb_linear[i * RES_X + j];
+			vfb[i][j] = vfb_linear[i * GlobalSettings::RES_X + j];
 		}
 	}
 }
@@ -193,7 +193,7 @@ int main(int argc, char** argv)
 	Menu mainMenu(appName);
 	mainMenu.Destroy();
 
-	if (!initGraphics(RES_X, RES_Y))
+	if (!initGraphics(GlobalSettings::RES_X, GlobalSettings::RES_Y))
 	{
 		return -1;
 	}
@@ -206,15 +206,15 @@ int main(int argc, char** argv)
 
 	// allocate memory for vfb on the GPU
 	Color* dev_vfb;
-	cudaMalloc((void**)&dev_vfb, sizeof(Color) * RES_X * RES_Y);
+	cudaMalloc((void**)&dev_vfb, sizeof(Color) * GlobalSettings::RES_X * GlobalSettings::RES_Y);
 
 	// memcpy HostToDevice
-	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * RES_X * RES_Y, cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_vfb, vfb_linear, sizeof(Color) * GlobalSettings::RES_X * GlobalSettings::RES_Y, cudaMemcpyHostToDevice);
 
 	// InitializeScene
 	initScene();
 
-	SDL_WarpMouse(RES_X / 2, RES_Y / 2);
+	SDL_WarpMouse(GlobalSettings::RES_X / 2, GlobalSettings::RES_Y / 2);
 
 //#ifdef REAL_TIME_RENDERING
 	if (GlobalSettings::realTime)
@@ -226,7 +226,7 @@ int main(int argc, char** argv)
 			displayFrameCounter();
 		
 			cudaRenderer(dev_vfb);
-			cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
+			cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * GlobalSettings::RES_X * GlobalSettings::RES_Y, cudaMemcpyDeviceToHost);
 			convertDeviceToHostBuffer();
 		
 			m_eventController.handleEvents();
@@ -245,7 +245,7 @@ int main(int argc, char** argv)
 		cudaRenderer(dev_vfb);
 
 		// memcpy DeviceToHost
-		cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
+		cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * GlobalSettings::RES_X * GlobalSettings::RES_Y, cudaMemcpyDeviceToHost);
 
 		// get stop time, and display the timing results
 		cudaStopTimer(start, stop);

@@ -22,7 +22,7 @@ public:
 	void beginFrame();
 	
 	__device__ 
-	Ray getScreenRay(const double& x, const double& y);
+	Ray getScreenRay(const double& x, const double& y, int RES_X, int RES_Y);
 };
 
 

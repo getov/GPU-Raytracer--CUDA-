@@ -28,7 +28,7 @@
 #include "WaterWaves.cuh"
 
 __device__
-bool needsAA[RES_X * RES_Y];
+bool needsAA[VFB_MAX_SIZE * VFB_MAX_SIZE];
 
 __device__ 
 Camera* dev_cam;
@@ -226,7 +226,7 @@ bool tooDifferent(const Color& a, const Color& b)
 }
 
 __global__
-void antiAliasing(Color* dev_vfb, bool previewAA)
+void antiAliasing(Color* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 {
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
@@ -280,7 +280,7 @@ void antiAliasing(Color* dev_vfb, bool previewAA)
 			
 			for (int i = 1; i < n_size; ++i)
 			{
-				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1]));
+				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1], RES_X, RES_Y));
 			}
 			dev_vfb[offset] = result / static_cast<float>(n_size);
 		}
@@ -288,7 +288,7 @@ void antiAliasing(Color* dev_vfb, bool previewAA)
 }
 
 __global__ 
-void renderScene(Color* dev_vfb)
+void renderScene(Color* dev_vfb, int RES_X, int RES_Y)
 {
 	// map from threadIdx/BlockIdx to pixel position
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
@@ -297,7 +297,7 @@ void renderScene(Color* dev_vfb)
 
 	if (offset < RES_X * RES_Y)
 	{
-		dev_vfb[offset] = raytrace(dev_cam->getScreenRay(x, y));
+		dev_vfb[offset] = raytrace(dev_cam->getScreenRay(x, y, RES_X, RES_Y));
 	}
 }
 
@@ -314,8 +314,6 @@ void freeMemory()
 		delete dev_textures[i];
 		delete dev_nodes[i];
 	}
-
-	printf("DELETED");
 }
 
 /**
@@ -343,15 +341,15 @@ extern "C"
 void cudaRenderer(Color* dev_vfb)
 {
 	dim3 THREADS_PER_BLOCK(32, 32); // 32*32 = 1024 (max threads per block supported)
-	dim3 BLOCKS(RES_X / THREADS_PER_BLOCK.x, RES_Y / THREADS_PER_BLOCK.y); 
+	dim3 BLOCKS(GlobalSettings::RES_X / THREADS_PER_BLOCK.x, GlobalSettings::RES_Y / THREADS_PER_BLOCK.y); 
 	
 	// first pass
-	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb);
+	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 
 	//second pass
 	if (GlobalSettings::AAEnabled)
 	{
-		antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA);
+		antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 	}
 }
 

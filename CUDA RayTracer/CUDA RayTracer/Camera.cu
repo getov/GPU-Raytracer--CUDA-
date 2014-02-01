@@ -38,7 +38,7 @@ void Camera::beginFrame()
 }
 
 __device__ 
-Ray Camera::getScreenRay(const double& x, const double& y)
+Ray Camera::getScreenRay(const double& x, const double& y, int RES_X, int RES_Y)
 {
 	Ray result; // A, B -     C = A + (B - A) * x
 	result.start = this->pos;

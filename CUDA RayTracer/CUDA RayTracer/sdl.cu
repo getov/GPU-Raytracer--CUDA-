@@ -50,7 +50,7 @@ void closeGraphics(void)
 }
 
 /// displays a VFB (virtual frame buffer) to the real framebuffer, with the necessary color clipping
-void displayVFB(Color vfb[RES_Y][RES_X])
+void displayVFB(Color vfb[VFB_MAX_SIZE][VFB_MAX_SIZE])
 {
 	int rs = screen->format->Rshift;
 	int gs = screen->format->Gshift;

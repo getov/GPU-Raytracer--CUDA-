@@ -25,7 +25,7 @@
 
 bool initGraphics(int frameWidth, int frameHeight);
 void closeGraphics(void);
-void displayVFB(Color vfb[RES_Y][RES_X]); //!< displays the VFB (Virtual framebuffer) to the real one.
+void displayVFB(Color vfb[VFB_MAX_SIZE][VFB_MAX_SIZE]); //!< displays the VFB (Virtual framebuffer) to the real one.
 int frameWidth(void); //!< returns the frame width (pixels)
 int frameHeight(void); //!< returns the frame height (pixels)
 
