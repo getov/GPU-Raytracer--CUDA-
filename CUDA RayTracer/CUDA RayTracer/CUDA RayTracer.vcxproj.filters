@@ -13,6 +13,9 @@
     <Filter Include="Camera">
       <UniqueIdentifier>{6616f7b8-cafa-4f1b-9922-4caaad1b83f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Menu">
+      <UniqueIdentifier>{59c3da42-d26d-46a5-a59f-0683a488cde5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Color.cuh">
@@ -30,6 +33,9 @@
     <ClInclude Include="sdl.cuh" />
     <ClInclude Include="Util.cuh" />
     <ClInclude Include="Settings.cuh" />
+    <ClInclude Include="Menu.h">
+      <Filter>Menu</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="sdl.cu" />
@@ -137,5 +143,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />
+    <ClCompile Include="Menu.cpp">
+      <Filter>Menu</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

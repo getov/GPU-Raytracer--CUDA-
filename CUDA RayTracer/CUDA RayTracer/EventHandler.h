@@ -1,7 +1,7 @@
 #ifndef EVENT_HANDLER_H
 #define EVENT_HANDLER_H
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <vector>
 
 class EventHandler

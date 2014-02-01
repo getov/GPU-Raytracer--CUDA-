@@ -1,5 +1,5 @@
 #include "EventHandler.h"
-#include <SDL\SDL.h>
+#include <SDL.h>
 #include "RaytracerControls.cuh"
 #include "Settings.cuh"
 
@@ -63,12 +63,12 @@ void EventHandler::handleKeyboard(SDL_Event& ev)
 
 		if (ev.key.keysym.sym == SDLK_F1 && !keySwitch[0])
 		{
-			GlobalSettings::AAEnabled = false;
+			GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
 			keySwitch[0] = true;
 		}
 		else if (ev.key.keysym.sym == SDLK_F1 && keySwitch[0])
 		{
-			GlobalSettings::AAEnabled = true;
+			GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
 			keySwitch[0] = false;
 		}
 	}

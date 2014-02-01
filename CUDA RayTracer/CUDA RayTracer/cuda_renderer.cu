@@ -26,9 +26,6 @@
 #include "RaytracerControls.cuh"
 #include "Settings.cuh"
 #include "WaterWaves.cuh"
-//#include "custom_vector.cuh"
-//
-//using pgg::vector;
 
 __device__
 bool needsAA[RES_X * RES_Y];
@@ -47,11 +44,6 @@ Node* dev_nodes[GEOM_MAX_SIZE];
 
 __device__
 Texture* dev_textures[GEOM_MAX_SIZE];
-
-//__device__ vector<Geometry*> dev_geom;
-//__device__ vector<Shader*> dev_shaders;
-//__device__ vector<Node*> dev_nodes;
-//__device__ vector<Texture*> dev_textures;
  
 __device__
 CameraController* m_controller;
@@ -92,15 +84,10 @@ Node* createNode(Geometry* geom, Shader* shader, Texture* tex = nullptr)
 	dev_nodes[GEOM_COUNT]    = new Node(dev_geom[GEOM_COUNT], dev_shaders[GEOM_COUNT], dev_textures[GEOM_COUNT]);
 
 	return dev_nodes[GEOM_COUNT++];
-
-	/*dev_geom.push_back(geom);
-	dev_shaders.push_back(shader);
-	dev_textures.push_back(tex);
-	dev_nodes.push_back(new Node(geom, shader, tex));*/
 }
 
 __global__ 
-void initializeScene()
+void initializeScene(bool realTime)
 {	
 	dev_cam = new Camera;
 	dev_cam->yaw = 0;
@@ -118,65 +105,72 @@ void initializeScene()
 	lightPower = 60000;
 	ambientLight = Color(0.2, 0.2, 0.2);
 
-#ifdef REAL_TIME_RENDERING
+//#ifdef REAL_TIME_RENDERING
+	if (realTime)
+	{
+		//createNode(new Plane(5), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 
-	//createNode(new Plane(5), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
+		////createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 
-	////createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
+		//createNode(new Sphere(Vector(0, 50, 200), 40.0), new Phong(Color(0, 0, 1), 32));
 
-	//createNode(new Sphere(Vector(0, 50, 200), 40.0), new Phong(Color(0, 0, 1), 32));
-
-	// ocean
-	createNode(new Plane(-30), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
-	Layered* water = new Layered;
-	water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
-	water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
+		// ocean
+		createNode(new Plane(-30), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
+		Layered* water = new Layered;
+		water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
+		water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
 	
-	Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
-	waterGeom->transform.scale(5, 5, 5);
+		Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
+		waterGeom->transform.scale(5, 5, 5);
 
-	createNode(new Sphere(Vector(10, -20, 250), 100.0), new Lambert(Color(0, 1, 0)));
+		createNode(new Sphere(Vector(10, -20, 250), 100.0), new Lambert(Color(0, 1, 0)));
+	}
+	else
+	{
+		/// room
+		createNode(new Plane(5, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
 
-#else
+		Layered* mirror = new Layered;
+		mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
 
-	/// room
-	createNode(new Plane(5, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
-
-	Layered* mirror = new Layered;
-	mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
-
-	Node* BackWall = createNode(new Plane(-300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
-	BackWall->transform.rotate(0, 90, 0);
+		Node* BackWall = createNode(new Plane(-300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
+		BackWall->transform.rotate(0, 90, 0);
 	
-	Node* SideWallLeft = createNode(new Plane(-150, 300, 300), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
-	SideWallLeft->transform.rotate(0, 0, 90);
+		Node* SideWallLeft = createNode(new Plane(-150, 300, 300), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
+		SideWallLeft->transform.rotate(0, 0, 90);
 
-	Node* SideWallRight = createNode(new Plane(150, 300, 300), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
-	SideWallRight->transform.rotate(0, 0, 90);
+		Node* SideWallRight = createNode(new Plane(150, 300, 300), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
+		SideWallRight->transform.rotate(0, 0, 90);
 
-	Node* Roof = createNode(new Plane(300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
+		Node* Roof = createNode(new Plane(300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
 
-	Layered* moreGlossy = new Layered;
-	moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
-	moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
-	createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
+		Layered* moreGlossy = new Layered;
+		moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
+		moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
+		createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
 
-	Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
-	rectMirror->transform.rotate(0, 90, 0);
-	rectMirror->transform.translate(Vector(0, 120, 298));
+		Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
+		rectMirror->transform.rotate(0, 90, 0);
+		rectMirror->transform.translate(Vector(0, 120, 298));
 
-	/// ocean
-	//createNode(new Plane(-300), new Lambert(Color(0x0AB6FF))); 
-	//Layered* water = new Layered;
-	//water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
-	//water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
-	//
-	//Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
-	//waterGeom->transform.scale(5, 5, 5);
+		/// ocean
+		//createNode(new Plane(-300), new Lambert(Color(0x0AB6FF))); 
+		//Layered* water = new Layered;
+		//water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
+		//water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
+		//
+		//Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
+		//waterGeom->transform.scale(5, 5, 5);
 
-	//createNode(new Sphere(Vector(50, -20, 350), 100.0), new Lambert(Color(0, 1, 0)));
+		//createNode(new Sphere(Vector(50, -20, 350), 100.0), new Lambert(Color(0, 1, 0)));
+	}
 	
-#endif
+
+//#else
+
+	
+	
+//#endif
 
 }
 
@@ -330,7 +324,7 @@ void freeMemory()
 extern "C"
 void initScene()
 {
-	initializeScene<<<1, 1>>>();
+	initializeScene<<<1, 1>>>(GlobalSettings::realTime);
 }
 
 __global__

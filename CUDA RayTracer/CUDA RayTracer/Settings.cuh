@@ -1,8 +1,11 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+
 //#define FULL_HD
-//#define REAL_TIME_RENDERING
+#define REAL_TIME_RENDERING
 #define VFB_MAX_SIZE 1920
 #define INF 1e99
 #define MAX_RAY_DEPTH 5
@@ -15,6 +18,9 @@ struct GlobalSettings
 {
 	static bool AAEnabled;
 	static bool previewAA;
+	static bool realTime;
+	static int RES_X;
+	static int RES_Y;
 };
 
 // the stack size in bytes for each GPU thread

@@ -3,7 +3,7 @@
 #include "device_launch_parameters.h"
 #include <GL\glfw.h>
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -21,6 +21,8 @@
 #include "Plane.cuh"
 #include "Sphere.cuh"
 #include "EventHandler.h"
+#include "Menu.h"
+#include "Settings.cuh"
 	
 using namespace std;
 
@@ -188,6 +190,9 @@ void convertDeviceToHostBuffer()
 
 int main(int argc, char** argv)
 {
+	Menu mainMenu(appName);
+	mainMenu.Destroy();
+
 	if (!initGraphics(RES_X, RES_Y))
 	{
 		return -1;
@@ -211,46 +216,53 @@ int main(int argc, char** argv)
 
 	SDL_WarpMouse(RES_X / 2, RES_Y / 2);
 
-#ifdef REAL_TIME_RENDERING
-	
-	while (m_eventController.isRealTimeRendering)
+//#ifdef REAL_TIME_RENDERING
+	if (GlobalSettings::realTime)
 	{
-		cameraBeginFrame();
+		while (m_eventController.isRealTimeRendering)
+		{
+			cameraBeginFrame();
 		
-		displayFrameCounter();
+			displayFrameCounter();
 		
-		cudaRenderer(dev_vfb);
-		cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
-		convertDeviceToHostBuffer();
+			cudaRenderer(dev_vfb);
+			cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
+			convertDeviceToHostBuffer();
 		
-		m_eventController.handleEvents();
+			m_eventController.handleEvents();
 		
-		displayVFB(vfb);
+			displayVFB(vfb);
+		}
 	}
-		
-#else
+	else
+	{
+		// capture the start time
+		cudaEvent_t start, stop;
+		cudaStartTimer(start, stop);
 
-	// capture the start time
-	cudaEvent_t start, stop;
-	cudaStartTimer(start, stop);
+		// call kernels
+		// - RenderScene
+		cudaRenderer(dev_vfb);
 
-	// call kernels
-	// - RenderScene
-	cudaRenderer(dev_vfb);
+		// memcpy DeviceToHost
+		cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
 
-	// memcpy DeviceToHost
-	cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * RES_X * RES_Y, cudaMemcpyDeviceToHost);
+		// get stop time, and display the timing results
+		cudaStopTimer(start, stop);
 
-	// get stop time, and display the timing results
-	cudaStopTimer(start, stop);
-
-	convertDeviceToHostBuffer();	
+		convertDeviceToHostBuffer();	
 	
-	displayVFB(vfb);
+		displayVFB(vfb);
 
-	m_eventController.handleUserInput();
+		m_eventController.handleUserInput();
+	}
+	
+		
+//#else
 
-#endif
+	
+
+//#endif
 
 	// free memory	
 	freeDeviceMemory();
