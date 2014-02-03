@@ -2,12 +2,12 @@
 #include "CameraController.cuh"
 
 extern __device__
-CameraController* m_controller;
+CameraController* controller;
 
 // movement
 __global__ void mvForward()
 {
-	m_controller->moveForward();
+	controller->moveForward();
 }
 extern "C" void moveForward()
 {
@@ -16,7 +16,7 @@ extern "C" void moveForward()
 
 __global__ void mvBackward()
 {
-	m_controller->moveBackward();
+	controller->moveBackward();
 }
 extern "C" void moveBackward()
 {
@@ -25,7 +25,7 @@ extern "C" void moveBackward()
 
 __global__ void mvLeft()
 {
-	m_controller->strafeLeft();
+	controller->strafeLeft();
 }
 extern "C" void strafeLeft()
 {
@@ -34,7 +34,7 @@ extern "C" void strafeLeft()
 
 __global__ void mvRight()
 {
-	m_controller->strafeRight();
+	controller->strafeRight();
 }
 extern "C" void strafeRight()
 {
@@ -45,7 +45,7 @@ extern "C" void strafeRight()
 __global__ 
 void setCamOrientation(float zenith, float azimuth)
 {
-	m_controller->offsetCameraOrientation(zenith, azimuth);
+	controller->offsetCameraOrientation(zenith, azimuth);
 }
 
 extern "C"

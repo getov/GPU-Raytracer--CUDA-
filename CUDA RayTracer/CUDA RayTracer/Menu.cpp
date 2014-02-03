@@ -1,12 +1,13 @@
 #include "Menu.h"
 #include "Settings.cuh"
 
-Button::Button(const char* buttonName, const SDL_Color& buttonColor, const int& buttonID)
+Button::Button(const char* buttonName, const SDL_Color& buttonColor, const int& buttonID, int fontSize)
 	: name(buttonName)
 	, color(buttonColor)
 	, id(buttonID)
+	, _fontSize(fontSize)
 {
-	font = TTF_OpenFont("../Fonts/Starcraft Normal.ttf", 20);
+	font = TTF_OpenFont("../Fonts/Starcraft Normal.ttf", _fontSize);
 
 	body = TTF_RenderText_Solid(font, name, color);
 }
@@ -62,8 +63,10 @@ void Menu::setTextColor()
 void Menu::renderMenuLabels()
 {
 	menuLabels.push_back(new Button("Resolution", color[3], 0));
+	menuLabels.push_back(new Button("Video Mode", color[3], 0));
 	menuLabels.push_back(new Button("Anti-Aliasing", color[3], 0));
 	menuLabels.push_back(new Button("Real-Time Rendering", color[3], 0));
+	menuLabels.push_back(new Button("Choose Scene", color[3], 0));
 
 	float offsetY = 0.0;
 	for (int i = 0; i < menuLabels.size(); ++i)
@@ -79,7 +82,7 @@ void Menu::renderOptionButtons()
 	// Resolution
 	optionButtons.push_back(new Button("640x480", color[0], 1));
 	optionButtons.push_back(new Button("1024x768", color[0], 2));
-	optionButtons.push_back(new Button("1280x720", color[0], 3));
+	optionButtons.push_back(new Button("1280x960", color[0], 3));
 	optionButtons.push_back(new Button("1920x1080", color[0], 4));
 	int lastSize = optionButtons.size();
 
@@ -99,7 +102,7 @@ void Menu::renderOptionButtons()
 	for (int i = lastSize; i < optionButtons.size(); ++i)
 	{
 		optionButtons[i]->boundingRect.x = menuScreen->clip_rect.w * (0.35 + offsetX);
-		optionButtons[i]->boundingRect.y = menuScreen->clip_rect.h * 0.4;
+		optionButtons[i]->boundingRect.y = menuScreen->clip_rect.h * 0.5;
 		offsetX += 0.05;
 	}
 	lastSize = optionButtons.size();
@@ -112,14 +115,28 @@ void Menu::renderOptionButtons()
 	for (int i = lastSize; i < optionButtons.size(); ++i)
 	{
 		optionButtons[i]->boundingRect.x = menuScreen->clip_rect.w * (0.35 + offsetX);
-		optionButtons[i]->boundingRect.y = menuScreen->clip_rect.h * 0.5;
+		optionButtons[i]->boundingRect.y = menuScreen->clip_rect.h * 0.6;
 		offsetX += 0.05;
 	}
 
 	// Render button
-	optionButtons.push_back(new Button("Render", color[0], 9));
-	optionButtons[8]->boundingRect.x = menuScreen->clip_rect.w * 0.85;
+	optionButtons.push_back(new Button("Render", color[0], 9, 25));
+	optionButtons[8]->boundingRect.x = menuScreen->clip_rect.w * 0.80;
 	optionButtons[8]->boundingRect.y = menuScreen->clip_rect.h * 0.85;
+	lastSize = optionButtons.size();
+
+	// Video Mode
+	optionButtons.push_back(new Button("Windowed", color[0], 10));
+	optionButtons.push_back(new Button("Fullscreen", color[0], 11));
+	
+	offsetX = 0.0;
+	for (int i = lastSize; i < optionButtons.size(); ++i)
+	{
+		optionButtons[i]->boundingRect.x = menuScreen->clip_rect.w * (0.35 + offsetX);
+		optionButtons[i]->boundingRect.y = menuScreen->clip_rect.h * 0.4;
+		offsetX += 0.15;
+	}
+	lastSize = optionButtons.size();
 }
 
 void Menu::handleMouseEvents()
@@ -188,7 +205,7 @@ void Menu::handleMouseEvents()
 							else if (optionButtons[i]->id == 3 && !selectedItem[i])
 							{
 								GlobalSettings::RES_X = 1280;
-								GlobalSettings::RES_Y = 720;
+								GlobalSettings::RES_Y = 960;
 
 								selectedItem[i] = true;
 								SDL_FreeSurface(optionButtons[i]->body);
@@ -266,6 +283,30 @@ void Menu::handleMouseEvents()
 								SDL_FreeSurface(optionButtons[i]->body);
 								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);
 								GlobalSettings::realTime = false;
+
+								selectedItem[i - 1] = false;
+								SDL_FreeSurface(optionButtons[i - 1]->body);
+								optionButtons[i - 1]->body = TTF_RenderText_Solid(optionButtons[i - 1]->font, optionButtons[i - 1]->name, color[0]);
+							}
+
+							// Video Mode
+							if (optionButtons[i]->id == 10 && !selectedItem[i]) // windowed
+							{
+								selectedItem[i] = true;
+								SDL_FreeSurface(optionButtons[i]->body);
+								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);
+								GlobalSettings::fullscreen = false;
+
+								selectedItem[i + 1] = false;
+								SDL_FreeSurface(optionButtons[i + 1]->body);
+								optionButtons[i + 1]->body = TTF_RenderText_Solid(optionButtons[i + 1]->font, optionButtons[i + 1]->name, color[0]);
+							}
+							else if (optionButtons[i]->id == 11 && !selectedItem[i]) // fullscreen
+							{
+								selectedItem[i] = true;
+								SDL_FreeSurface(optionButtons[i]->body);
+								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);
+								GlobalSettings::fullscreen = true;
 
 								selectedItem[i - 1] = false;
 								SDL_FreeSurface(optionButtons[i - 1]->body);

@@ -63,10 +63,10 @@ inline bool solveQuadraticEquation(float a, float b, float c, float& outX1, floa
 __device__
 inline float randomFloat()
 {
-	thrust::default_random_engine randEngine(10);
-	thrust::uniform_real_distribution<float> range(0,1);
+	thrust::default_random_engine randEngine(123u);
+	thrust::uniform_real_distribution<float> generator;
 
-	return (float)range(randEngine);
+	return (float)generator(randEngine);
 }
 
 template <typename T>

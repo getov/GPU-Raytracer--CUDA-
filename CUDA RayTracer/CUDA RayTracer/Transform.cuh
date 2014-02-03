@@ -86,7 +86,7 @@ public:
 	}
 
 	__device__
-	Vector undoPoint(Vector P)
+	Vector undoPoint(Vector P) const
 	{
 		P = P - offset;
 		P = P * inverseTransform;
@@ -95,15 +95,24 @@ public:
 	}
 
 	__device__
-	Vector direction(const Vector& dir)
+	Vector direction(const Vector& dir) const
 	{
 		return dir * transform;
 	}
 
 	__device__
-	Vector undoDirection(const Vector& dir) 
+	Vector undoDirection(const Vector& dir) const
 	{
 		return dir * inverseTransform;
+	}
+
+	__device__
+	Ray undoRay(const Ray& inputRay) const 
+	{
+		Ray result = inputRay;
+		result.start = undoPoint(inputRay.start);
+		result.dir   = undoDirection(inputRay.dir);
+		return result;
 	}
 };
 

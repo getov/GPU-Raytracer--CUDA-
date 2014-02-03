@@ -5,6 +5,7 @@
 #include "IShader.cuh"
 #include "Transform.cuh"
 #include "Texture.cuh"
+class Shader;
 
 class Node 
 {

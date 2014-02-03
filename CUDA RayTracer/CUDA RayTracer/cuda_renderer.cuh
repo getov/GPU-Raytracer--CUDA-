@@ -10,6 +10,11 @@
 #include "Node.cuh"
 #include "custom_vector.cuh"
 #include "CameraController.cuh"
+#include "Scene.cuh"
+
+class Scene;
+
+extern __device__ Scene* scene;
 
 __device__ 
 Color raytrace(Ray ray);

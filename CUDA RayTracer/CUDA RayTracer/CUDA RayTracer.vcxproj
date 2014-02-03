@@ -40,6 +40,7 @@
     <CudaCompile Include="IShader.cu" />
     <CudaCompile Include="Lambert.cu" />
     <CudaCompile Include="Layered.cu" />
+    <CudaCompile Include="Light.cu" />
     <CudaCompile Include="Matrix.cu" />
     <CudaCompile Include="OrenNayar.cu" />
     <CudaCompile Include="Phong.cu" />
@@ -47,6 +48,7 @@
     <CudaCompile Include="RaytracerControls.cu" />
     <CudaCompile Include="Reflection.cu" />
     <CudaCompile Include="Refraction.cu" />
+    <CudaCompile Include="Scene.cu" />
     <CudaCompile Include="sdl.cu" />
     <CudaCompile Include="cuda_renderer.cu" />
     <CudaCompile Include="Settings.cu" />
@@ -63,6 +65,7 @@
     <None Include="IGeometry.cuh" />
     <None Include="Lambert.cuh" />
     <None Include="Layered.cuh" />
+    <None Include="Light.cuh" />
     <None Include="Node.cuh" />
     <None Include="OrenNayar.cuh" />
     <None Include="Phong.cuh" />
@@ -71,6 +74,7 @@
     <None Include="RaytracerControls.cuh" />
     <None Include="Reflection.cuh" />
     <None Include="Refraction.cuh" />
+    <None Include="Scene.cuh" />
     <None Include="Sphere.cuh" />
     <None Include="Texture.cuh" />
     <None Include="Transform.cuh" />

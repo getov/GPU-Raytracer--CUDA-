@@ -193,14 +193,19 @@ int main(int argc, char** argv)
 	Menu mainMenu(appName);
 	mainMenu.Destroy();
 
+	initColorCache();
+
 	if (!initGraphics(GlobalSettings::RES_X, GlobalSettings::RES_Y))
 	{
 		return -1;
 	}
 
+	/*SDL_Surface* icon = SDL_LoadBMP("../floor.bmp");
+	SDL_WM_SetIcon(icon, NULL);*/
+
 	printGPUSpecs();
 
-	EventHandler m_eventController;
+	EventHandler eventController;
 
 	cudaDeviceSetLimit(cudaLimitStackSize, STACK_SIZE);
 
@@ -216,10 +221,9 @@ int main(int argc, char** argv)
 
 	SDL_WarpMouse(GlobalSettings::RES_X / 2, GlobalSettings::RES_Y / 2);
 
-//#ifdef REAL_TIME_RENDERING
 	if (GlobalSettings::realTime)
 	{
-		while (m_eventController.isRealTimeRendering)
+		while (eventController.isRealTimeRendering)
 		{
 			cameraBeginFrame();
 		
@@ -229,7 +233,7 @@ int main(int argc, char** argv)
 			cudaMemcpy(vfb_linear, dev_vfb, sizeof(Color) * GlobalSettings::RES_X * GlobalSettings::RES_Y, cudaMemcpyDeviceToHost);
 			convertDeviceToHostBuffer();
 		
-			m_eventController.handleEvents();
+			eventController.handleEvents();
 		
 			displayVFB(vfb);
 		}
@@ -254,15 +258,8 @@ int main(int argc, char** argv)
 	
 		displayVFB(vfb);
 
-		m_eventController.handleUserInput();
+		eventController.handleUserInput();
 	}
-	
-		
-//#else
-
-	
-
-//#endif
 
 	// free memory	
 	freeDeviceMemory();

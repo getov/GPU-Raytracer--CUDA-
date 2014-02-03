@@ -22,6 +22,7 @@
 #include "sdl.cuh"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include "Settings.cuh"
 
 SDL_Surface* screen = NULL;
 
@@ -33,7 +34,7 @@ bool initGraphics(int frameWidth, int frameHeight)
 		printf("Cannot initialize SDL: %s\n", SDL_GetError());
 		return false;
 	}
-	screen = SDL_SetVideoMode(frameWidth, frameHeight, 32, 0);
+	screen = SDL_SetVideoMode(frameWidth, frameHeight, 32, GlobalSettings::fullscreen ? SDL_FULLSCREEN : 0);
 
 	if (!screen)
 	{
@@ -56,13 +57,30 @@ void displayVFB(Color vfb[VFB_MAX_SIZE][VFB_MAX_SIZE])
 	int gs = screen->format->Gshift;
 	int bs = screen->format->Bshift;
 
-	for (int y = 0; y < screen->h; y++)
+	for (int y = 0; y < GlobalSettings::RES_Y/*screen->h*/; ++y)
 	{
 		Uint32* row = (Uint32*) ((Uint8*) screen->pixels + y * screen->pitch);
-		for (int x = 0; x < screen->w; x++)
+		for (int x = 0; x < GlobalSettings::RES_X /*screen->w*/; ++x)
 			row[x] = vfb[y][x].toRGB32(rs, gs, bs);
 	}
 	SDL_Flip(screen);
+}
+
+unsigned char SRGB_COMPRESS_CACHE[4097];
+
+void initColorCache()
+{
+	// precache the results of convertTo8bit_sRGB, in order to avoid the costly pow()
+	// in it and use a lookup table instead, see Color::convertTo8bit_sRGB_cached().
+	for (int i = 0; i <= 4096; i++)
+		SRGB_COMPRESS_CACHE[i] = (unsigned char) convertTo8bit_sRGB(i / 4096.0f);
+}
+
+unsigned convertTo8bit_sRGB_cached(float x)
+{
+	if (x <= 0) return 0;
+	if (x >= 1) return 255;
+	return SRGB_COMPRESS_CACHE[int(x * 4096.0f)];
 }
 
 /// returns the frame width

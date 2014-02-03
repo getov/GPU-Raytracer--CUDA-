@@ -16,6 +16,9 @@
     <Filter Include="Menu">
       <UniqueIdentifier>{59c3da42-d26d-46a5-a59f-0683a488cde5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{325dc4bf-f0b4-4511-a116-1e3c0450fff9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Color.cuh">
@@ -32,9 +35,11 @@
     </ClInclude>
     <ClInclude Include="sdl.cuh" />
     <ClInclude Include="Util.cuh" />
-    <ClInclude Include="Settings.cuh" />
     <ClInclude Include="Menu.h">
       <Filter>Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings.cuh">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -80,12 +85,20 @@
       <Filter>Camera</Filter>
     </CudaCompile>
     <CudaCompile Include="RaytracerControls.cu" />
-    <CudaCompile Include="Settings.cu" />
     <CudaCompile Include="EventHandler.cpp" />
     <CudaCompile Include="WaterWaves.cu">
       <Filter>Shaders</Filter>
     </CudaCompile>
     <CudaCompile Include="Util.cu" />
+    <CudaCompile Include="Settings.cu">
+      <Filter>Scene</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Scene.cu">
+      <Filter>Scene</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Light.cu">
+      <Filter>Scene</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cuda_renderer.cuh" />
@@ -140,6 +153,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="custom_vector.cuh" />
+    <None Include="Scene.cuh">
+      <Filter>Scene</Filter>
+    </None>
+    <None Include="Light.cuh">
+      <Filter>Scene</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cu" />

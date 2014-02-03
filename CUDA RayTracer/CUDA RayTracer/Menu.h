@@ -7,6 +7,9 @@
 
 class Button
 {
+private:
+	int _fontSize;
+
 public:
 	const char* name;
 	TTF_Font* font;
@@ -15,7 +18,7 @@ public:
 	SDL_Rect boundingRect;
 	int id;
 
-	Button(const char* buttonName, const SDL_Color& buttonColor, const int& buttonID);
+	Button(const char* buttonName, const SDL_Color& buttonColor, const int& buttonID, int fontSize = 20);
 };
 
 class Menu

@@ -12,6 +12,22 @@ inline unsigned convertTo8bit(float x)
 	return nearestInt(x * 255.0f);
 }
 
+__host__
+inline unsigned convertTo8bit_sRGB(float x)
+{
+	const float a = 0.055f;
+	if (x <= 0) return 0;
+	if (x >= 1) return 255;
+	// sRGB transform:
+	if (x <= 0.0031308f)
+		x = x * 12.02f;
+	else
+		x = (1.0f + a) * powf(x, 1.0f / 2.4f) - a;
+	return nearestInt(x * 255.0f);
+}
+
+unsigned convertTo8bit_sRGB_cached(float x);
+
 /// Represents a color, using floatingpoint components in [0..1]
 struct Color
 {
