@@ -1,0 +1,69 @@
+﻿Build started 04-Feb-14 16:52:25.
+     1>Project "P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\CUDA RayTracer.vcxproj" on node 2 (Build target(s)).
+     1>AddCudaCompileDeps:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\cl.exe /E /nologo /showIncludes /TP /D__CUDACC__ /DWIN32 /DNDEBUG /D_CONSOLE /D_MBCS /I"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\GL\include" /I"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\SDL\include" /I"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\include" /I"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin" /I"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\include" /I. /FIcuda_runtime.h /c "P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\cuda_renderer.cu" 
+       CudaBuild:
+         Compiling CUDA source file cuda_renderer.cu...
+         cmd.exe /C "C:\Users\Getov\AppData\Local\Temp\tmp7d306b08ce6e4bbb9447ec675856ebf9.cmd"
+         "G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin\nvcc.exe" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2012 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin" -rdc=true -I"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\GL\include" -I"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\SDL\include" -I"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\include" -I"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\include"      -maxrregcount=0  --machine 32 --compile -cudart static -l.     -DWIN32 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -o Release\cuda_renderer.cu.obj "P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\cuda_renderer.cu"
+         
+         P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer>"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin\nvcc.exe" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2012 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin" -rdc=true -I"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\GL\include" -I"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\SDL\include" -I"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\include" -I"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\include"      -maxrregcount=0  --machine 32 --compile -cudart static -l.     -DWIN32 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -o Release\cuda_renderer.cu.obj "P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\cuda_renderer.cu" 
+     1>p:\my projects\gpu-raytracer--cuda-.git\trunk\cuda raytracer\cuda raytracer\custom_vector.cuh(83): warning : pointless comparison of unsigned integer with zero
+     1>p:\my projects\gpu-raytracer--cuda-.git\trunk\cuda raytracer\cuda raytracer\custom_vector.cuh(87): warning : missing return statement at end of non-void function "pgg::vector<T>::operator[] [with T=Node *]"
+     1>p:\my projects\gpu-raytracer--cuda-.git\trunk\cuda raytracer\cuda raytracer\custom_vector.cuh(83): warning : pointless comparison of unsigned integer with zero
+     1>p:\my projects\gpu-raytracer--cuda-.git\trunk\cuda raytracer\cuda raytracer\custom_vector.cuh(87): warning : missing return statement at end of non-void function "pgg::vector<T>::operator[] [with T=Light *]"
+     1>p:\my projects\gpu-raytracer--cuda-.git\trunk\cuda raytracer\cuda raytracer\custom_vector.cuh(83): warning : pointless comparison of unsigned integer with zero
+     1>p:\my projects\gpu-raytracer--cuda-.git\trunk\cuda raytracer\cuda raytracer\custom_vector.cuh(87): warning : missing return statement at end of non-void function "pgg::vector<T>::operator[]"
+       CudaLink:
+         cmd.exe /C "C:\Users\Getov\AppData\Local\Temp\tmpb18b62b8589c4ce3a89c87e2f88f0b00.cmd"
+         "G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin\nvcc.exe" -dlink -o "Release\CUDA RayTracer.device-link.obj" -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -L"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\GL\lib" -L"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\SDL\lib\x86" -L"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\lib\Win32" opengl32.lib GLFW.lib cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib SDL.lib SDLmain.lib SDL_ttf.lib  -gencode=arch=compute_30,code=sm_30  --machine 32 Release\Camera.cu.obj Release\CameraController.cu.obj Release\EventHandler.cpp.obj Release\Fresnel.cu.obj Release\IShader.cu.obj Release\Lambert.cu.obj Release\Layered.cu.obj Release\Light.cu.obj Release\Matrix.cu.obj Release\OrenNayar.cu.obj Release\Phong.cu.obj Release\Plane.cu.obj Release\RaytracerControls.cu.obj Release\Reflection.cu.obj Release\Refraction.cu.obj Release\Scene.cu.obj Release\sdl.cu.obj Release\cuda_renderer.cu.obj Release\Settings.cu.obj Release\Sphere.cu.obj Release\Util.cu.obj Release\WaterWaves.cu.obj
+         
+         P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer>"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin\nvcc.exe" -dlink -o "Release\CUDA RayTracer.device-link.obj" -Xcompiler "/EHsc /W3 /nologo /O2 /Zi  /MD  " -L"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\GL\lib" -L"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\SDL\lib\x86" -L"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\lib\Win32" opengl32.lib GLFW.lib cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib SDL.lib SDLmain.lib SDL_ttf.lib  -gencode=arch=compute_30,code=sm_30  --machine 32 Release\Camera.cu.obj Release\CameraController.cu.obj Release\EventHandler.cpp.obj Release\Fresnel.cu.obj Release\IShader.cu.obj Release\Lambert.cu.obj Release\Layered.cu.obj Release\Light.cu.obj Release\Matrix.cu.obj Release\OrenNayar.cu.obj Release\Phong.cu.obj Release\Plane.cu.obj Release\RaytracerControls.cu.obj Release\Reflection.cu.obj Release\Refraction.cu.obj Release\Scene.cu.obj Release\sdl.cu.obj Release\cuda_renderer.cu.obj Release\Settings.cu.obj Release\Sphere.cu.obj Release\Util.cu.obj Release\WaterWaves.cu.obj 
+     1>nvlink : warning : Stack size for entry function '_Z12antiAliasingP5Colorbii' cannot be statically determined
+     1>nvlink : warning : Stack size for entry function '_Z12antiAliasingP5Colorbii' cannot be statically determined
+     1>nvlink : warning : Stack size for entry function '_Z12antiAliasingP5Colorbii' cannot be statically determined
+     1>nvlink : warning : Stack size for entry function '_Z11renderSceneP5Colorii' cannot be statically determined
+     1>nvlink : warning : Stack size for entry function '_Z11renderSceneP5Colorii' cannot be statically determined
+     1>nvlink : warning : Stack size for entry function '_Z11renderSceneP5Colorii' cannot be statically determined
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\Release\CUDA RayTracer.exe" /NOLOGO /LIBPATH:"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\GL\lib" /LIBPATH:"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\\..\ThirdParty\SDL\lib\x86" /LIBPATH:"G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\lib\Win32" opengl32.lib GLFW.lib cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib SDL.lib SDLmain.lib SDL_ttf.lib SDL_ttf.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\Release\CUDA RayTracer.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\Release\CUDA RayTracer.lib" /MACHINE:X86 /SAFESEH Release\Camera.cu.obj
+         Release\CameraController.cu.obj
+         Release\EventHandler.cpp.obj
+         Release\Fresnel.cu.obj
+         Release\IShader.cu.obj
+         Release\Lambert.cu.obj
+         Release\Layered.cu.obj
+         Release\Light.cu.obj
+         Release\Matrix.cu.obj
+         Release\OrenNayar.cu.obj
+         Release\Phong.cu.obj
+         Release\Plane.cu.obj
+         Release\RaytracerControls.cu.obj
+         Release\Reflection.cu.obj
+         Release\Refraction.cu.obj
+         Release\Scene.cu.obj
+         Release\sdl.cu.obj
+         Release\cuda_renderer.cu.obj
+         Release\Settings.cu.obj
+         Release\Sphere.cu.obj
+         Release\Util.cu.obj
+         Release\WaterWaves.cu.obj
+         Release\main.obj
+         Release\Menu.obj
+         "Release\CUDA RayTracer.device-link.obj"
+         Generating code
+         Finished generating code
+         CUDA RayTracer.vcxproj -> P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\Release\CUDA RayTracer.exe
+       PostBuildEvent:
+         echo copy "G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin\cudart*.dll" "P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\Release\"
+         copy "G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin\cudart*.dll" "P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\Release\"
+         :VCEnd
+         copy "G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin\cudart*.dll" "P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\Release\"
+         G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin\cudart32_55.dll
+         G:\Development\CUDA Toolkit\CUDA Toolkit v5.5\bin\cudart64_55.dll
+                 2 file(s) copied.
+     1>Done Building Project "P:\My Projects\GPU-Raytracer--CUDA-.git\trunk\CUDA RayTracer\CUDA RayTracer\CUDA RayTracer.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:09.68

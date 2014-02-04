@@ -100,20 +100,20 @@ void initializeScene(bool realTime, int RES_X, int RES_Y)
 
 	if (realTime)
 	{
-		createNode(new Plane(5), new Lambert(Color(0.5, 0.5, 0.5)));
-		//createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
-		createNode(new Sphere(Vector(0, 50, 200), 40.0), new Phong(Color(0, 0, 1), 32));
+		//createNode(new Plane(5), new Lambert(Color(0.5, 0.5, 0.5)));
+		////createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
+		//createNode(new Sphere(Vector(0, 50, 200), 40.0), new Phong(Color(0, 0, 1), 32));
 
 		// ocean
-		//createNode(new Plane(-30), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
-		//Layered* water = new Layered;
-		//water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
-		//water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
+		createNode(new Plane(-30), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
+		Layered* water = new Layered;
+		water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
+		water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
 	
-		//Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
-		//waterGeom->transform.scale(5, 5, 5);
+		Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
+		waterGeom->transform.scale(5, 5, 5);
 
-		//createNode(new Sphere(Vector(10, -20, 250), 100.0), new Lambert(Color(0, 1, 0)));
+		createNode(new Sphere(Vector(10, -20, 250), 100.0), new Lambert(Color(0, 1, 0)));
 	}
 	else
 	{
@@ -333,6 +333,20 @@ void renderScene(Color* dev_vfb, int RES_X, int RES_Y)
 	}
 }
 
+//__global__ 
+//void renderScene2(Color* dev_vfb, int RES_X, int RES_Y)
+//{
+//	// map from threadIdx/BlockIdx to pixel position
+//	int x = threadIdx.x + blockIdx.x * blockDim.x;
+//	int y = threadIdx.y + blockIdx.y * blockDim.y;
+//	int offset = x + y * blockDim.x * gridDim.x;
+//
+//	if (offset >= RES_X * RES_Y / 2)
+//	{
+//		dev_vfb[offset] = raytrace(dev_cam->getScreenRay(x, y, RES_X, RES_Y));
+//	}
+//}
+
 __global__
 void freeMemory()
 {
@@ -370,6 +384,8 @@ void cudaRenderer(Color* dev_vfb)
 	
 	// first pass
 	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::RES_X, GlobalSettings::RES_Y);
+
+	//renderScene2<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 
 	//second pass
 	if (GlobalSettings::AAEnabled)
