@@ -6,3 +6,4 @@ bool GlobalSettings::realTime   = false;
 bool GlobalSettings::fullscreen = false;
 int GlobalSettings::RES_X       = 640;
 int GlobalSettings::RES_Y       = 480;
+short GlobalSettings::sceneID   = 0;

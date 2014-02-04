@@ -7,44 +7,53 @@ EventHandler::EventHandler()
 	: isRealTimeRendering(true)
 	, mouseSensitivity(0.6f)
 	, keySwitch(2, false)
-	, keysHeld(323, false)
 {
 }
 
 void EventHandler::handleEvents()
 {
-	SDL_Event event;
-	while (SDL_PollEvent(&event))
+	handleKeyboard();
+	handleMouse();
+}
+
+void EventHandler::handleKeyboard()
+{
+	if (glfwGetKey(GLFW_KEY_F1) == GLFW_PRESS && !keySwitch[0])
 	{
-		handleKeyboard(event);
-		handleMouse(event);
+		GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
+		keySwitch[0] = true;
+	}
+	else if (glfwGetKey(GLFW_KEY_F1) == GLFW_PRESS && keySwitch[0])
+	{
+		GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
+		keySwitch[0] = false;
 	}
 
-	if (keysHeld[SDLK_w])
+	if (glfwGetKey('W'))
 	{
 		moveForward();
 	}
 
-	if (keysHeld[SDLK_s])
+	if (glfwGetKey('S'))
 	{
 		moveBackward();
 	}
 
-	if (keysHeld[SDLK_a])
+	if (glfwGetKey('A'))
 	{
 		strafeLeft();
 	}
 
-	if (keysHeld[SDLK_d])
+	if (glfwGetKey('D'))
 	{
 		strafeRight();
 	}
 
-	if (keysHeld[SDLK_KP_PLUS])
+	if (glfwGetKey(GLFW_KEY_KP_ADD) == GLFW_PRESS)
 	{
 		mouseSensitivity += 0.02;
 	}
-	else if (keysHeld[SDLK_KP_MINUS])
+	else if (glfwGetKey(GLFW_KEY_KP_SUBTRACT) == GLFW_PRESS)
 	{
 		mouseSensitivity -= 0.02;
 
@@ -53,79 +62,26 @@ void EventHandler::handleEvents()
 			mouseSensitivity = 0.6;
 		}
 	}
-}
 
-void EventHandler::handleKeyboard(SDL_Event& ev)
-{
-	if (ev.type == SDL_KEYDOWN)
+	if (glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS)
 	{
-		keysHeld[ev.key.keysym.sym] = true;
-
-		if (ev.key.keysym.sym == SDLK_F1 && !keySwitch[0])
-		{
-			GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
-			keySwitch[0] = true;
-		}
-		else if (ev.key.keysym.sym == SDLK_F1 && keySwitch[0])
-		{
-			GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
-			keySwitch[0] = false;
-		}
-	}
-	if (ev.type == SDL_KEYUP)
-	{
-		keysHeld[ev.key.keysym.sym] = false;
-	}
-	if (ev.type == SDL_QUIT)
-	{
-		isRealTimeRendering = false;
-	}
-
-	if (ev.key.keysym.sym == SDLK_ESCAPE)
-	{
-		isRealTimeRendering = false;
+		glfwTerminate();
 	}
 }
 
 void EventHandler::handleUserInput()
 {
-	SDL_Event event;
-	while (SDL_WaitEvent(&event))
-	{
-		switch (event.type)
-		{
-			case SDL_QUIT:
-				return;
-			case SDL_KEYDOWN:
-			{
-				switch (event.key.keysym.sym)
-				{
-					case SDLK_ESCAPE:
-						return;
-					default:
-						break;
-				}
-			}
-			default:
-				break;
-		}
-	}
+
 }
 
-void EventHandler::handleMouse(SDL_Event& ev)
+void EventHandler::handleMouse()
 {
-	if(ev.type == SDL_MOUSEMOTION)
-	{
-		int x, y;
+	int mouseX, mouseY;
 
-		SDL_GetMouseState(&x, &y);
+	glfwGetMousePos(&mouseX, &mouseY);
 
-		float deltaX = float(ev.motion.xrel);
-		float deltaY = float(ev.motion.yrel);
+	setCameraOrientation(mouseY * mouseSensitivity, mouseX * mouseSensitivity);
 
-		SDL_ShowCursor(0);
-		SDL_WM_GrabInput(SDL_GRAB_ON);
-
-		setCameraOrientation(deltaY * mouseSensitivity, deltaX * mouseSensitivity);
-	}
+	glfwDisable(GLFW_MOUSE_CURSOR);
+	glfwSetMousePos(0, 0);
 }

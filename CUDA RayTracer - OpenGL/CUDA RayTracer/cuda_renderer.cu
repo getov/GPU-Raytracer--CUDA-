@@ -31,6 +31,9 @@
 __device__
 bool needsAA[VFB_MAX_SIZE * VFB_MAX_SIZE];
 
+__device__
+Color colorBuffer[VFB_MAX_SIZE * VFB_MAX_SIZE];
+
 __device__ 
 Camera* dev_cam;
  
@@ -75,12 +78,9 @@ Node* createNode(Geometry* geom, Shader* shader, Texture* tex = nullptr)
 }
 
 __global__ 
-void initializeScene(bool realTime, int RES_X, int RES_Y)
+void initializeScene(short sceneID, int RES_X, int RES_Y)
 {	
 	scene = new Scene;
-	scene->dev_lights.push_back(new RectLight(Vector(0, 296, 200), Vector(0, 0, 0), Vector(50, 34, 34), Color(1, 1, 1), 20, 6, 6));
-	//scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
-	scene->dev_lights[0]->beginFrame();
 
 	dev_cam = new Camera;
 	dev_cam->yaw = 0;
@@ -93,92 +93,70 @@ void initializeScene(bool realTime, int RES_X, int RES_Y)
 
 	controller = new CameraController(*dev_cam, 10.f);
 	
-	/*lightPos = Vector(0, 296, 100);
-	lightColor = Color(1, 1, 1);
-	lightPower = 60000;
-	ambientLight = Color(0.2, 0.2, 0.2);*/
-
-	if (realTime)
+	switch (sceneID)
 	{
-		createNode(new Plane(5), new Lambert(Color(0.5, 0.5, 0.5)));
-		//createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
-		createNode(new Sphere(Vector(0, 50, 200), 40.0), new Phong(Color(0, 0, 1), 32));
+		case CORNELL_BOX:
+		{
+			scene->dev_lights.push_back(new RectLight(Vector(0, 296, 200), Vector(0, 0, 0), Vector(50, 34, 34), Color(1, 1, 1), 20, 6, 6));
+			scene->dev_lights[0]->beginFrame();
 
-		// ocean
-		//createNode(new Plane(-30), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
-		//Layered* water = new Layered;
-		//water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
-		//water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
+			createNode(new Plane(5, 300, 300), new Lambert(Color(0xF5E08C)));
+
+			Layered* mirror = new Layered;
+			mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
+
+			Node* BackWall = createNode(new Plane(-300, 300, 300), new Lambert(Color(0xF5E08C)));
+			BackWall->transform.rotate(0, 90, 0);
 	
-		//Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
-		//waterGeom->transform.scale(5, 5, 5);
+			Node* SideWallLeft = createNode(new Plane(-150, 300, 300), new Lambert(Color(1.0, 0.0, 0.0)));
+			SideWallLeft->transform.rotate(0, 0, 90);
 
-		//createNode(new Sphere(Vector(10, -20, 250), 100.0), new Lambert(Color(0, 1, 0)));
-	}
-	else
-	{
-		createNode(new Plane(5, 300, 300), new Lambert(Color(0xF5E08C)));
+			Node* SideWallRight = createNode(new Plane(150, 300, 300), new Lambert(Color(0.0, 0.0, 1.0)));
+			SideWallRight->transform.rotate(0, 0, 90);
 
-		Layered* mirror = new Layered;
-		mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
+			Node* Roof = createNode(new Plane(300, 300, 300), new Lambert(Color(0xF5E08C)));
 
-		Node* BackWall = createNode(new Plane(-300, 300, 300), new Lambert(Color(0xF5E08C)));
-		BackWall->transform.rotate(0, 90, 0);
+			Layered* moreGlossy = new Layered;
+			moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
+			moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
+			createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
+
+			Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
+			rectMirror->transform.rotate(0, 90, 0);
+			rectMirror->transform.translate(Vector(0, 120, 298));
+
+			break;
+		}
+		case ROAMING:
+		{
+			scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
+			scene->dev_lights[0]->beginFrame();
+
+			createNode(new Plane(5), new Lambert(Color(0.5, 0.5, 0.5)));
+			//createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
+			createNode(new Sphere(Vector(0, 50, 200), 40.0), new Phong(Color(0, 0, 1), 32));
+
+			break;
+		}
+		case SEA:
+		{
+			scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
+			scene->dev_lights[0]->beginFrame();
+
+			createNode(new Plane(-30), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
+			Layered* water = new Layered;
+			water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
+			water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
 	
-		Node* SideWallLeft = createNode(new Plane(-150, 300, 300), new Lambert(Color(1.0, 0.0, 0.0)));
-		SideWallLeft->transform.rotate(0, 0, 90);
+			Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
+			waterGeom->transform.scale(5, 5, 5);
 
-		Node* SideWallRight = createNode(new Plane(150, 300, 300), new Lambert(Color(0.0, 0.0, 1.0)));
-		SideWallRight->transform.rotate(0, 0, 90);
+			createNode(new Sphere(Vector(10, -20, 250), 100.0), new Lambert(Color(0, 1, 0)));
 
-		Node* Roof = createNode(new Plane(300, 300, 300), new Lambert(Color(0xF5E08C)));
-
-		Layered* moreGlossy = new Layered;
-		moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
-		moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
-		createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
-
-		Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
-		rectMirror->transform.rotate(0, 90, 0);
-		rectMirror->transform.translate(Vector(0, 120, 298));
-
-
-		/// room
-		/*createNode(new Plane(5, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
-
-		Layered* mirror = new Layered;
-		mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
-
-		Node* BackWall = createNode(new Plane(-300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
-		BackWall->transform.rotate(0, 90, 0);
-	
-		Node* SideWallLeft = createNode(new Plane(-150, 300, 300), new OrenNayar(Color(1.0, 0.0, 0.0), 1.0));
-		SideWallLeft->transform.rotate(0, 0, 90);
-
-		Node* SideWallRight = createNode(new Plane(150, 300, 300), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
-		SideWallRight->transform.rotate(0, 0, 90);
-
-		Node* Roof = createNode(new Plane(300, 300, 300), new OrenNayar(Color(0xF5E08C), 1.0));
-
-		Layered* moreGlossy = new Layered;
-		moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
-		moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
-		createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
-
-		Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
-		rectMirror->transform.rotate(0, 90, 0);
-		rectMirror->transform.translate(Vector(0, 120, 298));*/
-
-		/// ocean
-		//createNode(new Plane(-300), new Lambert(Color(0x0AB6FF))); 
-		//Layered* water = new Layered;
-		//water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
-		//water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
-		//
-		//Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
-		//waterGeom->transform.scale(5, 5, 5);
-
-		//createNode(new Sphere(Vector(50, -20, 350), 100.0), new Lambert(Color(0, 1, 0)));
+			break;
+		}
+		default:
+			break;
 	}
 }
 
@@ -240,10 +218,6 @@ Color raytrace(Ray ray)
 __device__
 inline bool tooDifferent(const Color& a, const Color& b)
 {
-	/*const float THRESHOLD = 0.1;
-	return (fabs(a.r - b.r) > THRESHOLD ||
-		     fabs(a.g - b.g) > THRESHOLD ||
-		     fabs(a.b - b.b) > THRESHOLD);*/
 	const float THRESHOLD = 0.1; // max color threshold; if met on any of the three channels, consider the colors too different
 	for (int comp = 0; comp < 3; comp++) {
 		float theMax = dev_max(a[comp], b[comp]);
@@ -258,7 +232,7 @@ inline bool tooDifferent(const Color& a, const Color& b)
 }
 
 __global__
-void antiAliasing(Color* dev_vfb, bool previewAA, int RES_X, int RES_Y)
+void antiAliasing(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 {
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
@@ -266,11 +240,11 @@ void antiAliasing(Color* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 		
 	const int n_size = 5;
 	Color neighs[n_size];
-	neighs[0] = dev_vfb[offset];
-	neighs[1] = dev_vfb[(x > 0 ? x - 1 : x) + y * blockDim.x * gridDim.x];
-	neighs[2] = dev_vfb[(x + 1 < RES_X ? x + 1 : x) + y * blockDim.x * gridDim.x];
-	neighs[3] = dev_vfb[x + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x];
-	neighs[4] = dev_vfb[x + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x];
+	neighs[0] = colorBuffer[offset];
+	neighs[1] = colorBuffer[(x > 0 ? x - 1 : x) + y * blockDim.x * gridDim.x];
+	neighs[2] = colorBuffer[(x + 1 < RES_X ? x + 1 : x) + y * blockDim.x * gridDim.x];
+	neighs[3] = colorBuffer[x + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x];
+	neighs[4] = colorBuffer[x + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x];
 
 	Color average(0, 0, 0);
 			
@@ -301,20 +275,23 @@ void antiAliasing(Color* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 	{
 		if (needsAA[offset])
 		{
-			dev_vfb[offset] = Color(1, 0, 0);
+			colorBuffer[offset] = Color(1, 0, 0);
 		}
 	}
 	else
 	{
 		if (needsAA[offset])
 		{
-			Color result = dev_vfb[offset];
+			Color result = colorBuffer[offset];
 			
 			for (int i = 1; i < n_size; ++i)
 			{
 				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1], RES_X, RES_Y));
 			}
-			dev_vfb[offset] = result / static_cast<float>(n_size);
+			colorBuffer[offset] = result / static_cast<float>(n_size);
+			dev_vfb[offset].x = convertTo8bit(colorBuffer[offset].r);
+			dev_vfb[offset].y = convertTo8bit(colorBuffer[offset].g);
+			dev_vfb[offset].z = convertTo8bit(colorBuffer[offset].b);
 		}
 	}
 }
@@ -329,11 +306,10 @@ void renderScene(uchar4* dev_vfb, int RES_X, int RES_Y)
 
 	if (offset < RES_X * RES_Y)
 	{
-		Color temp = raytrace(dev_cam->getScreenRay(x, y, RES_X, RES_Y));
-		dev_vfb[offset].x = convertTo8bit(temp.r);
-		dev_vfb[offset].y = convertTo8bit(temp.g);
-		dev_vfb[offset].z = convertTo8bit(temp.b);
-		//dev_vfb[offset].w = 255;
+		colorBuffer[offset] = raytrace(dev_cam->getScreenRay(x, y, RES_X, RES_Y));
+		dev_vfb[offset].x = convertTo8bit(colorBuffer[offset].r);
+		dev_vfb[offset].y = convertTo8bit(colorBuffer[offset].g);
+		dev_vfb[offset].z = convertTo8bit(colorBuffer[offset].b);
 	}
 }
 
@@ -351,7 +327,7 @@ void freeMemory()
 extern "C"
 void initScene()
 {
-	initializeScene<<<1, 1>>>(GlobalSettings::realTime, GlobalSettings::RES_X, GlobalSettings::RES_Y);
+	initializeScene<<<1, 1>>>(GlobalSettings::sceneID, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 }
 
 __global__
@@ -376,10 +352,10 @@ void cudaRenderer(uchar4* dev_vfb)
 	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 
 	//second pass
-	/*if (GlobalSettings::AAEnabled)
+	if (GlobalSettings::AAEnabled)
 	{
 		antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA, GlobalSettings::RES_X, GlobalSettings::RES_Y);
-	}*/
+	}
 }
 
 extern "C"

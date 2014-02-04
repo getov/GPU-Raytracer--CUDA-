@@ -9,9 +9,6 @@
 #include "cuda.h"
 #include "cuda_gl_interop.h"
 
-
-
-
 #include <SDL.h>
 #include <iostream>
 #include <string>
@@ -40,7 +37,6 @@ extern "C" void cudaRenderer(uchar4* dev_vfb);
 extern "C" void freeDeviceMemory();
 extern "C" void initScene();
 extern "C" void cameraBeginFrame();
-
 
 unsigned frameCount;
 unsigned lastFrameEnd;
@@ -145,11 +141,11 @@ void cudaStopTimer(cudaEvent_t& start, cudaEvent_t& stop)
     cudaEventSynchronize(stop);
     float  elapsedTime;
     cudaEventElapsedTime(&elapsedTime, start, stop);
-    printf( "Time to render:  %3.1f ms\n\n", elapsedTime);
+    //printf( "Time to render:  %3.1f ms\n\n", elapsedTime);
 	
 	char info[128];
 	sprintf(info, "CUDA Traycer || Time to render: %3.1f ms", elapsedTime);
-	SDL_WM_SetCaption(info, NULL);
+	glfwSetWindowTitle(info);
 
 	cudaEventDestroy(start);
     cudaEventDestroy(stop);
@@ -159,15 +155,15 @@ void displayFrameCounter()
 {
 	++frameCount;
 
-	const unsigned now = SDL_GetTicks();
+	const unsigned now = glfwGetTime();
 	const unsigned frameTime = now - lastFrameEnd;
 	const unsigned titleUpdateTimeDelta = now - lastTitleUpdateTime;
 
-	if (titleUpdateTimeDelta > 1000)
+	if (titleUpdateTimeDelta > 1)
 	{
 		const unsigned framesDelta = frameCount - lastTitleUpdateFrameCount;
 		const unsigned meanFrameTime = titleUpdateTimeDelta / framesDelta;
-		const unsigned fps = framesDelta * 1000 / titleUpdateTimeDelta;
+		const unsigned fps = framesDelta  / titleUpdateTimeDelta;
 
 		std::ostringstream title;
 		title << appName << " :\t\t\t mean frame time: " << meanFrameTime << " ms || fps: " << fps;
@@ -179,73 +175,29 @@ void displayFrameCounter()
 		lastTitleUpdateFrameCount = frameCount;
 	}
 
-	lastFrameEnd = SDL_GetTicks();
+	lastFrameEnd = glfwGetTime();
 }
+
+void OpenGL_Setup();
 
 int main(int argc, char** argv)
 {
+	cudaDeviceSetLimit(cudaLimitStackSize, STACK_SIZE);
+
 	Menu mainMenu(appName);
 	mainMenu.Destroy();
 
+	printGPUSpecs();
+
 	EventHandler eventController;
 
-	cudaDeviceProp prop;
-	int device;
-	memset(&prop, 0, sizeof(cudaDeviceProp));
-	prop.major = 1;
-	prop.minor = 0;
-	cudaChooseDevice(&device, &prop);
-	cudaGLSetGLDevice(device);
+	OpenGL_Setup();
 
-	if (!glfwInit())
-	{
-		std::cerr << "Could not initialize GLFW\n";
-	}
-
-	// open a window with GLFW
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE); //GLFW_OPENGL_CORE_PROFILE , GLFW_OPENGL_COMPAT_PROFILE
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
-    glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
-    if(!glfwOpenWindow(GlobalSettings::RES_X, GlobalSettings::RES_Y, 8, 8, 8, 8, 16, 0, GlobalSettings::fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW)) // for full screen = GLFW_FULLSCREEN
-	{
-		std::cerr << "glfwOpenWindow failed!\n";
-	}
-
-	glewExperimental = GL_TRUE;
-	// initialize GLEW
-	if (glewInit() != GLEW_OK)
-	{
-		std::cerr << "Failed to initialize GLEW\n";
-	}
-
-	while(glGetError() != GL_NO_ERROR) {}
-
-	/*glfwDisable(GLFW_MOUSE_CURSOR);
-    glfwSetMousePos(0, 0);
-    glfwSetMouseWheel(0);*/
-
-	glGenBuffers(1, &bufferObj);
-	glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, bufferObj);
-	glBufferData( GL_PIXEL_UNPACK_BUFFER_ARB, GlobalSettings::RES_X * GlobalSettings::RES_Y * 4,
-                  NULL, GL_DYNAMIC_DRAW_ARB );
-
-	/*cudaGraphicsGLRegisterBuffer( &resource, 
-                                      bufferObj, 
-                                      cudaGraphicsMapFlagsNone );
-
-	cudaGraphicsMapResources( 1, &resource, NULL );*/
+	//* framebuffer used by the GPU
 	uchar4* dev_vfb;
 	size_t size;
-	/*cudaGraphicsResourceGetMappedPointer( (void**)&dev_vfb, 
-                                              &size, 
-                                              resource);*/
 
-	cudaDeviceSetLimit(cudaLimitStackSize, STACK_SIZE);
-
-	// InitializeScene
 	initScene();
-
 
 	if (GlobalSettings::realTime)
 	{
@@ -265,46 +217,11 @@ int main(int argc, char** argv)
 
 			displayFrameCounter();
 
-			
-
-			
 			cudaRenderer(dev_vfb);
 
 			cudaGraphicsUnmapResources( 1, &resource, NULL );
 
-			//eventController.handleEvents();
-			if (glfwGetKey('W'))
-			{
-				moveForward();
-				printf("w");
-			}
-
-			if (glfwGetKey('S'))
-			{
-				moveBackward();
-			}
-
-			if (glfwGetKey('A'))
-			{
-				strafeLeft();
-			}
-
-			if (glfwGetKey('D'))
-			{
-				strafeRight();
-			}
-
-			if (glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS)
-			{
-				glfwTerminate();
-			}
-
-			int mouseX, mouseY;
-			glfwGetMousePos(&mouseX, &mouseY);
-			setCameraOrientation(mouseY * 0.6, mouseX * 0.6);
-
-			glfwDisable(GLFW_MOUSE_CURSOR);
-			glfwSetMousePos(0, 0);
+			eventController.handleEvents();
 			
 			draw();
 		}
@@ -320,11 +237,14 @@ int main(int argc, char** argv)
 		cudaGraphicsResourceGetMappedPointer( (void**)&dev_vfb, 
 												&size, 
 												resource);
+
+		cudaEvent_t start, stop;
+
 		while (glfwGetWindowParam(GLFW_OPENED))
 		{
-			cudaEvent_t start, stop;
+			
 			cudaStartTimer(start, stop);
-			displayFrameCounter();
+
 			cudaGraphicsResourceGetMappedPointer( (void**)&dev_vfb, 
 												  &size, 
 												  resource);
@@ -334,14 +254,57 @@ int main(int argc, char** argv)
 			cudaGraphicsUnmapResources( 1, &resource, NULL );
 
 			draw();
+
 			cudaStopTimer(start, stop);
 		}
 	}
 
-	
 	// free memory	
 	freeDeviceMemory();
 	glfwTerminate();
 
 	return EXIT_SUCCESS;
+}
+
+void OpenGL_Setup()
+{
+	cudaDeviceProp prop;
+	int device;
+	memset(&prop, 0, sizeof(cudaDeviceProp));
+	prop.major = 1;
+	prop.minor = 0;
+	cudaChooseDevice(&device, &prop);
+	cudaGLSetGLDevice(device);
+
+	if (!glfwInit())
+	{
+		std::cerr << "Could not initialize GLFW\n";
+	}
+
+	// open a window with GLFW
+    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE); //GLFW_OPENGL_CORE_PROFILE , GLFW_OPENGL_COMPAT_PROFILE
+    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
+    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
+    glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE);
+	
+    if(!glfwOpenWindow(GlobalSettings::RES_X, GlobalSettings::RES_Y, 8, 8, 8, 8, 16, 0,
+		               GlobalSettings::fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW))
+	{
+		std::cerr << "glfwOpenWindow failed!\n";
+	}
+
+	glewExperimental = GL_TRUE;
+	
+	if (glewInit() != GLEW_OK)
+	{
+		std::cerr << "Failed to initialize GLEW\n";
+	}
+
+	while(glGetError() != GL_NO_ERROR) {}
+
+	glGenBuffers(1, &bufferObj);
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, bufferObj);
+	glBufferData( GL_PIXEL_UNPACK_BUFFER_ARB,
+				  GlobalSettings::RES_X * GlobalSettings::RES_Y * 4,
+                  NULL, GL_DYNAMIC_DRAW_ARB );
 }

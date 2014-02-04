@@ -9,6 +9,8 @@
 #define MAX_RAY_DEPTH 5
 #define PI 3.141592653589793238
 
+enum SceneID { CORNELL_BOX, ROAMING, SEA };
+
 struct GlobalSettings
 {
 	static bool AAEnabled;
@@ -17,6 +19,7 @@ struct GlobalSettings
 	static bool fullscreen;
 	static int RES_X;
 	static int RES_Y;
+	static short sceneID; 
 };
 
 //__device__
