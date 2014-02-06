@@ -12,6 +12,7 @@ Features:
   - Procedural Bump Map Textures
   - Point lights, Drirection lights
   - More than one light source
+  - Soft Shadows
   - Anti-Aliasing
 
 Used Technologies:
