@@ -9,6 +9,7 @@ Features:
   - Diffuse shaders: Lambert, Phong, Oren Nayar
   - Reflection
   - Refraction
+  - Bump Map Textures
   - Point lights, Drirection lights
   - More than one light source
   - Anti-Aliasing
