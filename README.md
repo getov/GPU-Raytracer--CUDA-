@@ -12,3 +12,10 @@ Features:
   - Point lights, Drirection lights
   - More than one light source
   - Anti-Aliasing
+
+Used Technologies:
+ 
+  - C++
+  - CUDA
+  - OpenGL
+  - SDL
