@@ -2,6 +2,8 @@
 
 bool GlobalSettings::AAEnabled  = true;
 bool GlobalSettings::previewAA  = false;
+bool GlobalSettings::blur       = false;
+bool GlobalSettings::grayscale  = false;
 bool GlobalSettings::realTime   = false;
 bool GlobalSettings::fullscreen = false;
 int GlobalSettings::RES_X       = 640;

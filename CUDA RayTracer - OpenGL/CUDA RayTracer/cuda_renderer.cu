@@ -80,6 +80,8 @@ Node* createNode(Geometry* geom, Shader* shader, Texture* tex = nullptr)
 __global__ 
 void initializeScene(short sceneID, int RES_X, int RES_Y)
 {	
+	precomputeColorCache();
+
 	scene = new Scene;
 
 	dev_cam = new Camera;
@@ -98,7 +100,8 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 		case CORNELL_BOX:
 		{
 			scene->dev_lights.push_back(new RectLight(Vector(0, 296, 200), Vector(0, 0, 0), Vector(50, 34, 34), Color(1, 1, 1), 20, 6, 6));
-			scene->dev_lights[0]->beginFrame();
+			//scene->dev_lights.push_back(new RectLight(Vector(-70, 296, 200), Vector(0, 0, 0), Vector(50, 34, 34), Color(0, 0.5, 0.5), 20, 6, 6));
+			//scene->dev_lights.push_back(new SpotLight(Vector(0, 296, 180), Vector(0, -1, 1), Color(1, 1, 1), 60, 15.0, 35.0));
 
 			createNode(new Plane(5, 300, 300), new Lambert(Color(0xF5E08C)));
 
@@ -130,7 +133,6 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 		case ROAMING:
 		{
 			scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
-			scene->dev_lights[0]->beginFrame();
 
 			createNode(new Plane(5), new Lambert(Color(0.5, 0.5, 0.5)));
 			//createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
@@ -141,7 +143,6 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 		case SEA:
 		{
 			scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
-			scene->dev_lights[0]->beginFrame();
 
 			createNode(new Plane(-30), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
 			Layered* water = new Layered;
@@ -232,6 +233,52 @@ inline bool tooDifferent(const Color& a, const Color& b)
 }
 
 __global__
+void toGrayscale(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
+{
+	int x = threadIdx.x + blockIdx.x * blockDim.x;
+	int y = threadIdx.y + blockIdx.y * blockDim.y;
+	int offset = x + y * blockDim.x * gridDim.x;
+
+	dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].intensityPerceptual());
+	dev_vfb[offset].y = convertTo8bit_RGB_cached(colorBuffer[offset].intensityPerceptual());
+	dev_vfb[offset].z = convertTo8bit_RGB_cached(colorBuffer[offset].intensityPerceptual());
+}
+
+__global__
+void blurScene(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
+{
+	int x = threadIdx.x + blockIdx.x * blockDim.x;
+	int y = threadIdx.y + blockIdx.y * blockDim.y;
+	int offset = x + y * blockDim.x * gridDim.x;
+
+	Color result = colorBuffer[offset];
+
+	// take just straight up-down and right-left neighbours
+	result += colorBuffer[(x > 0 ? x - 1 : x) + y * blockDim.x * gridDim.x] +
+			  colorBuffer[(x + 1 < RES_X ? x + 1 : x) + y * blockDim.x * gridDim.x] +
+			  colorBuffer[x + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x] +
+			  colorBuffer[x + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x];
+
+	colorBuffer[offset] = result / static_cast<float>(5.0);
+
+	// take all neighbours (up-down, right-left and diagonals)
+	//result += colorBuffer[(x > 0 ? x - 1 : x) + y * blockDim.x * gridDim.x] +
+	//		    colorBuffer[(x > 0 ? x - 1 : x) + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x] +
+	//		    colorBuffer[(x + 1 < RES_X ? x + 1 : x) + y * blockDim.x * gridDim.x] +
+	//		    colorBuffer[(x + 1 < RES_X ? x + 1 : x) + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x] +
+	//		    colorBuffer[x + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x] +
+	//		    colorBuffer[(x > 0 ? x - 1 : x) + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x] +
+	//		    colorBuffer[x + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x] +
+	//		    colorBuffer[(x < 0 ? x + 1 : x) + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x];
+	//
+	//colorBuffer[offset] = result / static_cast<float>(9.0);
+
+	dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].r);
+	dev_vfb[offset].y = convertTo8bit_RGB_cached(colorBuffer[offset].g);
+	dev_vfb[offset].z = convertTo8bit_RGB_cached(colorBuffer[offset].b);
+}
+
+__global__
 void antiAliasing(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 {
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
@@ -245,7 +292,7 @@ void antiAliasing(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 	neighs[2] = colorBuffer[(x + 1 < RES_X ? x + 1 : x) + y * blockDim.x * gridDim.x];
 	neighs[3] = colorBuffer[x + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x];
 	neighs[4] = colorBuffer[x + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x];
-
+	
 	Color average(0, 0, 0);
 			
 	for (int i = 0; i < n_size; ++i)
@@ -275,7 +322,9 @@ void antiAliasing(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 	{
 		if (needsAA[offset])
 		{
-			colorBuffer[offset] = Color(1, 0, 0);
+			dev_vfb[offset].x = 255;
+			dev_vfb[offset].y = 0;
+			dev_vfb[offset].z = 0;
 		}
 	}
 	else
@@ -289,9 +338,9 @@ void antiAliasing(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1], RES_X, RES_Y));
 			}
 			colorBuffer[offset] = result / static_cast<float>(n_size);
-			dev_vfb[offset].x = convertTo8bit(colorBuffer[offset].r);
-			dev_vfb[offset].y = convertTo8bit(colorBuffer[offset].g);
-			dev_vfb[offset].z = convertTo8bit(colorBuffer[offset].b);
+			dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].r);
+			dev_vfb[offset].y = convertTo8bit_RGB_cached(colorBuffer[offset].g);
+			dev_vfb[offset].z = convertTo8bit_RGB_cached(colorBuffer[offset].b);
 		}
 	}
 }
@@ -307,9 +356,9 @@ void renderScene(uchar4* dev_vfb, int RES_X, int RES_Y)
 	if (offset < RES_X * RES_Y)
 	{
 		colorBuffer[offset] = raytrace(dev_cam->getScreenRay(x, y, RES_X, RES_Y));
-		dev_vfb[offset].x = convertTo8bit(colorBuffer[offset].r);
-		dev_vfb[offset].y = convertTo8bit(colorBuffer[offset].g);
-		dev_vfb[offset].z = convertTo8bit(colorBuffer[offset].b);
+		dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].r);
+		dev_vfb[offset].y = convertTo8bit_RGB_cached(colorBuffer[offset].g);
+		dev_vfb[offset].z = convertTo8bit_RGB_cached(colorBuffer[offset].b);
 	}
 }
 
@@ -319,6 +368,8 @@ void freeMemory()
 	delete dev_cam;
 	delete controller;
 	delete scene;
+
+	printf("asd\n");
 }
 
 /**
@@ -345,16 +396,26 @@ void cameraBeginFrame()
 extern "C" 
 void cudaRenderer(uchar4* dev_vfb)
 {
-	dim3 THREADS_PER_BLOCK(32, 32); // 32*32 = 1024 (max threads per block supported)
+	dim3 THREADS_PER_BLOCK(8, 8); // 8*8 - most optimal; 32*32 = 1024 (max threads per block supported)
 	dim3 BLOCKS(GlobalSettings::RES_X / THREADS_PER_BLOCK.x, GlobalSettings::RES_Y / THREADS_PER_BLOCK.y); 
 	
 	// first pass
 	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 
-	//second pass
 	if (GlobalSettings::AAEnabled)
 	{
+		//second pass
 		antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA, GlobalSettings::RES_X, GlobalSettings::RES_Y);
+	}
+
+	if (GlobalSettings::blur)
+	{
+		blurScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA, GlobalSettings::RES_X, GlobalSettings::RES_Y);
+	}
+
+	if (GlobalSettings::grayscale)
+	{
+		toGrayscale<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 	}
 }
 

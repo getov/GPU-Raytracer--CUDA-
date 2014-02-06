@@ -4,7 +4,29 @@
 #include "device_launch_parameters.h"
 #include "Util.cuh"
 
-__device__ __host__ 
+extern __device__
+unsigned char RGB_COMPRESS_CACHE[4097];
+
+extern __device__
+unsigned char SRGB_COMPRESS_CACHE[4097];
+
+__device__
+inline unsigned convertTo8bit_RGB_cached(float x)
+{
+	if (x <= 0) return 0;
+	if (x >= 1) return 255;
+	return RGB_COMPRESS_CACHE[int(x * 4096.0f)];
+}
+
+__device__
+inline unsigned convertTo8bit_sRGB_cached(float x)
+{
+	if (x <= 0) return 0;
+	if (x >= 1) return 255;
+	return SRGB_COMPRESS_CACHE[int(x * 4096.0f)];
+}
+
+__device__ 
 inline unsigned convertTo8bit(float x)
 {
 	if (x < 0) x = 0;
@@ -12,7 +34,11 @@ inline unsigned convertTo8bit(float x)
 	return nearestInt(x * 255.0f);
 }
 
-__host__
+__device__
+void precomputeColorCache();
+
+
+__device__
 inline unsigned convertTo8bit_sRGB(float x)
 {
 	const float a = 0.055f;
@@ -25,8 +51,6 @@ inline unsigned convertTo8bit_sRGB(float x)
 		x = (1.0f + a) * powf(x, 1.0f / 2.4f) - a;
 	return nearestInt(x * 255.0f);
 }
-
-unsigned convertTo8bit_sRGB_cached(float x);
 
 /// Represents a color, using floatingpoint components in [0..1]
 struct Color
@@ -57,14 +81,14 @@ struct Color
 
 	/// convert to RGB32, with channel shift specifications. The default values are for
 	/// the blue channel occupying the least-significant byte
-	__device__ __host__ 
+	/*__device__ __host__ 
 	unsigned toRGB32(int redShift = 16, int greenShift = 8, int blueShift = 0)
 	{
 		unsigned ir = convertTo8bit(r);
 		unsigned ig = convertTo8bit(g);
 		unsigned ib = convertTo8bit(b);
 		return (ib << blueShift) | (ig << greenShift) | (ir << redShift);
-	}
+	}*/
 
 	/// make black
 	__device__ 

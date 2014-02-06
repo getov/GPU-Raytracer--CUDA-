@@ -6,7 +6,6 @@
 EventHandler::EventHandler()
 	: isRealTimeRendering(true)
 	, mouseSensitivity(0.6f)
-	, keySwitch(2, false)
 {
 }
 
@@ -18,17 +17,6 @@ void EventHandler::handleEvents()
 
 void EventHandler::handleKeyboard()
 {
-	if (glfwGetKey(GLFW_KEY_F1) == GLFW_PRESS && !keySwitch[0])
-	{
-		GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
-		keySwitch[0] = true;
-	}
-	else if (glfwGetKey(GLFW_KEY_F1) == GLFW_PRESS && keySwitch[0])
-	{
-		GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
-		keySwitch[0] = false;
-	}
-
 	if (glfwGetKey('W'))
 	{
 		moveForward();
@@ -71,7 +59,10 @@ void EventHandler::handleKeyboard()
 
 void EventHandler::handleUserInput()
 {
-
+	if (glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS)
+	{
+		glfwTerminate();
+	}
 }
 
 void EventHandler::handleMouse()
@@ -84,4 +75,45 @@ void EventHandler::handleMouse()
 
 	glfwDisable(GLFW_MOUSE_CURSOR);
 	glfwSetMousePos(0, 0);
+}
+
+bool EventHandler::keySwitch[3] = { false, false, false };
+
+void GLFWCALL EventHandler::keyboardCallback(int key, int action)
+{	
+	if( action == GLFW_PRESS )
+	{
+		if (key == GLFW_KEY_F1 && !keySwitch[0])
+		{
+			GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
+			keySwitch[0] = true;
+		}
+		else if (key == GLFW_KEY_F1 && keySwitch[0])
+		{
+			GlobalSettings::AAEnabled = !GlobalSettings::AAEnabled;
+			keySwitch[0] = false;
+		}
+
+		if (key == GLFW_KEY_F2 && !keySwitch[1])
+		{
+			GlobalSettings::blur = !GlobalSettings::blur;
+			keySwitch[1] = true;
+		}
+		else if (key == GLFW_KEY_F2 && keySwitch[1])
+		{
+			GlobalSettings::blur = !GlobalSettings::blur;
+			keySwitch[1] = false;
+		}
+
+		if (key == GLFW_KEY_F3 && !keySwitch[2])
+		{
+			GlobalSettings::grayscale = !GlobalSettings::grayscale;
+			keySwitch[2] = true;
+		}
+		else if (key == GLFW_KEY_F3 && keySwitch[2])
+		{
+			GlobalSettings::grayscale = !GlobalSettings::grayscale;
+			keySwitch[2] = false;
+		}
+	}	
 }

@@ -64,7 +64,7 @@ public:
 	virtual void beginFrame() {}
 };
 
-class PointLight: public Light 
+class PointLight : public Light 
 {
 	Vector pos;
 public:
@@ -86,7 +86,7 @@ public:
 /// A rectangle light; uses a transform to position in space and change shape. The canonic
 /// light is a 1x1 square, positioned in (0, 0, 0), pointing in the direction of -Y. The
 /// light is one-sided (the +Y hemisphere doesn't get any light).
-class RectLight: public Light
+class RectLight : public Light
 {
 	Transform transform;
 	int xSubd, ySubd;
@@ -101,6 +101,32 @@ public:
 			  const Color& color, const float& power, int xSubd = 2, int ySubd = 2);
 
 	__device__ void beginFrame();
+
+	__device__ int getNumSamples();
+
+	__device__
+	void getNthSample(int sampleIdx, const Vector& shadePos, Vector& samplePos, Color& color);
+
+	__device__
+	bool intersect(const Ray& ray, double& intersectionDist);
+
+	__device__
+	float solidAngle(const Vector& x);
+};
+
+class SpotLight : public Light
+{
+private:
+	Vector pos;
+	Vector dir;
+	float innerAngle;
+	float outerAngle;
+
+public:
+	__device__
+	SpotLight(const Vector& position, const Vector& direction,
+			  const Color& color, const float& power,
+			  const float& innerAngle, const float& outerAngle);
 
 	__device__ int getNumSamples();
 

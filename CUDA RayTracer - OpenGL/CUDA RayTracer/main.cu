@@ -47,7 +47,7 @@ const char* const appName = "CUDA Traycer";
 GLuint bufferObj;
 cudaGraphicsResource* resource;
 
-static void draw(void)
+static void glRenderScene()
 {
 	glDrawPixels(GlobalSettings::RES_X, GlobalSettings::RES_Y, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glfwSwapBuffers();
@@ -141,7 +141,7 @@ void cudaStopTimer(cudaEvent_t& start, cudaEvent_t& stop)
     cudaEventSynchronize(stop);
     float  elapsedTime;
     cudaEventElapsedTime(&elapsedTime, start, stop);
-    //printf( "Time to render:  %3.1f ms\n\n", elapsedTime);
+    printf( "Time to render:  %3.1f ms\n\n", elapsedTime);
 	
 	char info[128];
 	sprintf(info, "CUDA Traycer || Time to render: %3.1f ms", elapsedTime);
@@ -222,8 +222,9 @@ int main(int argc, char** argv)
 			cudaGraphicsUnmapResources( 1, &resource, NULL );
 
 			eventController.handleEvents();
-			
-			draw();
+			glfwSetKeyCallback(eventController.keyboardCallback);
+
+			glRenderScene();
 		}
 	}
 	else
@@ -240,27 +241,29 @@ int main(int argc, char** argv)
 
 		cudaEvent_t start, stop;
 
+		cudaStartTimer(start, stop);
+
+		cudaRenderer(dev_vfb);
+
+		// free memory	
+		freeDeviceMemory();
+
+		cudaGraphicsUnmapResources( 1, &resource, NULL );
+
+		glRenderScene();
+
+		cudaStopTimer(start, stop);
+
+			
 		while (glfwGetWindowParam(GLFW_OPENED))
 		{
-			
-			cudaStartTimer(start, stop);
+			eventController.handleUserInput();
 
-			cudaGraphicsResourceGetMappedPointer( (void**)&dev_vfb, 
-												  &size, 
-												  resource);
-
-			cudaRenderer(dev_vfb);
-
-			cudaGraphicsUnmapResources( 1, &resource, NULL );
-
-			draw();
-
-			cudaStopTimer(start, stop);
+			glfwWaitEvents();
 		}
+		
 	}
 
-	// free memory	
-	freeDeviceMemory();
 	glfwTerminate();
 
 	return EXIT_SUCCESS;
@@ -301,6 +304,9 @@ void OpenGL_Setup()
 	}
 
 	while(glGetError() != GL_NO_ERROR) {}
+
+	/*glEnable(GL_MULTISAMPLE);
+	glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);*/
 
 	glGenBuffers(1, &bufferObj);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, bufferObj);

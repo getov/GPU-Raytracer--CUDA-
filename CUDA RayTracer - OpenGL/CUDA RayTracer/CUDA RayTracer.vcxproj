@@ -35,6 +35,7 @@
   <ItemGroup>
     <CudaCompile Include="Camera.cu" />
     <CudaCompile Include="CameraController.cu" />
+    <CudaCompile Include="Color.cu" />
     <CudaCompile Include="EventHandler.cpp" />
     <CudaCompile Include="Fresnel.cu" />
     <CudaCompile Include="IShader.cu" />

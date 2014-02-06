@@ -1,6 +1,8 @@
 #include "Light.cuh"
 #include "Util.cuh"
 
+// Point Light
+
 __device__
 PointLight::PointLight(const Vector& position, const Color& color, const float& power)
 	: Light(color, power)
@@ -42,6 +44,8 @@ RectLight::RectLight()
 	xSubd = 2;
 	ySubd = 2;
 	transform.reset(); 
+
+	beginFrame();
 }
 
 __device__
@@ -55,6 +59,8 @@ RectLight::RectLight(const Vector& translate, const Vector& rotate, const Vector
 	transform.translate(translate);
 	transform.rotate(rotate.x, rotate.y, rotate.z);
 	transform.scale(scale.x, scale.y, scale.z);
+
+	beginFrame();
 }
 
 __device__
@@ -78,8 +84,6 @@ int RectLight::getNumSamples()
 __device__
 void RectLight::getNthSample(int sampleIdx, const Vector& shadePos, Vector& samplePos, Color& color)
 {
-	//Random& R = getRandomGen();
-	
 	// convert the shade point onto the light's canonic space:
 	Vector shadePosCanonical = transform.undoPoint(shadePos);
 	
@@ -132,4 +136,62 @@ float RectLight::solidAngle(const Vector& x)
 	float cosA = dot(x_dir, Vector(0, -1, 0));
 	double d = (x - center).lengthSqr();
 	return area * cosA / (1 + d);
+}
+
+/// Spot light
+__device__
+SpotLight::SpotLight(const Vector& position, const Vector& direction, 
+					 const Color& color, const float& power,
+				     const float& innerAngle, const float& outerAngle)
+	: Light(color, power)
+	, pos(position)
+	, dir(direction)
+	, innerAngle(innerAngle)
+	, outerAngle(outerAngle)
+{
+	//dir.normalize();
+}
+
+__device__
+int SpotLight::getNumSamples()
+{
+	return 1;
+}
+
+__device__
+void SpotLight::getNthSample(int sampleIdx, const Vector& shadePos, Vector& samplePos, Color& color)
+{
+	Vector hitPointDir = pos - shadePos;
+	hitPointDir.normalize();
+
+	float cosTheta = dot(dir, hitPointDir);
+
+	float theta = acos(cosTheta);
+
+	if (theta < innerAngle)
+	{
+		color = m_color * m_power * cosTheta / (shadePos - pos).lengthSqr();
+	}
+
+	if (theta > outerAngle)
+	{
+		color = Color(0, 0, 0);
+	}
+
+	if (theta > innerAngle && theta < outerAngle)
+	{
+		color = m_color * m_power * cosTheta / (shadePos - pos).lengthSqr() / 2;
+	}
+}
+
+__device__
+bool SpotLight::intersect(const Ray& ray, double& intersectionDist)
+{
+	return false;
+}
+
+__device__
+float SpotLight::solidAngle(const Vector& x)
+{
+	return 0;
 }

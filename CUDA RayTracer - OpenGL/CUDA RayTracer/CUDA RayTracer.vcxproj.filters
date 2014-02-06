@@ -99,6 +99,9 @@
     <CudaCompile Include="Light.cu">
       <Filter>Scene</Filter>
     </CudaCompile>
+    <CudaCompile Include="Color.cu">
+      <Filter>Math</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cuda_renderer.cuh" />

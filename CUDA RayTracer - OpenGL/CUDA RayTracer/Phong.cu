@@ -18,7 +18,7 @@ Color Phong::shade(Ray ray, const IntersectionData& data)
 	
 	Color lightContrib = scene->ambientLight;
 	Color specular(0, 0, 0);
-	
+
 	for (int i = 0; i < scene->dev_lights.size(); ++i)
 	{
 		int numSamples = scene->dev_lights[i]->getNumSamples();
@@ -57,6 +57,7 @@ Color Phong::shade(Ray ray, const IntersectionData& data)
 					specular += baseLight * pow(cosGamma, exponent) * strength; // specular contribution
 			}
 		}
+		
 		lightContrib += avgColor / numSamples;
 		specular += avgSpecular / numSamples;
 	}

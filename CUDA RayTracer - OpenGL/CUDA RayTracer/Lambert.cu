@@ -24,7 +24,7 @@ Color Lambert::shade(Ray ray, const IntersectionData& data)
 	{
 		int numSamples = scene->dev_lights[i]->getNumSamples();
 		Color avgColor(0, 0, 0);
-
+		
 		for (int j = 0; j < numSamples; ++j)
 		{
 			Vector lightPos;
@@ -41,9 +41,9 @@ Color Lambert::shade(Ray ray, const IntersectionData& data)
 				{
 					avgColor += lightColor / (data.p - lightPos).lengthSqr() * cosTheta;
 				}
-				//lightContrib += lightColor * lightPower / (data.p - lightPos).lengthSqr() * cosTheta;
 			}
 		}
+		
 		lightContrib += avgColor / numSamples;
 	}
 	

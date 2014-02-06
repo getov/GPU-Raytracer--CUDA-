@@ -11,7 +11,7 @@ private:
 	EventHandler& operator=(const EventHandler& ev);
 
 	// helper array for implementing 'on' and 'off' switch button system
-	std::vector<bool> keySwitch;
+	static bool keySwitch[3];
 
 	float mouseSensitivity;
 
@@ -44,6 +44,14 @@ public:
 	* when the raytracer is not running in real-time mod
 	*/
 	void handleUserInput();
+
+	/**
+	* @brief - Callback function for registering keyboard presses
+	* @param key    - gets the pressed key
+	* @param action - registers the action (GLFW_PRESS or GLFW_RELEASE)
+	* @reference    - glfwSetKeyCallback()
+	*/
+	static void GLFWCALL keyboardCallback(int key, int action);
 };
 
 #endif

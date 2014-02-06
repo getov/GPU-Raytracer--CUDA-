@@ -15,6 +15,8 @@ struct GlobalSettings
 {
 	static bool AAEnabled;
 	static bool previewAA;
+	static bool blur;
+	static bool grayscale;
 	static bool realTime;
 	static bool fullscreen;
 	static int RES_X;
