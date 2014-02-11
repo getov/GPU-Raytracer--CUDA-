@@ -31,6 +31,7 @@ Menu::Menu(const char* name)
 	renderOptionButtons();
 
 	selectedItem.resize(optionButtons.size(), false);
+	hoveredItem.resize(optionButtons.size(), false);
 
 	SDL_FillRect(menuScreen, &menuScreen->clip_rect, SDL_MapRGB(menuScreen->format, 0x00, 0x00, 0x00));
 

@@ -398,7 +398,7 @@ void cudaRenderer(uchar4* dev_vfb)
 {
 	dim3 THREADS_PER_BLOCK(8, 8); // 8*8 - most optimal; 32*32 = 1024 (max threads per block supported)
 	dim3 BLOCKS(GlobalSettings::RES_X / THREADS_PER_BLOCK.x, GlobalSettings::RES_Y / THREADS_PER_BLOCK.y); 
-	
+
 	// first pass
 	renderScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 
