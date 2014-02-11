@@ -16,7 +16,6 @@
 #include "cuda_renderer.cuh"
 #include "Vector3D.cuh"
 #include <vector>
-#include "sdl.cuh"
 #include "Color.cuh"
 #include "Camera.cuh"
 #include "Matrix.cuh"

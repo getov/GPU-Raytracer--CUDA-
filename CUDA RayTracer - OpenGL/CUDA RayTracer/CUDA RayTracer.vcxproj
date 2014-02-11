@@ -24,7 +24,6 @@
     <ClInclude Include="Menu.h" />
     <ClInclude Include="Settings.cuh" />
     <ClInclude Include="Matrix.cuh" />
-    <ClInclude Include="sdl.cuh" />
     <ClInclude Include="Util.cuh" />
     <ClInclude Include="Vector3D.cuh" />
   </ItemGroup>
@@ -50,7 +49,6 @@
     <CudaCompile Include="Reflection.cu" />
     <CudaCompile Include="Refraction.cu" />
     <CudaCompile Include="Scene.cu" />
-    <CudaCompile Include="sdl.cu" />
     <CudaCompile Include="cuda_renderer.cu" />
     <CudaCompile Include="Settings.cu" />
     <CudaCompile Include="Sphere.cu" />

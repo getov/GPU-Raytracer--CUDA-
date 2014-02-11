@@ -33,7 +33,6 @@
     <ClInclude Include="Camera.cuh">
       <Filter>Camera</Filter>
     </ClInclude>
-    <ClInclude Include="sdl.cuh" />
     <ClInclude Include="Util.cuh" />
     <ClInclude Include="Menu.h">
       <Filter>Menu</Filter>
@@ -43,7 +42,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="sdl.cu" />
     <CudaCompile Include="cuda_renderer.cu" />
     <CudaCompile Include="Plane.cu">
       <Filter>Geometry</Filter>

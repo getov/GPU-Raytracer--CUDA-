@@ -4,7 +4,6 @@
 #include "Vector3D.cuh"
 #include "Matrix.cuh"
 #include "Util.cuh"
-#include "sdl.cuh"
 
 class Camera 
 {
