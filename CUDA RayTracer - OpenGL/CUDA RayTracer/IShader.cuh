@@ -5,12 +5,8 @@
 #include "Color.cuh"
 #include "IGeometry.cuh"
 #include "cuda_renderer.cuh"
+
 __device__ extern bool testVisibility(const Vector& from, const Vector& to);
-//__device__ extern Vector cameraPos;
-//__device__ extern Vector lightPos;
-//__device__ extern Color lightColor;
-//__device__ extern float lightPower;
-//__device__ extern Color ambientLight;
 
 class Shader
 {

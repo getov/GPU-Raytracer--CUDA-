@@ -34,8 +34,8 @@ bool needsAA[VFB_MAX_SIZE * VFB_MAX_SIZE];
 __device__
 Color colorBuffer[VFB_MAX_SIZE * VFB_MAX_SIZE];
 
-__device__ 
-Camera* dev_cam;
+//__device__ 
+//Camera* dev_cam;
  
 __device__
 CameraController* controller;
@@ -84,16 +84,16 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 
 	scene = new Scene;
 
-	dev_cam = new Camera;
-	dev_cam->yaw = 0;
-	dev_cam->pitch = 0;
-	dev_cam->roll = 0;
-	dev_cam->fov = 90;
-	dev_cam->aspect = static_cast<float>(RES_X) / RES_Y;
-	dev_cam->pos = Vector(0, 150, -100);
-	dev_cam->beginFrame();
+	scene->dev_cam = new Camera;
+	scene->dev_cam->yaw = 0;
+	scene->dev_cam->pitch = 0;
+	scene->dev_cam->roll = 0;
+	scene->dev_cam->fov = 90;
+	scene->dev_cam->aspect = static_cast<float>(RES_X) / RES_Y;
+	scene->dev_cam->pos = Vector(0, 150, -100);
+	scene->dev_cam->beginFrame();
 
-	controller = new CameraController(*dev_cam, 10.f);
+	controller = new CameraController(*(scene->dev_cam), 10.f);
 	
 	switch (sceneID)
 	{
@@ -102,6 +102,7 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 			scene->dev_lights.push_back(new RectLight(Vector(0, 296, 200), Vector(0, 0, 0), Vector(50, 34, 34), Color(1, 1, 1), 20, 6, 6));
 			//scene->dev_lights.push_back(new RectLight(Vector(-70, 296, 200), Vector(0, 0, 0), Vector(50, 34, 34), Color(0, 0.5, 0.5), 20, 6, 6));
 			//scene->dev_lights.push_back(new SpotLight(Vector(0, 296, 180), Vector(0, -1, 1), Color(1, 1, 1), 60, 15.0, 35.0));
+			//scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
 
 			createNode(new Plane(5, 300, 300), new Lambert(Color(0xF5E08C)));
 
@@ -123,6 +124,8 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 			moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
 			moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
 			createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
+
+			//createNode(new Sphere(Vector(0, 50, 200), 40.0), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
 
 			Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
 			rectMirror->transform.rotate(0, 90, 0);
@@ -259,7 +262,7 @@ void blurScene(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 			  colorBuffer[x + (y > 0 ? y - 1 : y) * blockDim.x * gridDim.x] +
 			  colorBuffer[x + (y + 1 < RES_Y ? y + 1 : y) * blockDim.x * gridDim.x];
 
-	colorBuffer[offset] = result / static_cast<float>(5.0);
+	colorBuffer[offset] = result / 5.0f;
 
 	// take all neighbours (up-down, right-left and diagonals)
 	//result += colorBuffer[(x > 0 ? x - 1 : x) + y * blockDim.x * gridDim.x] +
@@ -335,7 +338,7 @@ void antiAliasing(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 			
 			for (int i = 1; i < n_size; ++i)
 			{
-				result += raytrace(dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1], RES_X, RES_Y));
+				result += raytrace(scene->dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1], RES_X, RES_Y));
 			}
 			colorBuffer[offset] = result / static_cast<float>(n_size);
 			dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].r);
@@ -355,7 +358,7 @@ void renderScene(uchar4* dev_vfb, int RES_X, int RES_Y)
 
 	if (offset < RES_X * RES_Y)
 	{
-		colorBuffer[offset] = raytrace(dev_cam->getScreenRay(x, y, RES_X, RES_Y));
+		colorBuffer[offset] = raytrace(scene->dev_cam->getScreenRay(x, y, RES_X, RES_Y));
 		dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].r);
 		dev_vfb[offset].y = convertTo8bit_RGB_cached(colorBuffer[offset].g);
 		dev_vfb[offset].z = convertTo8bit_RGB_cached(colorBuffer[offset].b);
@@ -365,7 +368,7 @@ void renderScene(uchar4* dev_vfb, int RES_X, int RES_Y)
 __global__
 void freeMemory()
 {
-	delete dev_cam;
+	//delete dev_cam;
 	delete controller;
 	delete scene;
 
@@ -384,7 +387,7 @@ void initScene()
 __global__
 void camBeginFrame()
 {
-	dev_cam->beginFrame();
+	scene->dev_cam->beginFrame();
 }
 
 extern "C"

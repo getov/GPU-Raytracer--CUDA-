@@ -20,6 +20,7 @@ public:
 	pgg::vector<Light*> dev_lights;
 
 	Color ambientLight;
+	Camera* dev_cam;
 };
 
 #endif

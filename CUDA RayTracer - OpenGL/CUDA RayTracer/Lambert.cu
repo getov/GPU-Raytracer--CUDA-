@@ -1,11 +1,5 @@
 #include "Lambert.cuh"
 
-//Vector cameraPos;
-//Vector lightPos;
-//Color lightColor;
-//float lightPower;
-//Color ambientLight;
-
 __device__ 
 Lambert::Lambert(const Color& diffuseColor)
 	: Shader(diffuseColor)

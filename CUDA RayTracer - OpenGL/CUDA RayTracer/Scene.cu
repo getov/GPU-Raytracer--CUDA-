@@ -23,4 +23,6 @@ __device__ Scene::~Scene()
 
 		printf("scene elements deleted\n");
 	}
+
+	delete dev_cam;
 }
