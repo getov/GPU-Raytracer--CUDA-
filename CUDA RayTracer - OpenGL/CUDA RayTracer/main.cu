@@ -36,6 +36,7 @@ extern "C" void cudaRenderer(uchar4* dev_vfb);
 extern "C" void freeDeviceMemory();
 extern "C" void initScene();
 extern "C" void cameraBeginFrame();
+extern "C" void updateScene(float elapsedTime, float currentTime);
 
 unsigned frameCount;
 unsigned lastFrameEnd;
@@ -200,8 +201,14 @@ int main(int argc, char** argv)
 
 	if (GlobalSettings::realTime)
 	{
+		float lastTime = glfwGetTime();
+
 		while (glfwGetWindowParam(GLFW_OPENED))
 		{
+			float thisTime = glfwGetTime();
+
+			updateScene(thisTime - lastTime, thisTime);
+
 			cudaGraphicsGLRegisterBuffer( &resource, 
                                       bufferObj, 
                                       cudaGraphicsMapFlagsNone );
@@ -222,6 +229,8 @@ int main(int argc, char** argv)
 
 			eventController.handleEvents();
 			glfwSetKeyCallback(eventController.keyboardCallback);
+
+			lastTime = thisTime;
 
 			glRenderScene();
 		}

@@ -69,6 +69,15 @@ inline float randomFloat()
 	return (float)generator(randEngine);
 }
 
+__device__
+inline double randomDouble(const double& lowerBound, const double& upperBound)
+{
+	thrust::default_random_engine randEngine(123u);
+	thrust::uniform_real_distribution<double> generator(lowerBound, upperBound);
+
+	return (double)generator(randEngine);
+}
+
 template <typename T>
 __device__ T dev_min(const T& a, const T& b)
 {

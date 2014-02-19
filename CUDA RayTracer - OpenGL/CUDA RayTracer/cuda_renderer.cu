@@ -33,9 +33,6 @@ bool needsAA[VFB_MAX_SIZE * VFB_MAX_SIZE];
 
 __device__
 Color colorBuffer[VFB_MAX_SIZE * VFB_MAX_SIZE];
-
-//__device__ 
-//Camera* dev_cam;
  
 __device__
 CameraController* controller;
@@ -145,23 +142,37 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 		}
 		case SEA:
 		{
-			scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
+			scene->dev_lights.push_back(new PointLight(Vector(0, 300, -100), Color(0.2, 0.2, 0), 500000));
 
-			createNode(new Plane(-30), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
+			createNode(new Plane(-300, 1000, 1000), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
 			Layered* water = new Layered;
 			water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
 			water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
 	
-			Node* waterGeom = createNode(new Plane(0), water, new WaterWaves(0.2));
-			waterGeom->transform.scale(5, 5, 5);
+			Node* waterGeom = createNode(new Plane(0, 100, 100), water, new WaterWaves(0.2));
+			waterGeom->transform.scale(10, 1, 10);
 
-			createNode(new Sphere(Vector(10, -20, 250), 100.0), new Lambert(Color(0, 1, 0)));
+			Node* island = createNode(new Sphere(Vector(0, 0, 0), 100.0), new Lambert(Color(0, 1, 0)));
+			island->transform.scale(10, 2, 15);
+			island->transform.translate(Vector(10, -20, 1500));
 
 			break;
 		}
 		default:
 			break;
 	}
+}
+
+__global__
+void update(float elapsedTime, float currentTime)
+{
+	scene->waves = currentTime;
+}
+
+extern "C"
+void updateScene(float elapsedTime, float currentTime)
+{
+	update<<<1, 1>>>(elapsedTime, currentTime);
 }
 
 __device__ 
@@ -242,9 +253,9 @@ void toGrayscale(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
 	int offset = x + y * blockDim.x * gridDim.x;
 
-	dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].intensityPerceptual());
-	dev_vfb[offset].y = convertTo8bit_RGB_cached(colorBuffer[offset].intensityPerceptual());
-	dev_vfb[offset].z = convertTo8bit_RGB_cached(colorBuffer[offset].intensityPerceptual());
+	dev_vfb[offset].x = convertTo8bit_sRGB_cached(colorBuffer[offset].intensityPerceptual());
+	dev_vfb[offset].y = convertTo8bit_sRGB_cached(colorBuffer[offset].intensityPerceptual());
+	dev_vfb[offset].z = convertTo8bit_sRGB_cached(colorBuffer[offset].intensityPerceptual());
 }
 
 __global__
@@ -276,9 +287,9 @@ void blurScene(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 	//
 	//colorBuffer[offset] = result / static_cast<float>(9.0);
 
-	dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].r);
-	dev_vfb[offset].y = convertTo8bit_RGB_cached(colorBuffer[offset].g);
-	dev_vfb[offset].z = convertTo8bit_RGB_cached(colorBuffer[offset].b);
+	dev_vfb[offset].x = convertTo8bit_sRGB_cached(colorBuffer[offset].r);
+	dev_vfb[offset].y = convertTo8bit_sRGB_cached(colorBuffer[offset].g);
+	dev_vfb[offset].z = convertTo8bit_sRGB_cached(colorBuffer[offset].b);
 }
 
 __global__
@@ -341,9 +352,9 @@ void antiAliasing(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 				result += raytrace(scene->dev_cam->getScreenRay(x + kernel[i][0], y + kernel[i][1], RES_X, RES_Y));
 			}
 			colorBuffer[offset] = result / static_cast<float>(n_size);
-			dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].r);
-			dev_vfb[offset].y = convertTo8bit_RGB_cached(colorBuffer[offset].g);
-			dev_vfb[offset].z = convertTo8bit_RGB_cached(colorBuffer[offset].b);
+			dev_vfb[offset].x = convertTo8bit_sRGB_cached(colorBuffer[offset].r);
+			dev_vfb[offset].y = convertTo8bit_sRGB_cached(colorBuffer[offset].g);
+			dev_vfb[offset].z = convertTo8bit_sRGB_cached(colorBuffer[offset].b);
 		}
 	}
 }
@@ -359,9 +370,9 @@ void renderScene(uchar4* dev_vfb, int RES_X, int RES_Y)
 	if (offset < RES_X * RES_Y)
 	{
 		colorBuffer[offset] = raytrace(scene->dev_cam->getScreenRay(x, y, RES_X, RES_Y));
-		dev_vfb[offset].x = convertTo8bit_RGB_cached(colorBuffer[offset].r);
-		dev_vfb[offset].y = convertTo8bit_RGB_cached(colorBuffer[offset].g);
-		dev_vfb[offset].z = convertTo8bit_RGB_cached(colorBuffer[offset].b);
+		dev_vfb[offset].x = convertTo8bit_sRGB_cached(colorBuffer[offset].r);
+		dev_vfb[offset].y = convertTo8bit_sRGB_cached(colorBuffer[offset].g);
+		dev_vfb[offset].z = convertTo8bit_sRGB_cached(colorBuffer[offset].b);
 	}
 }
 

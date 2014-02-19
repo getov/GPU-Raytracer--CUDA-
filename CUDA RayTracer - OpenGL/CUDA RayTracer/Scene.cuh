@@ -21,6 +21,8 @@ public:
 
 	Color ambientLight;
 	Camera* dev_cam;
+
+	float waves;
 };
 
 #endif

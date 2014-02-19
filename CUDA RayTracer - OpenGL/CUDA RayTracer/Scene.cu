@@ -3,6 +3,7 @@
 __device__ Scene::Scene()
 {
 	ambientLight = Color(0.2, 0.2, 0.2);
+	waves = 0.2;
 }
 
 __device__ Scene::~Scene()
