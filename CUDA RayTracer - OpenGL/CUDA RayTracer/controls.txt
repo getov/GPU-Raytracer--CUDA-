@@ -1,0 +1,9 @@
+CUDA Traycer controls
+=====================
+
+Action				Key
+=======================
+Move Forward	|	W
+Move Backward	|	S
+Strafe Left		|	A
+Strafe Right	|	D
