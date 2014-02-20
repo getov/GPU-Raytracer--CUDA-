@@ -134,22 +134,32 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 		{
 			scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
 
-			createNode(new Plane(5), new Lambert(Color(0.5, 0.5, 0.5)));
+			//createNode(new Plane(5), new Lambert(Color(0.5, 0.5, 0.5)));
 			//createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
-			createNode(new Sphere(Vector(0, 50, 200), 40.0), new Phong(Color(0, 0, 1), 32));
+			Node* blueBall = createNode(new Sphere(Vector(0, 0, 0), 40.0), new Phong(Color(0, 0, 1), 32));
+			blueBall->transform.translate(Vector(0, 50, 200));
+
+			Node* redBall = createNode(new Sphere(Vector(0, 0, 0), 40.0), new Phong(Color(1, 0, 0), 32));
+			redBall->transform.translate(Vector(-120, 50, 200));
+
+			Node* greenBall = createNode(new Sphere(Vector(0, 0, 0), 40.0), new Phong(Color(0, 1, 0), 32));
+			greenBall->transform.translate(Vector(-240, 50, 200));
 
 			break;
 		}
 		case SEA:
 		{
-			scene->dev_lights.push_back(new PointLight(Vector(0, 300, -100), Color(0.2, 0.2, 0), 500000));
+			scene->dev_lights.push_back(new PointLight(Vector(0, 300, -150), Color(1, 1, 1), 50000));
+			//scene->dev_lights.push_back(new RectLight(Vector(0, 300, -150), Vector(0, 0, 0), Vector(50, 34, 34), Color(0.2, 0.2, 0), 200, 2, 2));
 
-			createNode(new Plane(-300, 1000, 1000), new Lambert(Color(0x0AB6FF)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF
+			// ocean floor
+			createNode(new Plane(-300, 1000, 1000), new Lambert(Color(0xEFE52C)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF - blueish
+
 			Layered* water = new Layered;
 			water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
-			water->addLayer(new Reflection(Color(0.9, 0.9, 0.9)), Color(1.0, 1.0, 1.0), new Fresnel(1.33));
+			water->addLayer(new Reflection(Color(0x0AB6FF)), Color(1.0, 1.0, 1.0), new Fresnel(1.5));
 	
-			Node* waterGeom = createNode(new Plane(0, 100, 100), water, new WaterWaves(0.2));
+			Node* waterGeom = createNode(new Plane(0, 100, 100), water, new WaterWaves(0.3));
 			waterGeom->transform.scale(10, 1, 10);
 
 			Node* island = createNode(new Sphere(Vector(0, 0, 0), 100.0), new Lambert(Color(0, 1, 0)));
@@ -164,13 +174,13 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 }
 
 __global__
-void update(float elapsedTime, float currentTime)
+void update(double elapsedTime, double currentTime)
 {
 	scene->waves = currentTime;
 }
 
 extern "C"
-void updateScene(float elapsedTime, float currentTime)
+void updateScene(const double& elapsedTime, const double& currentTime)
 {
 	update<<<1, 1>>>(elapsedTime, currentTime);
 }
@@ -219,6 +229,11 @@ Color raytrace(Ray ray)
 	if (closestNode->bumpTex != nullptr)
 	{
 		closestNode->bumpTex->modifyNormal(data);
+	}
+
+	if (closestNode == scene->selectedNode)
+	{
+		return closestNode->shader->shade(ray, data) * 2.2;
 	}
 	
 	return closestNode->shader->shade(ray, data);

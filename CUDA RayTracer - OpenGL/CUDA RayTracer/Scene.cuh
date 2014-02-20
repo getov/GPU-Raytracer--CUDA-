@@ -21,8 +21,10 @@ public:
 
 	Color ambientLight;
 	Camera* dev_cam;
+	Node* selectedNode;
+	int indexGeom;
 
-	float waves;
+	double waves;
 };
 
 #endif

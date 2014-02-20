@@ -24,8 +24,8 @@ void WaterWaves::modifyNormal(IntersectionData& data)
 
 		for (int i = 0; i < 3; ++i)
 		{                             // frequency                         intensity
-			dx += sin(scene->waves * randomDouble(0.0, 30.0) * data.u) * randomDouble(0.0, 20.0) * strength; 
-			dy += sin(scene->waves * randomDouble(0.0, 30.0) * data.v) * randomDouble(0.0, 20.0) * strength;
+			dx += sin(scene->waves * randomDouble(0.0, 20.0) * data.u) * randomDouble(0.0, 15.0) * strength; 
+			dy += sin(scene->waves * randomDouble(0.0, 20.0) * data.v) * randomDouble(0.0, 15.0) * strength;
 		}
 		
 		data.normal += dx * data.dNdx + dy * data.dNdy;

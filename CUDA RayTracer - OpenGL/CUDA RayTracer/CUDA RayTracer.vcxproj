@@ -86,6 +86,9 @@
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="controls.txt" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9A9B1A78-D0BA-4948-A5D9-74FB6B9C5289}</ProjectGuid>
     <RootNamespace>CUDA_RayTracer</RootNamespace>

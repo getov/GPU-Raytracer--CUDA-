@@ -1,6 +1,8 @@
 #include "Scene.cuh"
 
 __device__ Scene::Scene()
+	: selectedNode(nullptr)
+	, indexGeom(0)
 {
 	ambientLight = Color(0.2, 0.2, 0.2);
 	waves = 0.2;

@@ -14,12 +14,15 @@ private:
 	static bool keySwitch[3];
 
 	float mouseSensitivity;
+	double scaleFactor;
+	double angle;
+	double translateFactor;
 
 public:
 	EventHandler();
 
 	bool isRealTimeRendering;
-
+	
 	/**
 	* @brief - Combines handleKeyboard() and handleMouse()
 	* The function registers keyboard presses

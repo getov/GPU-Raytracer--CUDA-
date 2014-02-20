@@ -6,6 +6,9 @@
 EventHandler::EventHandler()
 	: isRealTimeRendering(true)
 	, mouseSensitivity(0.6f)
+	, scaleFactor(1.2)
+	, angle(15.0)
+	, translateFactor(2.0)
 {
 }
 
@@ -51,6 +54,110 @@ void EventHandler::handleKeyboard()
 		}
 	}
 
+	// Object Transformations	
+	// scaling
+	if (glfwGetKey(GLFW_KEY_KP_1) == GLFW_PRESS && 
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		scaleX(scaleFactor);
+	}
+	else if (glfwGetKey(GLFW_KEY_KP_1) == GLFW_PRESS && 
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		scaleX(1.0 / scaleFactor);
+	}
+
+	if (glfwGetKey(GLFW_KEY_KP_2) == GLFW_PRESS && 
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		scaleY(scaleFactor);
+	}
+	else if (glfwGetKey(GLFW_KEY_KP_2) == GLFW_PRESS && 
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		scaleY(1.0 / scaleFactor);
+	}
+
+	if (glfwGetKey(GLFW_KEY_KP_3) == GLFW_PRESS && 
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		scaleZ(scaleFactor);
+	}
+	else if (glfwGetKey(GLFW_KEY_KP_3) == GLFW_PRESS && 
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		scaleZ(1.0 / scaleFactor);
+	}
+
+	// rotation
+	if (glfwGetKey(GLFW_KEY_KP_4) == GLFW_PRESS && 
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		rotateAroundX(angle);
+	}
+	else if (glfwGetKey(GLFW_KEY_KP_4) == GLFW_PRESS && 
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		rotateAroundX(-angle);
+	}
+
+	if (glfwGetKey(GLFW_KEY_KP_5) == GLFW_PRESS && 
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		rotateAroundY(angle);
+	}
+	else if (glfwGetKey(GLFW_KEY_KP_5) == GLFW_PRESS && 
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		rotateAroundY(-angle);
+	}
+
+	if (glfwGetKey(GLFW_KEY_KP_6) == GLFW_PRESS && 
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		rotateAroundZ(angle);
+	}
+	else if (glfwGetKey(GLFW_KEY_KP_6) == GLFW_PRESS && 
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		rotateAroundZ(-angle);
+	}
+
+	// translation
+	if (glfwGetKey(GLFW_KEY_KP_7) == GLFW_PRESS && 
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		translateX(translateFactor);
+	}
+	else if (glfwGetKey(GLFW_KEY_KP_7) == GLFW_PRESS && 
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		translateX(-translateFactor);
+	}
+
+	if (glfwGetKey(GLFW_KEY_KP_8) == GLFW_PRESS && 
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		translateY(translateFactor);
+	}
+	else if (glfwGetKey(GLFW_KEY_KP_8) == GLFW_PRESS && 
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		translateY(-translateFactor);
+	}
+
+	if (glfwGetKey(GLFW_KEY_KP_9) == GLFW_PRESS && 
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		translateZ(translateFactor);
+	}
+	else if (glfwGetKey(GLFW_KEY_KP_9) == GLFW_PRESS && 
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		translateZ(-translateFactor);
+	}
+
+	// EXIT
 	if (glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS)
 	{
 		glfwTerminate();
@@ -114,6 +221,16 @@ void GLFWCALL EventHandler::keyboardCallback(int key, int action)
 		{
 			GlobalSettings::grayscale = !GlobalSettings::grayscale;
 			keySwitch[2] = false;
+		}
+
+		// target geometries
+		if (glfwGetKey(GLFW_KEY_UP) == GLFW_PRESS)
+		{
+			targetNextGeometry();
+		}
+		else if (glfwGetKey(GLFW_KEY_DOWN) == GLFW_PRESS)
+		{
+			targetPreviousGeometry();		
 		}
 	}	
 }

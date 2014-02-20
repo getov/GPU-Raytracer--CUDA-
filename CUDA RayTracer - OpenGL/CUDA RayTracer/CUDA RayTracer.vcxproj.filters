@@ -174,4 +174,7 @@
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="controls.txt" />
+  </ItemGroup>
 </Project>

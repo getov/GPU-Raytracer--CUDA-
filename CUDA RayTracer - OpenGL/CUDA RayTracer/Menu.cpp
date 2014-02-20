@@ -1,5 +1,6 @@
 #include "Menu.h"
 #include "Settings.cuh"
+#include <Windows.h>
 
 Button::Button(const char* buttonName, const SDL_Color& buttonColor, const int& buttonID, int fontSize)
 	: name(buttonName)
@@ -151,6 +152,12 @@ void Menu::renderOptionButtons()
 		optionButtons[i]->boundingRect.y = menuScreen->clip_rect.h * 0.7;
 		offsetX += 0.15;
 	}
+	lastSize = optionButtons.size();
+
+	// show controls
+	optionButtons.push_back(new Button("Show Controls", color[0], 1337));
+	optionButtons[lastSize]->boundingRect.x = menuScreen->clip_rect.w * 0.025;
+	optionButtons[lastSize]->boundingRect.y = menuScreen->clip_rect.h * 0.9;
 }
 
 void Menu::handleMouseEvents()
@@ -374,6 +381,13 @@ void Menu::handleMouseEvents()
 							{
 								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);
 								inOptionsMenu = false;
+							}
+
+							if (optionButtons[i]->id == 1337 && !selectedItem[i]) // open .txt file with controls
+							{
+								//selectedItem[i] = true;
+								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);
+								ShellExecute(0, 0, "controls.txt", 0, 0, SW_SHOW);
 							}
 						}
 					}
