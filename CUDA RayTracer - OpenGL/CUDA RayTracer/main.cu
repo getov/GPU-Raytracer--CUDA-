@@ -47,12 +47,15 @@ const char* const appName = "CUDA Traycer";
 GLuint bufferObj;
 cudaGraphicsResource* resource;
 
+/**
+ * @brief - render the scene using glDrawPixels()
+ * and then swap the buffers using glfwSwapBuffers()
+*/
 static void glRenderScene()
 {
 	glDrawPixels(GlobalSettings::RES_X, GlobalSettings::RES_Y, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glfwSwapBuffers();
 }
-
 
 /**
  * @brief - Function that prints CUDA specs 
@@ -151,6 +154,11 @@ void cudaStopTimer(cudaEvent_t& start, cudaEvent_t& stop)
     cudaEventDestroy(stop);
 }
 
+/**
+ * @brief - Calculate and display on the window frame
+ * the mean frame time and the frames per second.
+ * Using glfwGetTime() to register the time (in seconds).
+*/
 void displayFrameCounter()
 {
 	++frameCount;
@@ -178,6 +186,11 @@ void displayFrameCounter()
 	lastFrameEnd = glfwGetTime();
 }
 
+/**
+ * Set CUDA device (GPU)
+ * Initialize GLFW and GLEW and open GLFW window
+ * Generate and bind the buffer data
+*/
 void OpenGL_Setup();
 
 int main(int argc, char** argv)
@@ -312,9 +325,6 @@ void OpenGL_Setup()
 	}
 
 	while(glGetError() != GL_NO_ERROR) {}
-
-	/*glEnable(GL_MULTISAMPLE);
-	glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);*/
 
 	glGenBuffers(1, &bufferObj);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, bufferObj);

@@ -53,7 +53,6 @@
     <CudaCompile Include="cuda_renderer.cu" />
     <CudaCompile Include="Settings.cu" />
     <CudaCompile Include="Sphere.cu" />
-    <CudaCompile Include="Util.cu" />
     <CudaCompile Include="WaterWaves.cu" />
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,11 @@
 #include "Node.cuh"
 #include "Light.cuh"
 
+/**
+ * @class Scene
+ * @brief - Class that holds all the objects
+ * that are used in the raytracer
+*/
 class Scene
 {
 public:

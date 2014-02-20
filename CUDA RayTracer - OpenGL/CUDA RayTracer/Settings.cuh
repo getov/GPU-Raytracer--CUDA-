@@ -9,8 +9,14 @@
 #define MAX_RAY_DEPTH 5
 #define PI 3.141592653589793238
 
+//* enum with scene IDs
 enum SceneID { CORNELL_BOX, ROAMING, SEA };
 
+/**
+ * @struct GlobalSettings
+ * @brief - Structure that stores all the 
+ * global settings for the raytracer
+*/
 struct GlobalSettings
 {
 	static bool AAEnabled;
@@ -24,15 +30,7 @@ struct GlobalSettings
 	static short sceneID; 
 };
 
-//__device__
-//const Color ambientLight(0.2, 0.2, 0.2);
-
 // the stack size in bytes for each GPU thread
 const size_t STACK_SIZE = 20 * 1024;
-
-const int GEOM_MAX_SIZE = 1024;
-
-__device__ 
-static int GEOM_COUNT = 0;
 
 #endif // SETTINGS_H

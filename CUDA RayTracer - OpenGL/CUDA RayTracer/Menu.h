@@ -43,28 +43,28 @@ public:
 	Menu(const char* name);
 
 	/**
-	* @brief - initialize the SDL_Color array
-	* with different colors for different states
-	* - gray         - default color
-	* - lighter gray - for hovered button
-	* - green        - for selected button
-	* - white		 - for menu items
+	 * @brief - initialize the SDL_Color array
+	 * with different colors for different states
+	 * - gray         - default color
+	 * - lighter gray - for hovered button
+	 * - green        - for selected button
+	 * - white		 - for menu items
 	*/
 	void setTextColor();
 
 	/**
-	* @brief - Render the menu options on the screen
+	 * @brief - Render the menu options on the screen
 	*/
 	void renderMenuLabels();
 
 	/**
-	* @brief - Render the option buttons on the screen
+	 * @brief - Render the option buttons on the screen
 	*/
 	void renderOptionButtons();
 
 	/**
-	* @brief - Handles the mouse motion and mouse
-	* click events with the SDL_PollEvent system
+ 	 * @brief - Handles the mouse motion and mouse
+	 * click events with the SDL_PollEvent system
 	*/
 	void handleMouseEvents();
 

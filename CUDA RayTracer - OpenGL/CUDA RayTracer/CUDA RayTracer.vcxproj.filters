@@ -88,7 +88,6 @@
     <CudaCompile Include="WaterWaves.cu">
       <Filter>Shaders</Filter>
     </CudaCompile>
-    <CudaCompile Include="Util.cu" />
     <CudaCompile Include="Settings.cu">
       <Filter>Scene</Filter>
     </CudaCompile>

@@ -62,7 +62,7 @@ bool testVisibility(const Vector& from, const Vector& to)
 }
 
 __device__
-Node* createNode(Geometry* geom, Shader* shader, Texture* tex = nullptr)
+Node* createNode(Geometry* geom, Shader* shader, Texture* tex)
 {
 	scene->dev_geom.push_back(geom);
 	scene->dev_shaders.push_back(shader);
@@ -262,7 +262,7 @@ inline bool tooDifferent(const Color& a, const Color& b)
 }
 
 __global__
-void toGrayscale(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
+void toGrayscale(uchar4* dev_vfb, int RES_X, int RES_Y)
 {
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
@@ -274,7 +274,7 @@ void toGrayscale(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
 }
 
 __global__
-void blurScene(uchar4* dev_vfb, bool previewAA, int RES_X, int RES_Y)
+void blurScene(uchar4* dev_vfb, int RES_X, int RES_Y)
 {
 	int x = threadIdx.x + blockIdx.x * blockDim.x;
 	int y = threadIdx.y + blockIdx.y * blockDim.y;
@@ -394,7 +394,6 @@ void renderScene(uchar4* dev_vfb, int RES_X, int RES_Y)
 __global__
 void freeMemory()
 {
-	//delete dev_cam;
 	delete controller;
 	delete scene;
 
@@ -439,12 +438,12 @@ void cudaRenderer(uchar4* dev_vfb)
 
 	if (GlobalSettings::blur)
 	{
-		blurScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA, GlobalSettings::RES_X, GlobalSettings::RES_Y);
+		blurScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 	}
 
 	if (GlobalSettings::grayscale)
 	{
-		toGrayscale<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA, GlobalSettings::RES_X, GlobalSettings::RES_Y);
+		toGrayscale<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 	}
 }
 
