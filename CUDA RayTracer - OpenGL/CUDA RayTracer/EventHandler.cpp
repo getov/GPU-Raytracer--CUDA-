@@ -2,13 +2,14 @@
 #include <SDL.h>
 #include "RaytracerControls.cuh"
 #include "Settings.cuh"
+#include <Windows.h>
 
 EventHandler::EventHandler()
 	: isRealTimeRendering(true)
 	, mouseSensitivity(0.6f)
 	, scaleFactor(1.2)
-	, angle(15.0)
-	, translateFactor(2.0)
+	, angle(30.0)
+	, translateFactor(5.0)
 {
 }
 
@@ -157,6 +158,53 @@ void EventHandler::handleKeyboard()
 		translateZ(-translateFactor);
 	}
 
+	// set transformation precision
+	if (glfwGetKey('1') == GLFW_PRESS)
+	{
+		scaleFactor		= 1.01;
+		angle			= 2.0;
+		translateFactor = 1.0; 
+	}
+	if (glfwGetKey('2') == GLFW_PRESS)
+	{
+		scaleFactor		= 1.015;
+		angle			= 4.5;
+		translateFactor = 1.25; 
+	}
+	if (glfwGetKey('3') == GLFW_PRESS)
+	{
+		scaleFactor		= 1.02;
+		angle			= 8.0;
+		translateFactor = 1.6; 
+	}
+	if (glfwGetKey('4') == GLFW_PRESS)
+	{
+		scaleFactor		= 1.10;
+		angle			= 15.0;
+		translateFactor = 2.5; 
+	}
+	if (glfwGetKey('5') == GLFW_PRESS)
+	{
+		scaleFactor		= 1.2;
+		angle			= 30.0;
+		translateFactor = 5.0; 
+	}
+
+	/*if (glfwGetKey('1') == GLFW_PRESS &&
+		glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+	{
+		scaleFactor += 0.01;
+	}
+	else if (glfwGetKey('1') == GLFW_PRESS &&
+			 glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+	{
+		scaleFactor -= 0.01;
+		if (scaleFactor < 1.0)
+		{
+			scaleFactor = 1.0;
+		}
+	}*/
+
 	// EXIT
 	if (glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS)
 	{
@@ -231,6 +279,12 @@ void GLFWCALL EventHandler::keyboardCallback(int key, int action)
 		else if (glfwGetKey(GLFW_KEY_DOWN) == GLFW_PRESS)
 		{
 			targetPreviousGeometry();		
+		}
+
+		// open controls.txt
+		if (glfwGetKey(GLFW_KEY_F12) == GLFW_PRESS)
+		{
+			ShellExecute(0, 0, "controls.txt", 0, 0, SW_SHOW);
 		}
 	}	
 }
