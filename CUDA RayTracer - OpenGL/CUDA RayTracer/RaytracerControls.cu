@@ -58,13 +58,14 @@ void setCameraOrientation(float zenith, float azimuth)
 // Target Geometries
 __global__ void target_next_geom()
 {
+	++(scene->indexGeom);
+
 	if (scene->indexGeom >= scene->dev_nodes.size())
 	{
 		scene->indexGeom = 0;
 	}
 	
 	scene->selectedNode = scene->dev_nodes[scene->indexGeom];
-	++(scene->indexGeom);
 }
 extern "C" void targetNextGeometry()
 {
