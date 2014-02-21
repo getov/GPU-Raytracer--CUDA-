@@ -24,6 +24,8 @@ Scene Objects editing
 Enable/Disable Scene Editing	|	KP_0
 Select Next Geometry		|	UP
 Select Previous Geometry	|	DOWN
+Select Next Shader		|	RIGHT
+Select Previous Shader		|	LEFT
 Scale Up           'X' axis	|	KP_1
 Scale Down         'X' axis	|	KP_1 + LALT
 Scale Up           'Y' axis	|	KP_2

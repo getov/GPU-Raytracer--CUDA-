@@ -349,6 +349,16 @@ void GLFWCALL EventHandler::keyboardCallback(int key, int action)
 			{
 				targetPreviousGeometry();		
 			}
+
+			// select shaders
+			if (glfwGetKey(GLFW_KEY_RIGHT) == GLFW_PRESS)
+			{
+				getNextShader();
+			}
+			else if (glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS)
+			{
+				getPreviousShader();		
+			}
 		}
 		else
 		{

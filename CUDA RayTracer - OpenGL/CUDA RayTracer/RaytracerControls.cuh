@@ -85,4 +85,11 @@ extern "C" void moveLightY(int dir);
 __global__ void reg_light_power(int mult);
 extern "C" void regulateLightPower(int mult);
 
+// Shader selection
+__global__ void get_next_shader();
+extern "C" void getNextShader();
+
+__global__ void get_prev_shader();
+extern "C" void getPreviousShader();
+
 #endif

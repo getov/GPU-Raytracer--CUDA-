@@ -19,7 +19,6 @@ enum SceneID { CORNELL_BOX, ROAMING, SEA };
 */
 struct GlobalSettings
 {
-	__device__ GlobalSettings(){};
 	static bool AAEnabled;
 	static bool previewAA;
 	static bool blur;

@@ -64,7 +64,7 @@ __global__ void target_next_geom()
 	{
 		scene->indexGeom = 0;
 	}
-	
+
 	scene->selectedNode = scene->dev_nodes[scene->indexGeom];
 }
 extern "C" void targetNextGeometry()
@@ -259,4 +259,43 @@ __global__ void reg_light_power(int mult)
 extern "C" void regulateLightPower(int mult)
 {
 	reg_light_power<<<1, 1>>>(mult);
+}
+
+// Shader selection
+__global__ void get_next_shader()
+{
+	if (scene->selectedNode)
+	{
+		++(scene->indexShader);
+
+		if (scene->indexShader >= scene->dev_shaders.size())
+		{
+			scene->indexShader = 0;
+		}
+
+		scene->selectedNode->shader = scene->dev_shaders[scene->indexShader];
+	}
+}
+extern "C" void getNextShader()
+{
+	get_next_shader<<<1, 1>>>();
+}
+
+__global__ void get_prev_shader()
+{
+	if (scene->selectedNode)
+	{
+		--(scene->indexShader);
+
+		if (scene->indexShader < 0)
+		{
+			scene->indexShader = scene->dev_shaders.size() - 1;
+		}
+
+		scene->selectedNode->shader = scene->dev_shaders[scene->indexShader];
+	}
+}
+extern "C" void getPreviousShader()
+{
+	get_prev_shader<<<1, 1>>>();
 }

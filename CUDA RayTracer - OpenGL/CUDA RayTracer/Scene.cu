@@ -3,6 +3,7 @@
 __device__ Scene::Scene()
 	: selectedNode(nullptr)
 	, indexGeom(-1)
+	, indexShader(-1)
 {
 	ambientLight = Color(0.2, 0.2, 0.2);
 	waves = 0.2;

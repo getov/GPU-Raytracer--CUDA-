@@ -28,6 +28,7 @@ public:
 	Camera* dev_cam;
 	Node* selectedNode;
 	int indexGeom;
+	int indexShader;
 
 	double waves;
 	double timeInSecond;
