@@ -1,6 +1,8 @@
 #include "RaytracerControls.cuh"
 #include "CameraController.cuh"
 #include "cuda_renderer.cuh"
+#include "Sphere.cuh"
+#include "Lambert.cuh"
 
 extern __device__
 CameraController* controller;
@@ -298,4 +300,16 @@ __global__ void get_prev_shader()
 extern "C" void getPreviousShader()
 {
 	get_prev_shader<<<1, 1>>>();
+}
+
+// generate geometry
+__global__ void gen_sphere()
+{
+	Node* newNode = createNode(new Sphere(Vector(0, 0, 0), 40.0),
+					      new Lambert(Color(0.9, 0.9, 0.9)));
+	newNode->transform.translate(scene->dev_cam->pos + scene->dev_cam->frontDir * 120.0);
+}
+extern "C" void generateSphere()
+{
+	gen_sphere<<<1, 1>>>();
 }

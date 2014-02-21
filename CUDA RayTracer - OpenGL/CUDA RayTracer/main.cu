@@ -254,6 +254,7 @@ int main(int argc, char** argv)
 
 			eventController.handleEvents();
 			glfwSetKeyCallback(eventController.keyboardCallback);
+			glfwSetMouseButtonCallback(eventController.mouseKeyCallback);
 
 			lastTime = thisTime;
 

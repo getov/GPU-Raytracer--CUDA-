@@ -92,4 +92,8 @@ extern "C" void getNextShader();
 __global__ void get_prev_shader();
 extern "C" void getPreviousShader();
 
+// generate geometry
+__global__ void gen_sphere();
+extern "C" void generateSphere();
+
 #endif

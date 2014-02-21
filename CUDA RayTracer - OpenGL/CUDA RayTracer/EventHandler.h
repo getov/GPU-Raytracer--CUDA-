@@ -55,6 +55,14 @@ public:
 	 * @reference    - glfwSetKeyCallback()
 	*/
 	static void GLFWCALL keyboardCallback(int key, int action);
+
+	/**
+	 * @brief - Callback function for registering mouse presses
+	 * @param key    - gets the pressed key
+	 * @param action - registers the action (GLFW_PRESS or GLFW_RELEASE)
+	 * @reference	 - glfwSetMouseButtonCallback
+	*/
+	static void GLFWCALL mouseKeyCallback(int key, int action);
 };
 
 #endif

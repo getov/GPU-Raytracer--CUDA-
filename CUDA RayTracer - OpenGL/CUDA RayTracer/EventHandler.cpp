@@ -372,3 +372,17 @@ void GLFWCALL EventHandler::keyboardCallback(int key, int action)
 		}
 	}	
 }
+
+void GLFWCALL EventHandler::mouseKeyCallback(int key, int action)
+{
+	if (action == GLFW_PRESS)
+	{
+		if (GlobalSettings::isEditingAllowed)
+		{
+			if (key == GLFW_MOUSE_BUTTON_LEFT)
+			{
+				generateSphere();
+			}
+		}
+	}
+}
