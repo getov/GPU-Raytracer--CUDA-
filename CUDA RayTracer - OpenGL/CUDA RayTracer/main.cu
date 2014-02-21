@@ -44,6 +44,7 @@ unsigned lastTitleUpdateTime;
 unsigned lastTitleUpdateFrameCount;
 const char* const appName = "CUDA Traycer";
 
+//* Data handles to the OpenGL buffer
 GLuint bufferObj;
 cudaGraphicsResource* resource;
 
@@ -193,6 +194,14 @@ void displayFrameCounter()
 */
 void OpenGL_Setup();
 
+/**
+ * @brief - Perform a clenup that:
+ * - Unregisters the CUDA recource
+ * - Unbinds the OpenGL buffer
+ * - Deletes the OpenGL buffer
+*/
+void Clean_OpenGL_and_CUDA();
+
 int main(int argc, char** argv)
 {
 	cudaDeviceSetLimit(cudaLimitStackSize, STACK_SIZE);
@@ -222,12 +231,14 @@ int main(int argc, char** argv)
 
 			updateScene(thisTime - lastTime, thisTime);
 			
+			// notify CUDA runtime that we want to share bufferObj with resource (CUDA)
 			cudaGraphicsGLRegisterBuffer( &resource, 
                                       bufferObj, 
                                       cudaGraphicsMapFlagsNone );
 
 			cudaGraphicsMapResources( 1, &resource, NULL );
 			
+			// map the addres of 'resource' to 'dev_vfb'
 			cudaGraphicsResourceGetMappedPointer( (void**)&dev_vfb, 
 												  &size, 
 												  resource);
@@ -238,6 +249,7 @@ int main(int argc, char** argv)
 
 			cudaRenderer(dev_vfb);
 
+			// unmap resource so the CUDA and OpenGL buffers can synchronisze
 			cudaGraphicsUnmapResources( 1, &resource, NULL );
 
 			eventController.handleEvents();
@@ -266,9 +278,6 @@ int main(int argc, char** argv)
 
 		cudaRenderer(dev_vfb);
 
-		// free memory	
-		freeDeviceMemory();
-
 		cudaGraphicsUnmapResources( 1, &resource, NULL );
 
 		glRenderScene();
@@ -284,6 +293,10 @@ int main(int argc, char** argv)
 		}
 		
 	}
+
+	freeDeviceMemory();
+
+	Clean_OpenGL_and_CUDA();
 
 	glfwTerminate();
 
@@ -331,4 +344,11 @@ void OpenGL_Setup()
 	glBufferData( GL_PIXEL_UNPACK_BUFFER_ARB,
 				  GlobalSettings::RES_X * GlobalSettings::RES_Y * 4,
                   NULL, GL_DYNAMIC_DRAW_ARB );
+}
+
+void Clean_OpenGL_and_CUDA()
+{
+	cudaGraphicsUnregisterResource( resource );
+	glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
+	glDeleteBuffers( 1, &bufferObj );
 }
