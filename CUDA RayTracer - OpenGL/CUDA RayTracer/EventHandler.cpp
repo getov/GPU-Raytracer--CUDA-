@@ -382,7 +382,7 @@ void GLFWCALL EventHandler::mouseKeyCallback(int key, int action)
 			if (key == GLFW_MOUSE_BUTTON_LEFT)
 			{
 				generateSphere();
-			}
+			}		
 		}
 	}
 }

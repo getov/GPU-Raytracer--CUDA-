@@ -10,7 +10,7 @@
 #define PI 3.141592653589793238
 
 //* enum with scene IDs
-enum SceneID { CORNELL_BOX, ROAMING, SEA };
+enum SceneID { CORNELL_BOX, ROAMING, SEA, ROAMING_V2 };
 
 /**
  * @struct GlobalSettings

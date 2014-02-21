@@ -255,7 +255,7 @@ __global__ void reg_light_power(int mult)
 {
 	if (!scene->dev_lights.empty())
 	{
-		scene->dev_lights[0]->regulatePower(mult * 500.0);
+		scene->dev_lights[0]->regulatePower(mult * 1000.0);
 	}
 }
 extern "C" void regulateLightPower(int mult)
@@ -306,7 +306,7 @@ extern "C" void getPreviousShader()
 __global__ void gen_sphere()
 {
 	Node* newNode = createNode(new Sphere(Vector(0, 0, 0), 40.0),
-					      new Lambert(Color(0.9, 0.9, 0.9)));
+							   new Lambert(Color(0.9, 0.9, 0.9)));
 	newNode->transform.translate(scene->dev_cam->pos + scene->dev_cam->frontDir * 120.0);
 }
 extern "C" void generateSphere()

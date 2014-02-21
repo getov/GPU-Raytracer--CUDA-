@@ -144,6 +144,7 @@ void Menu::renderOptionButtons()
 	optionButtons.push_back(new Button("Cornell Box", color[0], 12));
 	optionButtons.push_back(new Button("Roaming", color[0], 13));
 	optionButtons.push_back(new Button("Island", color[0], 14));
+	optionButtons.push_back(new Button("Roaming_v2", color[0], 15));
 
 	offsetX = 0.0;
 	for (int i = lastSize; i < optionButtons.size(); ++i)
@@ -347,6 +348,10 @@ void Menu::handleMouseEvents()
 								SDL_FreeSurface(optionButtons[i + 2]->body);
 								optionButtons[i + 1]->body = TTF_RenderText_Solid(optionButtons[i + 1]->font, optionButtons[i + 1]->name, color[0]);
 								optionButtons[i + 2]->body = TTF_RenderText_Solid(optionButtons[i + 2]->font, optionButtons[i + 2]->name, color[0]);
+
+								selectedItem[i + 3] = false;
+								SDL_FreeSurface(optionButtons[i + 3]->body);
+								optionButtons[i + 3]->body = TTF_RenderText_Solid(optionButtons[i + 3]->font, optionButtons[i + 3]->name, color[0]);
 							}
 							else if (optionButtons[i]->id == 13 && !selectedItem[i])
 							{
@@ -361,6 +366,10 @@ void Menu::handleMouseEvents()
 								SDL_FreeSurface(optionButtons[i - 1]->body);
 								optionButtons[i + 1]->body = TTF_RenderText_Solid(optionButtons[i + 1]->font, optionButtons[i + 1]->name, color[0]);
 								optionButtons[i - 1]->body = TTF_RenderText_Solid(optionButtons[i - 1]->font, optionButtons[i - 1]->name, color[0]);
+
+								selectedItem[i + 2] = false;
+								SDL_FreeSurface(optionButtons[i + 2]->body);
+								optionButtons[i + 2]->body = TTF_RenderText_Solid(optionButtons[i + 2]->font, optionButtons[i + 2]->name, color[0]);
 							}
 							else if (optionButtons[i]->id == 14 && !selectedItem[i])
 							{
@@ -375,6 +384,27 @@ void Menu::handleMouseEvents()
 								SDL_FreeSurface(optionButtons[i - 2]->body);
 								optionButtons[i - 1]->body = TTF_RenderText_Solid(optionButtons[i - 1]->font, optionButtons[i - 1]->name, color[0]);
 								optionButtons[i - 2]->body = TTF_RenderText_Solid(optionButtons[i - 2]->font, optionButtons[i - 2]->name, color[0]);
+
+								selectedItem[i + 1] = false;
+								SDL_FreeSurface(optionButtons[i + 1]->body);
+								optionButtons[i + 1]->body = TTF_RenderText_Solid(optionButtons[i + 1]->font, optionButtons[i + 1]->name, color[0]);
+							}
+							else if (optionButtons[i]->id == 15 && !selectedItem[i])
+							{
+								selectedItem[i] = true;
+								SDL_FreeSurface(optionButtons[i]->body);
+								optionButtons[i]->body = TTF_RenderText_Solid(optionButtons[i]->font, optionButtons[i]->name, color[2]);
+								GlobalSettings::sceneID = ROAMING_V2;
+
+								selectedItem[i - 1] = false;
+								selectedItem[i - 2] = false;
+								selectedItem[i - 3] = false;
+								SDL_FreeSurface(optionButtons[i - 1]->body);
+								SDL_FreeSurface(optionButtons[i - 2]->body);
+								SDL_FreeSurface(optionButtons[i - 3]->body);
+								optionButtons[i - 1]->body = TTF_RenderText_Solid(optionButtons[i - 1]->font, optionButtons[i - 1]->name, color[0]);
+								optionButtons[i - 2]->body = TTF_RenderText_Solid(optionButtons[i - 2]->font, optionButtons[i - 2]->name, color[0]);
+								optionButtons[i - 3]->body = TTF_RenderText_Solid(optionButtons[i - 3]->font, optionButtons[i - 3]->name, color[0]);
 							}
 
 							if (optionButtons[i]->id == 9)

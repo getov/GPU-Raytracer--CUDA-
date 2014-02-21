@@ -88,7 +88,6 @@ void initializeScene(short sceneID, int RES_X, int RES_Y, bool realTime)
 	scene->dev_cam->fov = 90;
 	scene->dev_cam->aspect = static_cast<float>(RES_X) / RES_Y;
 	scene->dev_cam->pos = Vector(0, 150, -100);
-	scene->dev_cam->beginFrame();
 
 	controller = new CameraController(*(scene->dev_cam), 10.f);
 
@@ -105,37 +104,48 @@ void initializeScene(short sceneID, int RES_X, int RES_Y, bool realTime)
 	{
 		case CORNELL_BOX:
 		{
-			createNode(new Plane(5, 300, 300), new Lambert(Color(0xF5E08C)));
+			Node* floor = createNode(new Plane(0, 150, 150), new Lambert(Color(0xF5E08C)));
+			floor->transform.translate(Vector(0, 0, 150));
+			floor->transform.scale(1, 1, 1);
 
 			Layered* mirror = new Layered;
 			mirror->addLayer(new Reflection(), Color(1, 1, 1), new Fresnel(10.0));
 
-			Node* BackWall = createNode(new Plane(-300, 300, 300), new Lambert(Color(0xF5E08C)));
+			Node* BackWall = createNode(new Plane(0, 150, 150), new Lambert(Color(0xF5E08C)));
 			BackWall->transform.rotate(0, 90, 0);
+			BackWall->transform.translate(Vector(0, 150, 300));
+			BackWall->transform.scale(1, 1, 1);
 	
-			Node* SideWallLeft = createNode(new Plane(-150, 300, 300), new Lambert(Color(1.0, 0.0, 0.0)));
+			Node* SideWallLeft = createNode(new Plane(0, 150, 150), new Lambert(Color(1.0, 0.0, 0.0)));
 			SideWallLeft->transform.rotate(0, 0, 90);
+			SideWallLeft->transform.translate(Vector(-150, 150, 150));
+			SideWallLeft->transform.scale(1, 1, 1);
 
-			Node* SideWallRight = createNode(new Plane(150, 300, 300), new Lambert(Color(0.0, 0.0, 1.0)));
+			Node* SideWallRight = createNode(new Plane(0, 150, 150), new Lambert(Color(0.0, 0.0, 1.0)));
 			SideWallRight->transform.rotate(0, 0, 90);
+			SideWallRight->transform.translate(Vector(150, 150, 150));
+			SideWallRight->transform.scale(1, 1, 1);
 
-			Node* Roof = createNode(new Plane(300, 300, 300), new Lambert(Color(0xF5E08C)));
+			Node* Roof = createNode(new Plane(0, 150, 150), new Lambert(Color(0xF5E08C)));
+			Roof->transform.translate(Vector(0, 300, 150));
+			Roof->transform.scale(1, 1, 1);
 
 			Layered* moreGlossy = new Layered;
 			moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
 			moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(1.8));
-			createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
+
+			Node* ball = createNode(new Sphere(Vector(0, 0, 0), 40.0), moreGlossy);
+			ball->transform.translate(Vector(0, 50, 200));
 
 			Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
 			rectMirror->transform.rotate(0, 90, 0);
 			rectMirror->transform.translate(Vector(0, 120, 298));
+			rectMirror->transform.scale(1, 1, 1);
 
 			break;
 		}
 		case ROAMING:
 		{
-			//createNode(new Plane(0, 300, 300), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
-
 			Node* blueBall = createNode(new Sphere(Vector(0, 0, 0), 40.0), new Phong(Color(0, 0, 1), 32));
 			blueBall->transform.translate(Vector(0, 50, 200));
 
@@ -149,10 +159,12 @@ void initializeScene(short sceneID, int RES_X, int RES_Y, bool realTime)
 		}
 		case SEA:
 		{
-			scene->dev_cam->pos = Vector(0, 150, 0);
+			scene->dev_cam->pos = Vector(0, 10, 200);
+			scene->dev_cam->yaw = 45.0;
 			// ocean floor
-			Node* oceanFloor = createNode(new Plane(-300, 1000, 1000), new Lambert(Color(0xEFE52C)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF - blueish
-			oceanFloor->transform.translate(Vector(0, 0, 600));
+			Node* oceanFloor = createNode(new Plane(0, 1000, 1000), new Lambert(Color(0xF5E08C)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF - blueish
+			oceanFloor->transform.translate(Vector(0, -300, 600));
+			oceanFloor->transform.scale(1, 1, 1);
 
 			Layered* water = new Layered;
 			water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
@@ -168,9 +180,36 @@ void initializeScene(short sceneID, int RES_X, int RES_Y, bool realTime)
 
 			break;
 		}
+		case ROAMING_V2:
+		{
+			scene->dev_cam->pos = Vector(40, 140, 0);
+			scene->dev_cam->yaw = 40.0;
+			scene->dev_cam->pitch = -30.0;
+			//scene->dev_cam->roll = 15.0;
+
+			Layered* glossy = new Layered;
+			glossy->addLayer(new OrenNayar(Color(0.5, 0.5, 0.5), 1.0), Color(1.0, 1.0, 1.0));
+			glossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(1.8));
+
+			Layered* mirror = new Layered;
+			mirror->addLayer(new Reflection(), Color(0.8, 0.8, 0.9), new Fresnel(10.0));
+
+			Node* floor = createNode(new Plane(0), glossy);
+
+			Node* blueBall = createNode(new Sphere(Vector(0, 0, 0), 40.0), new OrenNayar(Color(0.2, 0, 1), 1.0));
+			blueBall->transform.translate(Vector(0, 50, 200));
+
+			Node* refrBall = createNode(new Sphere(Vector(0, 0, 0), 40.0), new Refraction(Color(0.7, 0.9, 0.7), 2.3));
+			refrBall->transform.translate(Vector(-120, 50, 60));
+
+			Node* mirrorBall = createNode(new Sphere(Vector(0, 0, 0), 40.0), mirror);
+			mirrorBall->transform.translate(Vector(-220, 50, 220));
+		}
 		default:
 			break;
 	}
+
+	scene->dev_cam->beginFrame();
 }
 
 __global__
