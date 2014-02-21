@@ -198,3 +198,12 @@ extern "C" void translateZ(double translateFactor)
 {
 	translate_z<<<1, 1>>>(translateFactor);
 }
+
+__global__ void null_current_node()
+{
+	scene->selectedNode = nullptr;
+}
+extern "C" void discardSelectedNode()
+{
+	null_current_node<<<1, 1>>>();
+}

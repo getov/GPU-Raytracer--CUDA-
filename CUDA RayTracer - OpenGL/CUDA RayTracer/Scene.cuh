@@ -30,6 +30,7 @@ public:
 	int indexGeom;
 
 	double waves;
+	double timeInSecond;
 };
 
 #endif

@@ -25,6 +25,7 @@ struct GlobalSettings
 	static bool grayscale;
 	static bool realTime;
 	static bool fullscreen;
+	static bool isEditingAllowed;
 	static int RES_X;
 	static int RES_Y;
 	static short sceneID; 

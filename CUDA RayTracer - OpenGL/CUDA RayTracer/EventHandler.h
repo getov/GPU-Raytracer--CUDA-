@@ -11,7 +11,7 @@ private:
 	EventHandler& operator=(const EventHandler& ev);
 
 	// helper array for implementing 'on' and 'off' switch button system
-	static bool keySwitch[3];
+	static bool keySwitch[4];
 
 	float mouseSensitivity;
 	double scaleFactor;

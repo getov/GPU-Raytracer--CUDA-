@@ -67,7 +67,7 @@ Node* createNode(Geometry* geom, Shader* shader, Texture* tex)
 	scene->dev_geom.push_back(geom);
 	scene->dev_shaders.push_back(shader);
 	scene->dev_textures.push_back(tex);
-
+	
 	Node* node = new Node(geom, shader, tex);
 	scene->dev_nodes.push_back(node);
 
@@ -177,6 +177,8 @@ __global__
 void update(double elapsedTime, double currentTime)
 {
 	scene->waves = currentTime;
+
+	scene->timeInSecond = (currentTime - elapsedTime) - static_cast<int>(currentTime - elapsedTime);
 }
 
 extern "C"
@@ -233,7 +235,14 @@ Color raytrace(Ray ray)
 
 	if (closestNode == scene->selectedNode)
 	{
-		return closestNode->shader->shade(ray, data) * 2.2;
+		if (scene->timeInSecond < 0.5)
+		{
+			return closestNode->shader->shade(ray, data) * 3.5;
+		}
+		else
+		{
+			return closestNode->shader->shade(ray, data) * 0.5;
+		}		
 	}
 	
 	return closestNode->shader->shade(ray, data);
@@ -396,8 +405,6 @@ void freeMemory()
 {
 	delete controller;
 	delete scene;
-
-	printf("asd\n");
 }
 
 /**

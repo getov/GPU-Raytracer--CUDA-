@@ -35,6 +35,9 @@ extern "C" void targetNextGeometry();
 __global__ void target_prev_geom();
 extern "C" void targetPreviousGeometry();
 
+__global__ void null_current_node();
+extern "C" void discardSelectedNode();
+
 __global__ void scale_x(double scaleFactor);
 extern "C" void scaleX(double scaleFactor);
 

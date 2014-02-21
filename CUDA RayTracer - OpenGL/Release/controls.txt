@@ -1,11 +1,11 @@
 CUDA Traycer controls
-===================================================
+====================================================
 
 Action					Key
-===================================================
+====================================================
 
 Main Camera
----------------------------------------------------
+----------------------------------------------------
 Move Forward			|	W
 Move Backward			|	S
 Strafe Left			|	A
@@ -14,13 +14,14 @@ Increase Mouse Sensitivity	|	+
 Decrease Mouse Sensitivity	|	-
 
 Raytracer Settings
----------------------------------------------------
+----------------------------------------------------
 Toggle ON/OFF Anti-Aliasing	|	F1
 Toggle ON/OFF Scene Blur	|	F2
 Toggle ON/OFF Scene Grayscale	|	F3
 
 Scene Objects editing
-----------------------------
+----------------------------------------------------
+Enable/Disable Scene Editing	|	KP_0
 Select Next Geometry		|	UP
 Select Previous Geometry	|	DOWN
 Scale Up           'X' axis	|	KP_1
