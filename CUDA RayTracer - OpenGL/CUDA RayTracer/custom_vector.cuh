@@ -39,6 +39,8 @@ namespace pgg
 
 		__device__ void resize(int newSize, T val = T());
 		__device__ void reserve(int newAlloc);
+
+		__device__ bool empty();
 	};
 
 	template <typename T>
@@ -160,6 +162,12 @@ namespace pgg
 		_data = p;
 
 		return *this;
+	}
+
+	template <typename T>
+	__device__ bool vector<T>::empty()
+	{
+		return _size == 0 ? true : false;
 	}
 
 	template <typename T>

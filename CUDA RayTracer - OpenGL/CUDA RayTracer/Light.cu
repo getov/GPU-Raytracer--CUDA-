@@ -35,6 +35,23 @@ float PointLight::solidAngle(const Vector& x)
 	return 0;
 }
 
+__device__ 
+void PointLight::setPosition(const Vector& pos)
+{
+	this->pos = pos;
+}
+
+__device__
+Vector PointLight::getPosition()
+{
+	return this->pos;
+}
+
+__device__
+void PointLight::regulatePower(const float& power)
+{
+	m_power += power;
+}
 
 // Rectangle Light
 __device__

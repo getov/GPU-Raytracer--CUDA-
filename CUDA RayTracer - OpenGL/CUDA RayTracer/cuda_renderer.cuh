@@ -37,6 +37,7 @@ __device__ bool testVisibility(const Vector& from, const Vector& to);
  * @param geom   - The geometry to be added to the Node
  * @param shader - The shader to be added to the Node
  * @param tex    - The texture to be added to the Node
+ * @return - returns pointer to the constructed Node
 */
 __device__ Node* createNode(Geometry* geom, Shader* shader, Texture* tex = nullptr);
 
@@ -46,7 +47,7 @@ __device__ Node* createNode(Geometry* geom, Shader* shader, Texture* tex = nullp
  * @param RES_X - the horizontal window resolution
  * @param RES_Y - the vertical window resolution
 */
-__global__ void initializeScene(short sceneID, int RES_X, int RES_Y);
+__global__ void initializeScene(short sceneID, int RES_X, int RES_Y, bool realTime);
 
 /**
  * @brief - update scene elements when Real-Time rendering is enabled

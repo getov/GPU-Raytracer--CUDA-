@@ -65,4 +65,24 @@ extern "C" void translateY(double translateFactor);
 __global__ void translate_z(double translateFactor);
 extern "C" void translateZ(double translateFactor);
 
+/**
+ * Light Movement
+ * Only 3 functions for representing all 
+ * the 6 directions towards the axes
+ * (x, -x, z, -z, y, -y)
+ * @param dir - if positive, move towards the positive direction
+ *				if negative, move towards the negative direction
+*/ 
+__global__ void move_light_x(int dir);
+extern "C" void moveLightX(int dir);
+
+__global__ void move_light_z(int dir);
+extern "C" void moveLightZ(int dir);
+
+__global__ void move_light_y(int dir);
+extern "C" void moveLightY(int dir);
+
+__global__ void reg_light_power(int mult);
+extern "C" void regulateLightPower(int mult);
+
 #endif

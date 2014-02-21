@@ -75,7 +75,7 @@ Node* createNode(Geometry* geom, Shader* shader, Texture* tex)
 }
 
 __global__ 
-void initializeScene(short sceneID, int RES_X, int RES_Y)
+void initializeScene(short sceneID, int RES_X, int RES_Y, bool realTime)
 {	
 	precomputeColorCache();
 
@@ -91,16 +91,20 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 	scene->dev_cam->beginFrame();
 
 	controller = new CameraController(*(scene->dev_cam), 10.f);
-	
+
+	if (realTime)
+	{
+		scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
+	}
+	else
+	{
+		scene->dev_lights.push_back(new RectLight(Vector(0, 296, 200), Vector(0, 0, 0), Vector(50, 34, 34), Color(1, 1, 1), 20, 6, 6));
+	}
+
 	switch (sceneID)
 	{
 		case CORNELL_BOX:
 		{
-			scene->dev_lights.push_back(new RectLight(Vector(0, 296, 200), Vector(0, 0, 0), Vector(50, 34, 34), Color(1, 1, 1), 20, 6, 6));
-			//scene->dev_lights.push_back(new RectLight(Vector(-70, 296, 200), Vector(0, 0, 0), Vector(50, 34, 34), Color(0, 0.5, 0.5), 20, 6, 6));
-			//scene->dev_lights.push_back(new SpotLight(Vector(0, 296, 180), Vector(0, -1, 1), Color(1, 1, 1), 60, 15.0, 35.0));
-			//scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
-
 			createNode(new Plane(5, 300, 300), new Lambert(Color(0xF5E08C)));
 
 			Layered* mirror = new Layered;
@@ -119,10 +123,8 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 
 			Layered* moreGlossy = new Layered;
 			moreGlossy->addLayer(new Phong(Color(0.0, 0.0, 1.0), 32), Color(1.0, 1.0, 1.0)); 
-			moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(2.5));
+			moreGlossy->addLayer(new Reflection(Color(1.0, 1.0, 1.0)), Color(1, 1, 1), new Fresnel(1.8));
 			createNode(new Sphere(Vector(0, 50, 200), 40.0), moreGlossy);
-
-			//createNode(new Sphere(Vector(0, 50, 200), 40.0), new OrenNayar(Color(0.0, 0.0, 1.0), 1.0));
 
 			Node* rectMirror = createNode(new Plane(0, 60, 80), mirror);
 			rectMirror->transform.rotate(0, 90, 0);
@@ -132,10 +134,8 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 		}
 		case ROAMING:
 		{
-			scene->dev_lights.push_back(new PointLight(Vector(0, 296, 200), Color(1, 1, 1), 50000));
+			//createNode(new Plane(0, 300, 300), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 
-			//createNode(new Plane(5), new Lambert(Color(0.5, 0.5, 0.5)));
-			//createNode(new Plane(500), new OrenNayar(Color(0.5, 0.5, 0.5), 1.0));
 			Node* blueBall = createNode(new Sphere(Vector(0, 0, 0), 40.0), new Phong(Color(0, 0, 1), 32));
 			blueBall->transform.translate(Vector(0, 50, 200));
 
@@ -149,11 +149,10 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 		}
 		case SEA:
 		{
-			scene->dev_lights.push_back(new PointLight(Vector(0, 300, -150), Color(1, 1, 1), 50000));
-			//scene->dev_lights.push_back(new RectLight(Vector(0, 300, -150), Vector(0, 0, 0), Vector(50, 34, 34), Color(0.2, 0.2, 0), 200, 2, 2));
-
+			scene->dev_cam->pos = Vector(0, 150, 0);
 			// ocean floor
-			createNode(new Plane(-300, 1000, 1000), new Lambert(Color(0xEFE52C)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF - blueish
+			Node* oceanFloor = createNode(new Plane(-300, 1000, 1000), new Lambert(Color(0xEFE52C)));  // 0.1448, 0.4742, 0.6804   0x0AB6FF - blueish
+			oceanFloor->transform.translate(Vector(0, 0, 600));
 
 			Layered* water = new Layered;
 			water->addLayer(new Refraction(Color(0.9, 0.9, 0.9), 1.33), Color(1.0, 1.0, 1.0));
@@ -161,10 +160,11 @@ void initializeScene(short sceneID, int RES_X, int RES_Y)
 	
 			Node* waterGeom = createNode(new Plane(0, 100, 100), water, new WaterWaves(0.3));
 			waterGeom->transform.scale(10, 1, 10);
+			waterGeom->transform.translate(Vector(0, 0, 600));
 
 			Node* island = createNode(new Sphere(Vector(0, 0, 0), 100.0), new Lambert(Color(0, 1, 0)));
-			island->transform.scale(10, 2, 15);
-			island->transform.translate(Vector(10, -20, 1500));
+			island->transform.scale(8, 2, 7);
+			island->transform.translate(Vector(10, -20, 1000));
 
 			break;
 		}
@@ -413,7 +413,9 @@ void freeMemory()
 extern "C"
 void initScene()
 {
-	initializeScene<<<1, 1>>>(GlobalSettings::sceneID, GlobalSettings::RES_X, GlobalSettings::RES_Y);
+	initializeScene<<<1, 1>>>(GlobalSettings::sceneID,
+							  GlobalSettings::RES_X, GlobalSettings::RES_Y,
+							  GlobalSettings::realTime);
 }
 
 __global__

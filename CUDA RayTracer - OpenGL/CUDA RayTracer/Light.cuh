@@ -46,8 +46,7 @@ public:
 	{
 	}
 
-	__device__ 
-		virtual ~Light() {}
+	__device__ virtual ~Light() {}
 
 	__device__ Color getColor() const
 	{
@@ -84,11 +83,22 @@ public:
 
 	__device__
 	virtual void beginFrame() {}
+
+	__device__ 
+	virtual void setPosition(const Vector& pos) {}
+
+	__device__
+	virtual Vector getPosition() {}
+
+	__device__
+	virtual void regulatePower(const float& power) {}
 };
 
 class PointLight : public Light 
 {
+private:
 	Vector pos;
+
 public:
 	__device__
 	PointLight(const Vector& position, const Color& color, const float& power);
@@ -103,6 +113,15 @@ public:
 
 	__device__
 	float solidAngle(const Vector& x);
+
+	__device__ 
+	void setPosition(const Vector& pos);
+
+	__device__
+	Vector getPosition();
+
+	__device__
+	void regulatePower(const float& power);
 };
 
 /// A rectangle light; uses a transform to position in space and change shape. The canonic
@@ -110,6 +129,7 @@ public:
 /// light is one-sided (the +Y hemisphere doesn't get any light).
 class RectLight : public Light
 {
+private:
 	Transform transform;
 	int xSubd, ySubd;
 	float area;

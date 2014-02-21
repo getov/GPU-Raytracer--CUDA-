@@ -42,6 +42,14 @@ Translate Towards  'Y' axis	|	KP_8
 Translate Towards '-Y' axis	|	KP_8 + LALT
 Translate Towards  'Z' axis	|	KP_9
 Translate Towards '-Z' axis	|	KP_9 + LALT
+Move Light Along   'X' axis	|	J
+Move Light Along  '-X' axis	|	J + LALT
+Move Light Along   'Y' axis	|	K 
+Move Light Along  '-Y' axis	|	K + LALT
+Move Light Along   'Z' axis	|	L
+Move Light Along  '-Z' axis	|	L + LALT
+Increase Light Power		|	P
+Decrease Light Power		|	P + LALT
 
 Transformation Sensitivity
 ----------------------------------------------------

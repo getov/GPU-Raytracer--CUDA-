@@ -208,3 +208,55 @@ extern "C" void discardSelectedNode()
 {
 	null_current_node<<<1, 1>>>();
 }
+
+// Light
+__global__ void move_light_x(int dir)
+{
+	if (!scene->dev_lights.empty())
+	{
+		scene->dev_lights[0]->setPosition(
+				scene->dev_lights[0]->getPosition() + Vector(dir, 0, 0) * 1.5);
+	}	
+}
+extern "C" void moveLightX(int dir)
+{
+	move_light_x<<<1, 1>>>(dir);
+}
+
+__global__ void move_light_z(int dir)
+{
+	if (!scene->dev_lights.empty())
+	{
+		scene->dev_lights[0]->setPosition(
+				scene->dev_lights[0]->getPosition() + Vector(0, 0, dir) * 1.5);
+	}
+}
+extern "C" void moveLightZ(int dir)
+{
+	move_light_z<<<1, 1>>>(dir);
+}
+
+__global__ void move_light_y(int dir)
+{
+	if (!scene->dev_lights.empty())
+	{
+		scene->dev_lights[0]->setPosition(
+				scene->dev_lights[0]->getPosition() + Vector(0, dir, 0) * 1.5);
+	}
+}
+extern "C" void moveLightY(int dir)
+{
+	move_light_y<<<1, 1>>>(dir);
+}
+
+__global__ void reg_light_power(int mult)
+{
+	if (!scene->dev_lights.empty())
+	{
+		scene->dev_lights[0]->regulatePower(mult * 500.0);
+	}
+}
+extern "C" void regulateLightPower(int mult)
+{
+	reg_light_power<<<1, 1>>>(mult);
+}

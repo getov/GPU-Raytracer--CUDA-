@@ -206,7 +206,61 @@ void EventHandler::handleKeyboard()
 				scaleFactor = 1.0;
 			}
 		}*/
+		
+		// Ligth Movement
+		if (glfwGetKey('J') == GLFW_PRESS &&
+			glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+		{
+			// +X direction
+			moveLightX(1);
+		}
+		else if (glfwGetKey('J') == GLFW_PRESS &&
+			     glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+		{
+			// -X direction
+			moveLightX(-1);
+		}
+
+		if (glfwGetKey('K') == GLFW_PRESS &&
+			glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+		{
+			// +Y direction
+			moveLightY(1);
+		}
+		else if (glfwGetKey('K') == GLFW_PRESS &&
+			     glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+		{
+			// -Y direction
+			moveLightY(-1);
+		}
+
+		if (glfwGetKey('L') == GLFW_PRESS &&
+			glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+		{
+			// +Z direction
+			moveLightZ(1);
+		}
+		else if (glfwGetKey('L') == GLFW_PRESS &&
+			     glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+		{
+			// -Z direction
+			moveLightZ(-1);
+		}
+
+		if (glfwGetKey('P') == GLFW_PRESS &&
+			glfwGetKey(GLFW_KEY_LALT) == GLFW_RELEASE)
+		{
+			// increase light power
+			regulateLightPower(1);
+		}
+		else if (glfwGetKey('P') == GLFW_PRESS &&
+			     glfwGetKey(GLFW_KEY_LALT) == GLFW_PRESS)
+		{
+			// decrease light power
+			regulateLightPower(-1);
+		}
 	}
+
 	// EXIT
 	if (glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS)
 	{
