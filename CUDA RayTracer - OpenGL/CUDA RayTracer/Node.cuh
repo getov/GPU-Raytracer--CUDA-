@@ -29,21 +29,24 @@ public:
 	__device__
 	bool intersect(Ray ray, IntersectionData& data)
 	{
-		ray.start = transform.undoPoint(ray.start);
-		ray.dir = transform.undoDirection(ray.dir);
+		// transform from world space into model space
+		Ray modelRay;
+		modelRay.start = transform.undoPoint(ray.start);
+		modelRay.dir = transform.undoDirection(ray.dir);
+		modelRay.depth = ray.depth;
+
 		double oldDist = data.dist;
 		double rayDirLength = ray.dir.length();
 		data.dist *= rayDirLength;
-		ray.dir.normalize();
+		modelRay.dir.normalize();
 
-		bool res = geom->intersect(ray, data);
-
-		if (!res)
+		if (!geom->intersect(modelRay, data))
 		{
 			data.dist = oldDist;
 			return false;
 		}
 
+		// transform from model space into world space
 		data.normal = normalize(transform.direction(data.normal));
 		data.dNdx = normalize(transform.direction(data.dNdx));
 		data.dNdy = normalize(transform.direction(data.dNdy));

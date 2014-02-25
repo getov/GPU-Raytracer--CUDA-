@@ -32,6 +32,12 @@ public:
 
 	double waves;
 	double timeInSecond;
+
+	// fog
+	bool isFogActive;
+	double fogDensity;
+	double expDecay;
+	Color fogColor;
 };
 
 #endif

@@ -27,7 +27,7 @@ void WaterWaves::modifyNormal(IntersectionData& data)
 			dx += sin(scene->waves * randomDouble(0.0, 20.0) * data.u) * randomDouble(0.0, 15.0) * strength; 
 			dy += sin(scene->waves * randomDouble(0.0, 20.0) * data.v) * randomDouble(0.0, 15.0) * strength;
 		}
-		
+
 		data.normal += dx * data.dNdx + dy * data.dNdy;
 		data.normal.normalize();
 	}

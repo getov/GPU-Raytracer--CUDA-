@@ -4,6 +4,10 @@ __device__ Scene::Scene()
 	: selectedNode(nullptr)
 	, indexGeom(-1)
 	, indexShader(-1)
+	, isFogActive(false)
+	, fogDensity(150.0)
+	, expDecay(1.0)
+	, fogColor(0.5, 0.5, 0.5)
 {
 	ambientLight = Color(0.2, 0.2, 0.2);
 	waves = 0.2;

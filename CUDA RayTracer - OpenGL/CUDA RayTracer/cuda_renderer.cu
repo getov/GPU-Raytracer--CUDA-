@@ -217,13 +217,27 @@ void update(double elapsedTime, double currentTime)
 {
 	scene->waves = currentTime;
 
-	scene->timeInSecond = (currentTime - elapsedTime) - static_cast<int>(currentTime - elapsedTime);
+	// record in which part of the second we are at [0.0; 0.9]
+	// and multiply it by PI, so we can get a value in the interval [0.0; PI]
+	scene->timeInSecond = ((currentTime - elapsedTime) - static_cast<int>(currentTime - elapsedTime)) * PI;
 }
 
 extern "C"
 void updateScene(const double& elapsedTime, const double& currentTime)
 {
 	update<<<1, 1>>>(elapsedTime, currentTime);
+}
+
+__device__
+Color BackgroundColor(const double& decay)
+{
+	return Color(0.55f, 0.8f, 0.95f) * decay;
+}
+
+__device__
+Color Fog(const double& decay)
+{
+	return Color(0.5, 0.5, 0.5) * (1.0 - decay);
 }
 
 __device__ 
@@ -246,7 +260,7 @@ Color raytrace(Ray ray)
 			closestNode = scene->dev_nodes[i];
 		}
 	}
-
+	
 	// check if the closest intersection point is actually a light:
 	bool hitLight = false;
 	Color hitLightColor;
@@ -260,11 +274,23 @@ Color raytrace(Ray ray)
 	}
 	if (hitLight) return hitLightColor;
 
+	double expDecay;
+	if (scene->isFogActive)
+	{
+		double minDist = data.dist;
+		//scene->expDecay = pow(0.5, minDist / scene->fogDensity);
+		
+		expDecay = pow(0.5, minDist / scene->fogDensity);
+	}
+	else
+	{
+		//scene->expDecay = 1.0;
+		expDecay = 1.0;
+	}
+
 	if (!closestNode)
 	{
-		//return Color(0, 0, 0);
-		return Color(0.55f, 0.8f, 0.95f); // skyblue
-		//return Color(1, 1, 1);
+		return BackgroundColor(expDecay) + Fog(expDecay); // skyblue
 	}
 
 	if (closestNode->bumpTex != nullptr)
@@ -274,17 +300,10 @@ Color raytrace(Ray ray)
 
 	if (closestNode == scene->selectedNode)
 	{
-		if (scene->timeInSecond < 0.5)
-		{
-			return closestNode->shader->shade(ray, data) * 3.5;
-		}
-		else
-		{
-			return closestNode->shader->shade(ray, data) * 0.5;
-		}		
+		return closestNode->shader->shade(ray, data) * sin(scene->timeInSecond) * 1.5;
 	}
-	
-	return closestNode->shader->shade(ray, data);
+
+	return closestNode->shader->shade(ray, data) * expDecay + Fog(expDecay);
 }
 
 /**
@@ -472,7 +491,7 @@ void cameraBeginFrame()
 extern "C" 
 void cudaRenderer(uchar4* dev_vfb)
 {
-	dim3 THREADS_PER_BLOCK(8, 8); // 8*8 - most optimal; 32*32 = 1024 (max threads per block supported)
+	dim3 THREADS_PER_BLOCK(4, 8); // 4*8 - most optimal; 32*32 = 1024 (max threads per block supported)
 	dim3 BLOCKS(GlobalSettings::RES_X / THREADS_PER_BLOCK.x, GlobalSettings::RES_Y / THREADS_PER_BLOCK.y); 
 
 	// first pass
@@ -483,7 +502,7 @@ void cudaRenderer(uchar4* dev_vfb)
 		//second pass
 		antiAliasing<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::previewAA, GlobalSettings::RES_X, GlobalSettings::RES_Y);
 	}
-
+	
 	if (GlobalSettings::blur)
 	{
 		blurScene<<<BLOCKS, THREADS_PER_BLOCK>>>(dev_vfb, GlobalSettings::RES_X, GlobalSettings::RES_Y);

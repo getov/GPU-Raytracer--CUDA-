@@ -313,3 +313,13 @@ extern "C" void generateSphere()
 {
 	gen_sphere<<<1, 1>>>();
 }
+
+// Fog options
+__global__ void use_fog(bool fog)
+{
+	scene->isFogActive = fog;
+}
+extern "C" void useFog(bool fog)
+{
+	use_fog<<<1, 1>>>(fog);
+}

@@ -288,7 +288,8 @@ void EventHandler::handleMouse()
 	glfwSetMousePos(0, 0);
 }
 
-bool EventHandler::keySwitch[4] = { false, false, false, false };
+bool EventHandler::keySwitch[10] = { false, false, false, false, false,
+									 false, false, false, false, false };
 
 void GLFWCALL EventHandler::keyboardCallback(int key, int action)
 {	
@@ -358,6 +359,18 @@ void GLFWCALL EventHandler::keyboardCallback(int key, int action)
 			else if (glfwGetKey(GLFW_KEY_LEFT) == GLFW_PRESS)
 			{
 				getPreviousShader();		
+			}
+
+			// Fog options
+			if (key == 'F' && !keySwitch[4])
+			{
+				useFog(true);
+				keySwitch[4] = true;
+			}
+			else if (key == 'F' && keySwitch[4])
+			{
+				useFog(false);
+				keySwitch[4] = false;
 			}
 		}
 		else

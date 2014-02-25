@@ -96,4 +96,8 @@ extern "C" void getPreviousShader();
 __global__ void gen_sphere();
 extern "C" void generateSphere();
 
+// Fog options
+__global__ void use_fog(bool fog);
+extern "C" void useFog(bool fog);
+
 #endif

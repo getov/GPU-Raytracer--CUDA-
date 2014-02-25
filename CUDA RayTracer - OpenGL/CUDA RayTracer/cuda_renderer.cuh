@@ -108,6 +108,14 @@ __global__ void freeMemory();
 __global__ void camBeginFrame();
 
 /**
+*/
+__device__ Color BackgroundColor(const double& decay = 1.0);
+
+/**
+*/
+__device__ Color Fog(const double& decay = 1.0);
+
+/**
  * @brief - Wrapper functions that are used to launch the kernels
 */
 extern "C"
