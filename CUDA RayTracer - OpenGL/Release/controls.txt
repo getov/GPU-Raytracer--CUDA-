@@ -18,6 +18,9 @@ Raytracer Settings
 Toggle ON/OFF Anti-Aliasing	|	F1
 Toggle ON/OFF Scene Blur	|	F2
 Toggle ON/OFF Scene Grayscale	|	F3
+Toggle ON/OFF Fog		|	F
+Increase Fog Level		|	MOUSE WHEEL UP
+Decrease Fog Level		|	MOUSE WHEEL DOWN
 
 Scene Objects editing
 ----------------------------------------------------

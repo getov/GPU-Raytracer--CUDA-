@@ -2,12 +2,16 @@
 #define CAMERA_CONTROLLER_H
 
 #include "Camera.cuh"
+#include "Scene.cuh"
 
 class CameraController
 {
 private:
 	Camera* m_camera;
 	float movementSpeed;
+
+	double q;
+	double n;
 
 	/**
 	 * @brief - Wrapper function for returning
@@ -80,6 +84,8 @@ public:
 	*/
 	__device__
 	void offsetCameraOrientation(const float& zenith, const float& azimuth);
+
+	__device__ void quaternion();
 };
 
 #endif 

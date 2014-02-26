@@ -30,13 +30,14 @@ public:
 	int indexGeom;
 	int indexShader;
 
+	// time
 	double waves;
 	double timeInSecond;
+	double secondsElapsed;
 
 	// fog
 	bool isFogActive;
 	double fogDensity;
-	double expDecay;
 	Color fogColor;
 };
 

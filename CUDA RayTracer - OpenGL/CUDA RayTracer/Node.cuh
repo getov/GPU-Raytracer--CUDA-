@@ -36,7 +36,7 @@ public:
 		modelRay.depth = ray.depth;
 
 		double oldDist = data.dist;
-		double rayDirLength = ray.dir.length();
+		double rayDirLength = modelRay.dir.length();
 		data.dist *= rayDirLength;
 		modelRay.dir.normalize();
 

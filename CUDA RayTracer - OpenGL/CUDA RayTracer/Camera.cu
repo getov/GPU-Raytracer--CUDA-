@@ -22,6 +22,26 @@
 
 #include "Camera.cuh"
 
+__device__
+void Camera::applyOrientation()
+{
+	Matrix rotation = rotationAroundZ(toRadians(roll))  *
+			   rotationAroundX(toRadians(pitch)) *
+	           rotationAroundY(toRadians(yaw));
+
+	upLeft   *= rotation;
+	upRight  *= rotation;
+	downLeft *= rotation;
+
+	rightDir = Vector(1, 0, 0) * rotation;
+	upDir    = Vector(0, 1, 0) * rotation;
+	frontDir = Vector(0, 0, 1) * rotation;
+	
+	upLeft   += pos;
+	upRight  += pos;
+	downLeft += pos;
+}
+
 __device__ 
 void Camera::beginFrame()
 {
@@ -39,23 +59,25 @@ void Camera::beginFrame()
 	x *= scaling;
 	y *= scaling;
 
-	this->upLeft = Vector(x, -y, 1);
-	this->upRight = Vector(-x, -y, 1);
-	this->downLeft = Vector(x, y, 1);
+	this->upLeft   = Vector(x, -y, 1);
+	this->upRight  = Vector(-x, -y, 1);
+	this->downLeft = Vector(x,  y, 1);
 	
+	//applyOrientation();
 	Matrix rotation = rotationAroundZ(toRadians(roll))
 	                * rotationAroundX(toRadians(pitch))
 	                * rotationAroundY(toRadians(yaw));
-	upLeft *= rotation;
-	upRight *= rotation;
+
+	upLeft   *= rotation;
+	upRight  *= rotation;
 	downLeft *= rotation;
 
 	rightDir = Vector(1, 0, 0) * rotation;
 	upDir    = Vector(0, 1, 0) * rotation;
 	frontDir = Vector(0, 0, 1) * rotation;
 	
-	upLeft += pos;
-	upRight += pos;
+	upLeft   += pos;
+	upRight  += pos;
 	downLeft += pos;
 }
 

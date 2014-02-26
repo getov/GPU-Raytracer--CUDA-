@@ -57,6 +57,15 @@ void setCameraOrientation(float zenith, float azimuth)
 	setCamOrientation<<<1, 1>>>(zenith, azimuth);
 }
 
+__global__ void quat()
+{
+	controller->quaternion();
+}
+extern "C" void interpolateQuat()
+{
+	quat<<<1, 1>>>();
+}
+
 // Target Geometries
 __global__ void target_next_geom()
 {
@@ -322,4 +331,23 @@ __global__ void use_fog(bool fog)
 extern "C" void useFog(bool fog)
 {
 	use_fog<<<1, 1>>>(fog);
+}
+
+__global__ void fog_level(float fogMult)
+{
+	scene->fogDensity += fogMult;
+
+	if (scene->fogDensity <= 0)
+	{
+		scene->fogDensity = 1.0;
+	}
+
+	if (scene->fogDensity > 1600.0)
+	{
+		scene->fogDensity = 1600.0;
+	}
+}
+extern "C" void fogLevel(float fogMult)
+{
+	fog_level<<<1, 1>>>(fogMult);
 }

@@ -89,7 +89,7 @@ void initializeScene(short sceneID, int RES_X, int RES_Y, bool realTime)
 	scene->dev_cam->aspect = static_cast<float>(RES_X) / RES_Y;
 	scene->dev_cam->pos = Vector(0, 150, -100);
 
-	controller = new CameraController(*(scene->dev_cam), 10.f);
+	controller = new CameraController(*(scene->dev_cam), 100.f);
 
 	if (realTime)
 	{
@@ -215,6 +215,8 @@ void initializeScene(short sceneID, int RES_X, int RES_Y, bool realTime)
 __global__
 void update(double elapsedTime, double currentTime)
 {
+	scene->secondsElapsed = elapsedTime;
+
 	scene->waves = currentTime;
 
 	// record in which part of the second we are at [0.0; 0.9]
@@ -237,7 +239,7 @@ Color BackgroundColor(const double& decay)
 __device__
 Color Fog(const double& decay)
 {
-	return Color(0.5, 0.5, 0.5) * (1.0 - decay);
+	return scene->fogColor * (1.0 - decay);
 }
 
 __device__ 

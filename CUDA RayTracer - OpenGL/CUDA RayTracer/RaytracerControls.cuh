@@ -28,6 +28,9 @@ extern "C" void strafeRight();
 __global__ void setCamOrientation(float zenith, float azimuth);
 extern "C" void setCameraOrientation(float zenith, float azimuth);
 
+__global__ void quat();
+extern "C" void interpolateQuat();
+
 // Object transformations
 __global__ void target_next_geom();
 extern "C" void targetNextGeometry();
@@ -99,5 +102,8 @@ extern "C" void generateSphere();
 // Fog options
 __global__ void use_fog(bool fog);
 extern "C" void useFog(bool fog);
+
+__global__ void fog_level(float fogMult);
+extern "C" void fogLevel(float fogMult);
 
 #endif

@@ -6,7 +6,6 @@ __device__ Scene::Scene()
 	, indexShader(-1)
 	, isFogActive(false)
 	, fogDensity(150.0)
-	, expDecay(1.0)
 	, fogColor(0.5, 0.5, 0.5)
 {
 	ambientLight = Color(0.2, 0.2, 0.2);

@@ -24,6 +24,7 @@ void EventHandler::handleKeyboard()
 	if (glfwGetKey('W'))
 	{
 		moveForward();
+		//interpolateQuat();
 	}
 
 	if (glfwGetKey('S'))
@@ -286,6 +287,13 @@ void EventHandler::handleMouse()
 
 	glfwDisable(GLFW_MOUSE_CURSOR);
 	glfwSetMousePos(0, 0);
+
+	if (GlobalSettings::isEditingAllowed && keySwitch[4])
+	{
+		fogLevel((float)glfwGetMouseWheel() * (-25.f));
+	}
+
+	glfwSetMouseWheel(0);
 }
 
 bool EventHandler::keySwitch[10] = { false, false, false, false, false,
@@ -371,7 +379,7 @@ void GLFWCALL EventHandler::keyboardCallback(int key, int action)
 			{
 				useFog(false);
 				keySwitch[4] = false;
-			}
+			}	
 		}
 		else
 		{

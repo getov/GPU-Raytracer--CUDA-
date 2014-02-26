@@ -29,7 +29,12 @@
 
 class Camera 
 {
+private:
 	Vector upLeft, upRight, downLeft;
+	//Matrix rotation;
+
+	__device__
+	void applyOrientation();
 	
 public:
 	Vector frontDir, rightDir, upDir;
