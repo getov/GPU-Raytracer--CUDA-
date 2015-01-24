@@ -1,25 +1,3 @@
-/***************************************************************************
- *   Copyright (C) 2009-2013 by Veselin Georgiev, Slavomir Kaslev et al    *
- *   admin@raytracing-bg.net                                               *
- *																		   *
- *	 Contributor: Peter Getov											   *
- *																		   *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
-
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -30,13 +8,35 @@
 class Camera 
 {
 private:
-	Vector upLeft, upRight, downLeft;
-	//Matrix rotation;
+	Camera(const Camera&);
 
-	__device__
-	void applyOrientation();
+	// position vectors for the virtual 'screen'
+	Vector upLeft, upRight, downLeft;
+
+	// matrix that applies rotation to the Camera
+	Matrix rotation;
+
+	/**
+	 * @brief - Function that sets the orientation 
+	 * and applies rotation to the Camera
+	*/
+	__device__ void applyOrientation();
+
+	/**
+	 * @brief - Function that initializes the virtual 'screen'
+	 * on which the image is going to be drawn. We shoot rays
+	 * through each pixel of that screen.
+	*/
+	__device__ void setupScreen();
 	
 public:
+	__device__ Camera();
+
+	__device__
+	Camera(double yaw, double pitch, double roll,
+		   double fov, double aspectRatio);
+
+	// direction vectors for the Camera
 	Vector frontDir, rightDir, upDir;
 
 	Vector pos; // position
@@ -44,9 +44,24 @@ public:
 	double fov; // in degrees
 	double aspect; 
 	
-	__device__ 
-	void beginFrame();
+	/**
+	 * @brief - Function that sets up the virtual 'screen'
+	 * and applies orientation to the camera. 
+	 * (calls Camera::setupScreen() and Camera::applyOrientation()
+	 * @reference - __device__ void setupScreen()
+	 * @reference - __device__ void applyOrientation()
+	*/
+	__device__ void beginFrame();
 	
+	/**
+	 * @brief - Function that shoots a ray through a pixel on the screen
+	 * @param x - the 'x' coordinate of the pixel (horizontal position)
+	 * @param y - the 'y' coordinate of the pixel (vertical position)
+	 * @param RES_X - the width of the screen
+	 * @param RES_Y - the height of the screen
+	 * @return Ray - returns the ray shot through the pixel with
+	 * cooridates [x , y]
+	*/
 	__device__ 
 	Ray getScreenRay(const double& x, const double& y, int RES_X, int RES_Y);
 };

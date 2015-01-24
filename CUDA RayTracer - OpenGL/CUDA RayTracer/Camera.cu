@@ -23,9 +23,28 @@
 #include "Camera.cuh"
 
 __device__
+Camera::Camera()
+	: yaw(0.0)
+	, pitch(0.0)
+	, roll(0.0)
+{
+}
+
+__device__
+Camera::Camera(double yaw, double pitch, double roll,
+			   double fov, double aspectRatio)
+	: yaw(yaw)
+	, pitch(pitch)
+	, roll(roll)
+	, fov(fov)
+	, aspect(aspectRatio)
+{
+}
+
+__device__
 void Camera::applyOrientation()
 {
-	Matrix rotation = rotationAroundZ(toRadians(roll))  *
+	rotation = rotationAroundZ(toRadians(roll))  *
 			   rotationAroundX(toRadians(pitch)) *
 	           rotationAroundY(toRadians(yaw));
 
@@ -42,43 +61,34 @@ void Camera::applyOrientation()
 	downLeft += pos;
 }
 
-__device__ 
-void Camera::beginFrame()
+__device__
+void Camera::setupScreen()
 {
-	double x = -aspect;
-	double y = +1;
+	double x = aspect;
+	double y = 1.0;
 	
 	Vector corner = Vector(x, y, 1);
 	Vector center = Vector(0, 0, 1);
 	
-	double lenXY = (corner - center).length();
-	double wantedLength = tan(toRadians(fov / 2));
+	double screenHalfDiagonal = (corner - center).length();
+	double tangent = tan(toRadians(fov / 2.0)); 
 	
-	double scaling = wantedLength / lenXY;
+	double scaling = tangent / screenHalfDiagonal;
 	
 	x *= scaling;
 	y *= scaling;
 
-	this->upLeft   = Vector(x, -y, 1);
-	this->upRight  = Vector(-x, -y, 1);
-	this->downLeft = Vector(x,  y, 1);
-	
-	//applyOrientation();
-	Matrix rotation = rotationAroundZ(toRadians(roll))
-	                * rotationAroundX(toRadians(pitch))
-	                * rotationAroundY(toRadians(yaw));
+	this->upLeft   = Vector(-x, -y, 1);
+	this->upRight  = Vector( x, -y, 1);
+	this->downLeft = Vector(-x,  y, 1);
+}
 
-	upLeft   *= rotation;
-	upRight  *= rotation;
-	downLeft *= rotation;
-
-	rightDir = Vector(1, 0, 0) * rotation;
-	upDir    = Vector(0, 1, 0) * rotation;
-	frontDir = Vector(0, 0, 1) * rotation;
+__device__ 
+void Camera::beginFrame()
+{
+	setupScreen();
 	
-	upLeft   += pos;
-	upRight  += pos;
-	downLeft += pos;
+	applyOrientation();
 }
 
 __device__ 

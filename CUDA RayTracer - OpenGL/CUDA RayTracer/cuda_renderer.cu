@@ -81,12 +81,7 @@ void initializeScene(short sceneID, int RES_X, int RES_Y, bool realTime)
 
 	scene = new Scene;
 
-	scene->dev_cam = new Camera;
-	scene->dev_cam->yaw = 0;
-	scene->dev_cam->pitch = 0;
-	scene->dev_cam->roll = 0;
-	scene->dev_cam->fov = 90;
-	scene->dev_cam->aspect = static_cast<float>(RES_X) / RES_Y;
+	scene->dev_cam = new Camera(0.0, 0.0, 0.0, 90.0, static_cast<float>(RES_X) / RES_Y);
 	scene->dev_cam->pos = Vector(0, 150, -100);
 
 	controller = new CameraController(*(scene->dev_cam), 100.f);
